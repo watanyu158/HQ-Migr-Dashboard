@@ -133,6 +133,29 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
 .hm-nums{display:flex;justify-content:space-between;font-size:10px;color:var(--text2)}
 .hm-pct{font-size:14px;font-weight:700;color:var(--text)}
 
+/* ── Plan tab ── */
+.pcard{background:var(--bg);border-radius:8px;padding:10px 12px;margin-bottom:0}
+.pc-l{font-size:11px;color:var(--text2);margin-bottom:3px}
+.pc-v{font-size:15px;font-weight:700;color:var(--text)}
+.pc-v.red{color:var(--danger)}
+.pc-v.grn{color:var(--success)}
+.fpc{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px;box-shadow:var(--sh)}
+.fpc-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.fpc-name{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600}
+.fpc-pct{font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px}
+.fpc-big{font-size:24px;font-weight:800;line-height:1;margin-bottom:2px}
+.fpc-sub{font-size:11px;color:var(--text2);margin-bottom:8px}
+.fpc-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:10px}
+.fpc-fill{height:100%;border-radius:3px;transition:.6s}
+.fpc-cats{display:flex;flex-direction:column;gap:6px}
+.fcc{display:flex;align-items:center;gap:6px;font-size:11px}
+.cl2{color:var(--text2);min-width:50px}
+.cv2{font-weight:600;min-width:60px}
+.cb{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.cbf{height:100%;border-radius:2px}
+.fpc-dates{display:flex;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid var(--border)}
+.fdate{flex:1}.dl{font-size:10px;color:var(--text2)}.dv{font-size:12px;font-weight:600}
+
 /* ── Weekly chart with legend ── */
 .wk-chart-wrap{position:relative}
 .wk-chart-legend{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:11px;color:var(--text2)}
@@ -247,6 +270,7 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
   <div class="tab"     onclick="showTab('weekly',this)">📈 รายสัปดาห์</div>
   <div class="tab"     onclick="showTab('daily',this)">📆 รายวัน</div>
   <div class="tab"     onclick="showTab('location',this)">📍 สถานที่</div>
+  <div class="tab"     onclick="showTab('plan',this)">📅 แผนงาน</div>
 </div>
 
 <!-- ══ Tab: Overview ══ -->
@@ -394,6 +418,68 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
 </div>
 
 </main>
+
+<!-- ══ Tab: Plan ══ -->
+<div class="tab-body" id="tab-plan">
+
+  <div style="background:linear-gradient(90deg,var(--primary-l),var(--hold-l));border-radius:var(--rsm);padding:9px 13px;display:flex;align-items:center;gap:7px;margin-bottom:13px;font-size:13px;font-weight:600;color:var(--primary)">📅 การวางแผนโครงการ</div>
+
+  <div class="g3" style="margin-bottom:14px">
+    <!-- ระยะเวลา -->
+    <div class="card">
+      <div class="ch" style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:9px">📅 ระยะเวลาโครงการ</div>
+      <div class="g2" style="gap:7px">
+        <div class="pcard"><div class="pc-l">วันเริ่มต้น</div><div class="pc-v">2 ก.พ. 69</div></div>
+        <div class="pcard"><div class="pc-l">วันสิ้นสุด</div><div class="pc-v">3 เม.ย. 69</div></div>
+        <div class="pcard"><div class="pc-l">จำนวนวันทั้งหมด</div><div class="pc-v">60 วัน</div></div>
+        <div class="pcard"><div class="pc-l">วันที่เหลือ</div><div class="pc-v red">10 วัน</div></div>
+      </div>
+    </div>
+    <!-- เป้าหมาย -->
+    <div class="card">
+      <div class="ch" style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:9px">📈 เป้าหมายตามแผน</div>
+      <div class="pcard" style="margin-bottom:7px"><div class="pc-l">เป้าหมายอุปกรณ์/วัน</div><div class="pc-v">3.2/วัน</div></div>
+      <div class="pcard" style="margin-bottom:7px"><div class="pc-l">เป้าหมายปัจจุบัน</div><div class="pc-v red">5.2/วัน</div></div>
+      <div class="pcard"><div class="pc-l">อุปกรณ์ที่เหลือ</div><div class="pc-v">52 เครื่อง</div></div>
+    </div>
+    <!-- ประเมิน -->
+    <div class="card">
+      <div class="ch" style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:9px">✅ การประเมินโครงการ</div>
+      <div class="pcard" style="margin-bottom:7px"><div class="pc-l">ความคืบหน้าตามแผน (W.8)</div><div class="pc-v">91.71%</div></div>
+      <div class="pcard" style="margin-bottom:7px">
+        <div class="pc-l">ความคืบหน้าปัจจุบัน</div>
+        <div class="pc-v grn">73.06%</div>
+        <div style="height:5px;background:#f0f4ff;border-radius:99px;margin-top:5px;overflow:hidden">
+          <div style="height:100%;width:73.06%;background:var(--success);border-radius:99px"></div>
+        </div>
+      </div>
+      <div class="pcard"><div class="pc-l">สถานะ</div><div class="pc-v red">↘ ช้ากว่าแผน 18.6%</div></div>
+    </div>
+  </div>
+
+  <!-- ข้อมูลการติดตั้งจริง -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">⚡</div>ข้อมูลการติดตั้งจริง</div>
+    <div class="g3" style="margin-bottom:11px">
+      <div class="pcard"><div class="pc-l">Migration ที่ทำแล้ว</div><div class="pc-v" style="font-size:20px">141/193 เครื่อง</div></div>
+      <div class="pcard"><div class="pc-l">เฉลี่ยที่ทำได้/วัน</div><div class="pc-v" style="font-size:20px">2.82/วัน</div></div>
+      <div class="pcard"><div class="pc-l">คาดว่าจะเสร็จ</div><div class="pc-v red" style="font-size:20px">12 เม.ย. 69 <span style="font-size:12px">(ช้า 9 วัน)</span></div></div>
+    </div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:5px">ประสิทธิภาพเทียบกับเป้าหมายปัจจุบัน:</div>
+    <div style="display:flex;align-items:center;gap:9px">
+      <span style="font-size:12px;color:var(--text2);white-space:nowrap">ทำได้ 2.82/วัน จากเป้า 5.2/วัน</span>
+      <div style="flex:1;height:11px;background:#f0f4ff;border-radius:99px;overflow:hidden">
+        <div style="height:100%;width:54.2%;background:linear-gradient(90deg,var(--danger),#ff8a8a);border-radius:99px"></div>
+      </div>
+      <span style="font-size:12px;font-weight:700;color:var(--danger)">54.2%</span>
+    </div>
+    <div style="text-align:right;font-size:11px;color:var(--danger);margin-top:3px">⚠ ต่ำกว่าเป้าหมาย — ต้องเพิ่มอัตรา +84%</div>
+  </div>
+
+  <!-- รายละเอียดแยก Location -->
+  <div id="plan-loc-list"></div>
+
+</div>
 
 <script>
 const API = window.location.hostname==='localhost'?'http://localhost:3001':'https://hq-migr-api.onrender.com';
@@ -699,6 +785,48 @@ function buildLocTable(){
   }).join('');
 }
 
+
+// ── Build Plan Location cards ─────────────────────────────────────────────
+function buildPlanTab(){
+  const w=document.getElementById('plan-loc-list');
+  if(!w||w.innerHTML) return;
+
+  // Location data พร้อม schedule
+  const locs=[
+    {n:'อาคารสำนักงานใหญ่',        tor:94,  mig:95,  s:'3 ก.พ. 69', e:'14 มี.ค. 69', c:'#4361ee'},
+    {n:'อาคารสายงานวิศวกรรมฯ',     tor:58,  mig:41,  s:'3 ก.พ. 69', e:'20 มี.ค. 69', c:'#2bc48a'},
+    {n:'อาคารสันทนาการ สนญ.',       tor:6,   mig:4,   s:'21 มี.ค. 69',e:'25 มี.ค. 69',c:'#ff9f43'},
+    {n:'อาคารสโมสรท่าอากาศยาน',     tor:8,   mig:1,   s:'26 มี.ค. 69',e:'31 มี.ค. 69',c:'#9b59b6'},
+    {n:'อาคารจอดรถ',               tor:11,  mig:0,   s:'1 เม.ย. 69', e:'2 เม.ย. 69',  c:'#e74c3c'},
+    {n:'อาคาร/สถานที่อื่นๆ',       tor:16,  mig:0,   s:'2 เม.ย. 69', e:'3 เม.ย. 69',  c:'#95a5a6'},
+  ];
+
+  const pairs=[];
+  for(let i=0;i<locs.length;i+=2) pairs.push(locs.slice(i,i+2));
+
+  w.innerHTML=`<div style="display:flex;align-items:center;gap:7px;margin-bottom:12px;font-size:13px;font-weight:600;color:var(--text)">
+    <div class="chi" style="background:var(--primary-l);color:var(--primary)">📍</div>
+    ความก้าวหน้าแยกตามสถานที่
+  </div>`+
+  pairs.map(pair=>`<div class="g2" style="margin-bottom:9px">${pair.map(f=>{
+    const p=f.tor>0?Math.min(100,Math.round(f.mig/f.tor*100)):0;
+    const pbg=p>=80?'var(--success-l);color:#065f46':p>=30?'var(--warning-l);color:#92400e':'var(--primary-l);color:var(--primary)';
+    return `<div class="fpc">
+      <div class="fpc-h">
+        <div class="fpc-name"><div style="width:9px;height:9px;border-radius:50%;background:${f.c}"></div>${f.n}</div>
+        <div class="fpc-pct" style="background:${pbg}">${p}%</div>
+      </div>
+      <div class="fpc-big">${f.mig}/${f.tor}</div>
+      <div class="fpc-sub">Migration / TOR</div>
+      <div class="fpc-bar"><div class="fpc-fill" style="width:${p}%;background:${f.c}"></div></div>
+      <div class="fpc-dates">
+        <div class="fdate"><div class="dl">เริ่ม</div><div class="dv">${f.s}</div></div>
+        <div class="fdate"><div class="dl">สิ้นสุด</div><div class="dv">${f.e}</div></div>
+      </div>
+    </div>`;
+  }).join('')}</div>`).join('');
+}
+
 // ── Show tab ──────────────────────────────────────────────────────────────────
 let _wkBuilt=false, _dayBuilt=false;
 function showTab(name,el){
@@ -708,6 +836,7 @@ function showTab(name,el){
   if(el) el.classList.add('on');
   if(name==='weekly' && !_wkBuilt){ _wkBuilt=true; buildWeeklyBar(); buildCumCfg(); buildCumMig(); buildTypeBar(); }
   if(name==='daily'  && !_dayBuilt){ _dayBuilt=true; buildDailyBar(); buildDailyCum(); }
+  if(name==='plan') buildPlanTab();
 }
 
 // ── Refresh ───────────────────────────────────────────────────────────────────
