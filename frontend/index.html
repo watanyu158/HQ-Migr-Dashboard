@@ -140,9 +140,9 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
 .wk-leg-dot{width:10px;height:10px;border-radius:2px}
 .wk-leg-line{width:18px;height:2px;border-top:2px dashed}
 .wk-stat-row{display:flex;align-items:center;gap:6px;background:var(--primary-l);border-radius:8px;padding:5px 10px;font-size:11px;margin-bottom:8px}
-.wk-stat-done{font-size:15px;font-weight:700;color:var(--primary)}
-.wk-stat-total{color:var(--text2)}
-.wk-stat-pct{font-size:12px;font-weight:600;padding:1px 7px;border-radius:99px}
+.wk-stat-done{font-size:13px;font-weight:700;color:var(--primary)}
+.wk-stat-total{color:var(--text2);font-size:12px}
+.wk-stat-pct{font-size:11px;font-weight:600;padding:1px 7px;border-radius:99px}
 
 @media(max-width:640px){
   .g2,.g3,.g4,.step-row,.ins-pills{grid-template-columns:1fr}
@@ -354,8 +354,8 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
 
   <!-- Device Type chart -->
   <div class="card" style="margin-top:14px">
-    <div class="ch"><div class="chi" style="background:var(--primary-l);color:var(--primary)">📊</div>Device Type — Plan vs Installed</div>
-    <div style="height:400px"><canvas id="type-bar-c"></canvas></div>
+    <div class="ch"><div class="chi" style="background:var(--primary-l);color:var(--primary)">📊</div>แยกตามประเภทอุปกรณ์ — แผน vs ติดตั้งแล้ว</div>
+    <div style="height:480px"><canvas id="type-bar-c"></canvas></div>
   </div>
 </div>
 
@@ -411,7 +411,7 @@ const _todayLabel= _todayGMT7.getDate()+'/'+(String(_todayGMT7.getMonth()+1).pad
 
 // ── Hardcoded data from Excel ─────────────────────────────────────────────────
 const WK_LABELS  = ['W.1\n(2/2)','W.2\n(9/2)','W.3\n(16/2)','W.4\n(23/2)','W.5\n(2/3)','W.6\n(9/3)','W.7\n(16/3)','W.8\n(23/3)','W.9\n(30/3)'];
-const WK_SHORT   = ['W.1','W.2','W.3','W.4','W.5','W.6','W.7','W.8','W.9'];
+const WK_SHORT   = ['2/2-8/2','9/2-15/2','16/2-22/2','23/2-1/3','2/3-8/3','9/3-15/3','16/3-22/3','23/3-29/3','30/3-5/4'];
 const TOTAL_PLAN = 193;
 const WK_PLAN    = [35,10,9,52,14,18,11,28,16];
 const WK_CFG  = [27, 10, 9, 52, 14, 18, 11, 5, null];
@@ -535,19 +535,19 @@ function buildCumWeekly(){
 
 // ── Build Weekly Bar ──────────────────────────────────────────────────────────
 const HQ_TYPE_DATA = [
-  {n:'Access Switch Type 4',    plan:85, done:69},
-  {n:'Access Switch Type 2',    plan:85, done:54},
-  {n:'Access Control Type 1',   plan:4,  done:4},
-  {n:'SDN Controller',          plan:3,  done:3},
-  {n:'Extranet Switch Type 1',  plan:2,  done:2},
-  {n:'Wireless Controller',     plan:2,  done:2},
-  {n:'Core Switch Type 2',      plan:2,  done:2},
-  {n:'Fusion Switch Type 1',    plan:2,  done:2},
-  {n:'Distribute Switch Type 3',plan:2,  done:2},
-  {n:'Web Application Firewall',plan:1,  done:1},
-  {n:'Centralized Management',  plan:1,  done:0},
-  {n:'NGFW Type 1',             plan:2,  done:0},
-  {n:'NGFW Type 2',             plan:2,  done:0},
+  {n:'Access Switch Type 4',     plan:85, done:69},
+  {n:'Access Switch Type 2',     plan:85, done:54},
+  {n:'Access Control Type 1',    plan:4,  done:4},
+  {n:'SDN Controller',           plan:3,  done:3},
+  {n:'Extranet Switch Type 1',   plan:2,  done:2},
+  {n:'Wireless Controller',      plan:2,  done:2},
+  {n:'Core Switch Type 2',       plan:2,  done:2},
+  {n:'Fusion Switch Type 1',     plan:2,  done:2},
+  {n:'Distribute Switch Type 3', plan:2,  done:2},
+  {n:'Web Application Firewall', plan:1,  done:1},
+  {n:'Centralized Management',   plan:1,  done:0},
+  {n:'NGFW Type 1',              plan:2,  done:0},
+  {n:'NGFW Type 2',              plan:2,  done:0},
 ];
 function buildWeeklyBar(){
   const cv=document.getElementById('wk-bar-c');
@@ -565,7 +565,7 @@ function buildWeeklyBar(){
           const val=ds.data[i];
           if(val==null||val===0) return;
           ctx.save();
-          ctx.font=`bold 11px Segoe UI`;
+          ctx.font=`bold 9px Segoe UI`;
           ctx.fillStyle=di===0?'#94a3c4':'#e67e00';
           ctx.textAlign='center';
           ctx.textBaseline='bottom';
@@ -585,7 +585,7 @@ function buildWeeklyBar(){
     options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
       layout:{padding:{top:20}},
       plugins:{legend:{position:'bottom',labels:{font:{size:11}}}},
-      scales:{x:{grid:{display:false},ticks:{font:{size:11}}},y:{grid:{color:'#f0f4ff'},ticks:{font:{size:10}}}}}
+      scales:{x:{grid:{display:false},ticks:{font:{size:9},maxRotation:35,minRotation:35}},y:{grid:{color:'#f0f4ff'},ticks:{font:{size:10}}}}}
   });
 }
 
@@ -805,8 +805,8 @@ function buildTypeBar(){
     data:{
       labels:sorted.map(d=>d.n),
       datasets:[
-        {label:'Plan (TOR)',     data:sorted.map(d=>d.plan),backgroundColor:'rgba(148,163,196,.35)',borderColor:'#94a3c4',borderWidth:1,borderRadius:3},
-        {label:'Installed',      data:sorted.map(d=>d.done),backgroundColor:'rgba(67,97,238,.75)',borderColor:'#4361ee',borderWidth:1,borderRadius:3},
+        {label:'แผน (TOR)',     data:sorted.map(d=>d.plan),backgroundColor:'rgba(148,163,196,.35)',borderColor:'#94a3c4',borderWidth:1,borderRadius:3},
+        {label:'ติดตั้งแล้ว',      data:sorted.map(d=>d.done),backgroundColor:'rgba(67,97,238,.75)',borderColor:'#4361ee',borderWidth:1,borderRadius:3},
       ]
     },
     options:{
@@ -817,13 +817,13 @@ function buildTypeBar(){
         legend:{position:'bottom',labels:{font:{size:11}}},
         tooltip:{callbacks:{label:c=>{
           const d=sorted[c.dataIndex];
-          if(c.datasetIndex===0) return ` Plan: ${d.plan}`;
-          return ` Installed: ${d.done} (${d.plan>0?Math.round(d.done/d.plan*100):0}%)`;
+          if(c.datasetIndex===0) return ` แผน: ${d.plan} เครื่อง`;
+          return ` ติดตั้งแล้ว: ${d.done} เครื่อง (${d.plan>0?Math.round(d.done/d.plan*100):0}%)`;
         }}}
       },
       scales:{
         x:{grid:{color:'#f0f4ff'},ticks:{font:{size:9},maxTicksLimit:8}},
-        y:{grid:{display:false},ticks:{font:{size:10}}}
+        y:{grid:{display:false},ticks:{font:{size:8}}}
       }
     }
   });
