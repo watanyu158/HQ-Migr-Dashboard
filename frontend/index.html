@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>SDA Migration Progress Dashboard - HQ</title>
+<title>HQ Migration Progress Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root{
@@ -945,7 +945,7 @@ async function exportPDF(){
     mn.querySelectorAll('canvas').forEach(cv=>{const d=imgs[cv.id];if(d){const i=document.createElement('img');i.src=d.url;i.style.cssText=`display:block;width:${d.w}px;height:${d.h}px;max-width:100%`;cv.parentNode.replaceChild(i,cv);}else cv.style.display='none';});
     ['tab-weekly','tab-daily','tab-location','tab-plan'].forEach((id,i)=>{const el=mn.querySelector(`#${id}`);if(el)el.style.pageBreakBefore='always';});
     const date=new Date().toLocaleDateString('th-TH');
-    const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>SDA Migration Progress Dashboard - HQ</title>
+    const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>HQ Migration Progress Dashboard</title>
 <style>@page{size:A4 landscape;margin:8mm 10mm}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;box-sizing:border-box}body{font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;background:#fff;margin:0}
 ${styles}
 .topbar,.tabs,[onclick]{display:none!important}.tab-body{display:block!important}.card{break-inside:avoid}canvas{display:none!important}
@@ -956,7 +956,7 @@ ${styles}
 .g2{display:grid!important;grid-template-columns:1fr 1fr!important;gap:12px!important}.g3{display:grid!important;grid-template-columns:1fr 1fr 1fr!important;gap:12px!important}.step-row{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:10px!important}.hm-grid{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:8px!important}
 .ph{background:linear-gradient(135deg,#3a56e4,#6c4de4);color:#fff;padding:8px 16px;margin-bottom:10px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700}
 </style></head><body>
-<div class="ph"><span>✈ SDA Migration Progress Dashboard - <span style="background:linear-gradient(90deg,#ffd700,#ffaa00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800">HQ</span></span><span style="font-size:11px;font-weight:400">${date}</span></div>
+<div class="ph"><span>✈ SDA Migration Progress Dashboard - <span style="background:linear-gradient(90deg,#ffd700,#ffaa00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800">HQ</span><span style="font-size:11px;font-weight:400">${date}</span></div>
 ${ins.outerHTML}${mn.outerHTML}
 <script>window.onload=function(){setTimeout(function(){window.print();},600);};<\/script>
 </body></html>`;
