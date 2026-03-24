@@ -166,7 +166,7 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
   <div class="tb-stats">
     <div class="tb-stat"><div class="v" id="tb-done">141/193</div><div class="l">Migration</div></div>
     <div class="tb-div"></div>
-    <div class="tb-stat"><div class="v" id="tb-pct" style="color:#ffd700">70.98%</div><div class="l">% สะสม</div></div>
+    <div class="tb-stat"><div class="v" id="tb-pct" style="color:#ffd700">73.06%</div><div class="l">% สะสม</div></div>
     <div class="tb-div"></div>
     <div class="tb-stat"><div class="v" id="tb-wk">W.7</div><div class="l">สัปดาห์ปัจจุบัน</div></div>
   </div>
@@ -183,7 +183,7 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
       <div class="ins-alert-head">
         <div class="ins-icon">🚀</div>
         <div>
-          <div class="ins-big">Migration สะสม <em id="ins-act-pct">70.98%</em> — ช้ากว่าแผน <span class="ins-pct-tag" id="ins-gap-tag">-20.7%</span></div>
+          <div class="ins-big">Migration สะสม <em id="ins-act-pct">73.06%</em> — ช้ากว่าแผน <span class="ins-pct-tag" id="ins-gap-tag">-18.6%</span></div>
           <div style="font-size:12px;color:var(--text2);margin-top:3px">W.8 (23/3-29/3) | เป้าหมาย 193 เครื่อง | เสร็จแล้ว 141 เครื่อง</div>
         </div>
       </div>
@@ -210,7 +210,7 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
         <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:2px;text-transform:uppercase;letter-spacing:.4px">ประเมินความตรงต่อเวลา</div>
         <div class="ins-kpi-row">
           <span class="ins-kpi-lbl">สะสมจริง</span>
-          <span class="ins-kpi-val" id="kpi-act" style="color:var(--warning)">70.98</span>
+          <span class="ins-kpi-val" id="kpi-act" style="color:var(--warning)">73.06</span>
           <span class="ins-kpi-unit">%</span>
         </div>
         <div class="ins-kpi-row">
@@ -220,7 +220,7 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
         </div>
         <div class="ins-kpi-row" style="border-top:1px solid var(--border);padding-top:5px;margin-top:3px">
           <span class="ins-kpi-lbl">ส่วนต่าง</span>
-          <span class="ins-kpi-val" id="kpi-diff" style="color:var(--danger)">-20.7</span>
+          <span class="ins-kpi-val" id="kpi-diff" style="color:var(--danger)">-18.6</span>
           <span class="ins-kpi-unit" style="color:var(--danger)">%</span>
         </div>
         <div class="ins-kpi-row">
@@ -267,20 +267,20 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
   <!-- 3-step progress -->
   <div class="step-row">
     <div class="step s-cfg">
-      <div class="step-top"><span class="step-icon">⚙️</span><span class="step-pct" style="background:var(--primary-l)">75.6%</span></div>
-      <div><span class="step-num">146</span><span class="step-denom">/193</span></div>
+      <div class="step-top"><span class="step-icon">⚙️</span><span class="step-pct" style="background:var(--primary-l)">73.6%</span></div>
+      <div><span class="step-num">142</span><span class="step-denom">/193</span></div>
       <div class="step-lbl">Configuration</div>
-      <div class="step-bar"><div class="step-fill" style="width:75.6%;background:var(--primary)"></div></div>
+      <div class="step-bar"><div class="step-fill" style="width:71.0%;background:var(--primary)"></div></div>
     </div>
     <div class="step s-inst">
-      <div class="step-top"><span class="step-icon">🔧</span><span class="step-pct" style="background:var(--success-l)">75.6%</span></div>
-      <div><span class="step-num">146</span><span class="step-denom">/193</span></div>
+      <div class="step-top"><span class="step-icon">🔧</span><span class="step-pct" style="background:var(--success-l)">73.6%</span></div>
+      <div><span class="step-num">142</span><span class="step-denom">/193</span></div>
       <div class="step-lbl">Installation</div>
       <div class="step-bar"><div class="step-fill" style="width:75.6%;background:var(--success)"></div></div>
     </div>
     <div class="step s-mig">
-      <div class="step-top"><span class="step-icon">🚀</span><span class="step-pct" style="background:var(--warning-l)">73.1%</span></div>
-      <div><span class="step-num">141</span><span class="step-denom">/193</span></div>
+      <div class="step-top"><span class="step-icon">🚀</span><span class="step-pct" style="background:var(--warning-l)">71.0%</span></div>
+      <div><span class="step-num">137</span><span class="step-denom">/193</span></div>
       <div class="step-lbl">Migration</div>
       <div class="step-bar"><div class="step-fill" style="width:73.1%;background:var(--warning)"></div></div>
     </div>
@@ -351,6 +351,12 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
       <div style="height:200px"><canvas id="cum-mig-c"></canvas></div>
     </div>
   </div>
+
+  <!-- Device Type chart -->
+  <div class="card" style="margin-top:14px">
+    <div class="ch"><div class="chi" style="background:var(--primary-l);color:var(--primary)">📊</div>Device Type — Plan vs Installed</div>
+    <div style="height:400px"><canvas id="type-bar-c"></canvas></div>
+  </div>
 </div>
 
 <!-- ══ Tab: Daily ══ -->
@@ -408,12 +414,12 @@ const WK_LABELS  = ['W.1\n(2/2)','W.2\n(9/2)','W.3\n(16/2)','W.4\n(23/2)','W.5\n
 const WK_SHORT   = ['W.1','W.2','W.3','W.4','W.5','W.6','W.7','W.8','W.9'];
 const TOTAL_PLAN = 193;
 const WK_PLAN    = [35,10,9,52,14,18,11,28,16];
-const WK_CFG  = [27, 10, 9, 52, 14, 18, 11, 1, null];
-const WK_MIG  = [22, 10, 9, 52, 14, 18, 11, 1, null];
+const WK_CFG  = [27, 10, 9, 52, 14, 18, 11, 5, null];
+const WK_MIG  = [22, 10, 9, 52, 14, 18, 11, 5, null];
 
 // Cumulative % (carry-forward actual to today)
 const CUM_PLAN_PCT = [18.13, 23.32, 27.98, 54.92, 62.18, 71.5, 77.2, 91.71, 100];
-const CUM_ACT_RAW  = [11.4, 16.58, 21.24, 48.19, 55.44, 64.77, 70.47, 70.98, null];
+const CUM_ACT_RAW  = [11.4, 16.58, 21.24, 48.19, 55.44, 64.77, 70.47, 73.06, null];
 
 // Carry-forward actual to TODAY_WK
 function carryFwd(arr){
@@ -528,15 +534,56 @@ function buildCumWeekly(){
 }
 
 // ── Build Weekly Bar ──────────────────────────────────────────────────────────
+const HQ_TYPE_DATA = [
+  {n:'Access Switch Type 4',    plan:85, done:69},
+  {n:'Access Switch Type 2',    plan:85, done:54},
+  {n:'Access Control Type 1',   plan:4,  done:4},
+  {n:'SDN Controller',          plan:3,  done:3},
+  {n:'Extranet Switch Type 1',  plan:2,  done:2},
+  {n:'Wireless Controller',     plan:2,  done:2},
+  {n:'Core Switch Type 2',      plan:2,  done:2},
+  {n:'Fusion Switch Type 1',    plan:2,  done:2},
+  {n:'Distribute Switch Type 3',plan:2,  done:2},
+  {n:'Web Application Firewall',plan:1,  done:1},
+  {n:'Centralized Management',  plan:1,  done:0},
+  {n:'NGFW Type 1',             plan:2,  done:0},
+  {n:'NGFW Type 2',             plan:2,  done:0},
+];
 function buildWeeklyBar(){
   const cv=document.getElementById('wk-bar-c');
   const ex=Chart.getChart(cv); if(ex) ex.destroy();
+
+  // Plugin: แสดงตัวเลขบนสุดของแต่ละ bar
+  const dataLabelPlugin = {
+    id:'wkBarLabels',
+    afterDatasetsDraw(chart){
+      const ctx=chart.ctx;
+      chart.data.datasets.forEach((ds,di)=>{
+        const meta=chart.getDatasetMeta(di);
+        if(meta.hidden) return;
+        meta.data.forEach((bar,i)=>{
+          const val=ds.data[i];
+          if(val==null||val===0) return;
+          ctx.save();
+          ctx.font=`bold 11px Segoe UI`;
+          ctx.fillStyle=di===0?'#94a3c4':'#e67e00';
+          ctx.textAlign='center';
+          ctx.textBaseline='bottom';
+          ctx.fillText(val, bar.x, bar.y-2);
+          ctx.restore();
+        });
+      });
+    }
+  };
+
   new Chart(cv,{type:'bar',
+    plugins:[dataLabelPlugin],
     data:{labels:WK_SHORT,datasets:[
       {label:'แผน',data:WK_PLAN,backgroundColor:'rgba(148,163,196,.4)',borderColor:'#94a3c4',borderWidth:1,borderRadius:3,order:2},
       {label:'Migration จริง',data:WK_MIG,backgroundColor:'rgba(255,159,67,.75)',borderColor:'#ff9f43',borderWidth:1,borderRadius:3,order:1},
     ]},
     options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      layout:{padding:{top:20}},
       plugins:{legend:{position:'bottom',labels:{font:{size:11}}}},
       scales:{x:{grid:{display:false},ticks:{font:{size:11}}},y:{grid:{color:'#f0f4ff'},ticks:{font:{size:10}}}}}
   });
@@ -651,7 +698,7 @@ function showTab(name,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   document.getElementById('tab-'+name).style.display='block';
   if(el) el.classList.add('on');
-  if(name==='weekly' && !_wkBuilt){ _wkBuilt=true; buildWeeklyBar(); buildCumCfg(); buildCumMig(); }
+  if(name==='weekly' && !_wkBuilt){ _wkBuilt=true; buildWeeklyBar(); buildCumCfg(); buildCumMig(); buildTypeBar(); }
   if(name==='daily'  && !_dayBuilt){ _dayBuilt=true; buildDailyBar(); buildDailyCum(); }
 }
 
@@ -716,6 +763,70 @@ ${ins.outerHTML}${mn.outerHTML}
     ['overview','weekly','daily','location'].forEach(t=>{const e=document.getElementById('tab-'+t);if(e)e.style.display=t===name?'block':'none';});
     if(btn){btn.textContent='⬇ PDF';btn.disabled=false;}
   }
+}
+
+
+function buildTypeBar(){
+  const cv=document.getElementById('type-bar-c');
+  if(!cv) return;
+  const ex=Chart.getChart(cv); if(ex) ex.destroy();
+  const sorted=[...HQ_TYPE_DATA].sort((a,b)=>b.plan-a.plan);
+
+  const labelPlugin={
+    id:'hqTypeLabels',
+    afterDraw(chart){
+      const ctx=chart.ctx;
+      chart.data.datasets.forEach((ds,di)=>{
+        const meta=chart.getDatasetMeta(di);
+        if(meta.hidden) return;
+        meta.data.forEach((bar,i)=>{
+          const val=ds.data[i];
+          if(!val||val<1) return;
+          const d=sorted[i];
+          ctx.save();
+          if(di===0){
+            ctx.font='10px Segoe UI'; ctx.fillStyle='#94a3b8';
+          } else {
+            const pct=d.plan>0?Math.round(d.done/d.plan*100):0;
+            ctx.font='bold 10px Segoe UI'; ctx.fillStyle='#4361ee';
+            val && (bar._label=`${val} (${pct}%)`);
+          }
+          ctx.textAlign='left'; ctx.textBaseline='middle';
+          ctx.fillText(di===1?(bar._label||val):val, bar.x+4, bar.y);
+          ctx.restore();
+        });
+      });
+    }
+  };
+
+  new Chart(cv,{
+    type:'bar',
+    plugins:[labelPlugin],
+    data:{
+      labels:sorted.map(d=>d.n),
+      datasets:[
+        {label:'Plan (TOR)',     data:sorted.map(d=>d.plan),backgroundColor:'rgba(148,163,196,.35)',borderColor:'#94a3c4',borderWidth:1,borderRadius:3},
+        {label:'Installed',      data:sorted.map(d=>d.done),backgroundColor:'rgba(67,97,238,.75)',borderColor:'#4361ee',borderWidth:1,borderRadius:3},
+      ]
+    },
+    options:{
+      indexAxis:'y',
+      responsive:true, maintainAspectRatio:false,
+      layout:{padding:{right:80}},
+      plugins:{
+        legend:{position:'bottom',labels:{font:{size:11}}},
+        tooltip:{callbacks:{label:c=>{
+          const d=sorted[c.dataIndex];
+          if(c.datasetIndex===0) return ` Plan: ${d.plan}`;
+          return ` Installed: ${d.done} (${d.plan>0?Math.round(d.done/d.plan*100):0}%)`;
+        }}}
+      },
+      scales:{
+        x:{grid:{color:'#f0f4ff'},ticks:{font:{size:9},maxTicksLimit:8}},
+        y:{grid:{display:false},ticks:{font:{size:10}}}
+      }
+    }
+  });
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
