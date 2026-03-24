@@ -859,10 +859,11 @@ async function exportPDF(){
   pw.document.close();
   try{
     // show all tabs
-    ['overview','weekly','daily','location'].forEach(t=>{const e=document.getElementById('tab-'+t);if(e)e.style.display='block';});
-    if(!_wkBuilt){_wkBuilt=true;buildWeeklyBar();buildCumCfg();buildCumMig();}
+    ['overview','weekly','daily','location','plan'].forEach(t=>{const e=document.getElementById('tab-'+t);if(e)e.style.display='block';});
+    if(!_wkBuilt){_wkBuilt=true;buildWeeklyBar();buildCumCfg();buildCumMig();buildTypeBar();}
     if(!_dayBuilt){_dayBuilt=true;buildDailyBar();buildDailyCum();}
-    await new Promise(r=>setTimeout(r,800));
+    buildPlanTab();
+    await new Promise(r=>setTimeout(r,1000));
     // capture charts
     const imgs={};
     if(typeof Chart!=='undefined'){
@@ -879,12 +880,16 @@ async function exportPDF(){
     mn.querySelectorAll('.tab-body').forEach(t=>t.style.display='block');
     mn.querySelectorAll('.tabs').forEach(t=>t.style.display='none');
     mn.querySelectorAll('canvas').forEach(cv=>{const d=imgs[cv.id];if(d){const i=document.createElement('img');i.src=d.url;i.style.cssText=`display:block;width:${d.w}px;height:${d.h}px;max-width:100%`;cv.parentNode.replaceChild(i,cv);}else cv.style.display='none';});
-    ['tab-weekly','tab-daily','tab-location'].forEach((id,i)=>{const el=mn.querySelector(`#${id}`);if(el)el.style.pageBreakBefore='always';});
+    ['tab-weekly','tab-daily','tab-location','tab-plan'].forEach((id,i)=>{const el=mn.querySelector(`#${id}`);if(el)el.style.pageBreakBefore='always';});
     const date=new Date().toLocaleDateString('th-TH');
     const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>HQ Migration Progress Dashboard</title>
 <style>@page{size:A4 landscape;margin:8mm 10mm}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;box-sizing:border-box}body{font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;background:#fff;margin:0}
 ${styles}
 .topbar,.tabs,[onclick]{display:none!important}.tab-body{display:block!important}.card{break-inside:avoid}canvas{display:none!important}
+.pcard{background:var(--bg);border-radius:8px;padding:10px 12px}.pc-l{font-size:11px;color:var(--text2)}.pc-v{font-size:15px;font-weight:700}.pc-v.red{color:var(--danger)}.pc-v.grn{color:var(--success)}.fpc{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px}.fpc-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.fpc-name{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600}.fpc-pct{font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px}.fpc-big{font-size:24px;font-weight:800}.fpc-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:10px}.fpc-fill{height:100%;border-radius:3px}.fpc-dates{display:flex;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid var(--border)}.fdate{flex:1}.dl{font-size:10px;color:var(--text2)}.dv{font-size:12px;font-weight:600}
+#tab-plan .g3{display:grid!important;grid-template-columns:1fr 1fr 1fr!important;gap:12px!important}
+#tab-plan .g2{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}
+#tab-plan #plan-loc-list .g2{display:grid!important;grid-template-columns:1fr 1fr!important;gap:9px!important}
 .g2{display:grid!important;grid-template-columns:1fr 1fr!important;gap:12px!important}.g3{display:grid!important;grid-template-columns:1fr 1fr 1fr!important;gap:12px!important}.step-row{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:10px!important}.hm-grid{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:8px!important}
 .ph{background:linear-gradient(135deg,#3a56e4,#6c4de4);color:#fff;padding:8px 16px;margin-bottom:10px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700}
 </style></head><body>
@@ -897,7 +902,7 @@ ${ins.outerHTML}${mn.outerHTML}
   finally{
     const active=document.querySelector('.tab.on');
     const name=active?.getAttribute('onclick')?.match(/'(\w+)'/)?.[1]||'overview';
-    ['overview','weekly','daily','location'].forEach(t=>{const e=document.getElementById('tab-'+t);if(e)e.style.display=t===name?'block':'none';});
+    ['overview','weekly','daily','location','plan'].forEach(t=>{const e=document.getElementById('tab-'+t);if(e)e.style.display=t===name?'block':'none';});
     if(btn){btn.textContent='⬇ PDF';btn.disabled=false;}
   }
 }
