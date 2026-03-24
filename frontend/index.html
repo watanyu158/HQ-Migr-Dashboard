@@ -267,20 +267,20 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
   <!-- 3-step progress -->
   <div class="step-row">
     <div class="step s-cfg">
-      <div class="step-top"><span class="step-icon">⚙️</span><span class="step-pct" style="background:var(--primary-l)">73.6%</span></div>
-      <div><span class="step-num">142</span><span class="step-denom">/193</span></div>
+      <div class="step-top"><span class="step-icon">⚙️</span><span class="step-pct" style="background:var(--primary-l)">75.6%</span></div>
+      <div><span class="step-num">146</span><span class="step-denom">/193</span></div>
       <div class="step-lbl">Configuration</div>
       <div class="step-bar"><div class="step-fill" style="width:75.6%;background:var(--primary)"></div></div>
     </div>
     <div class="step s-inst">
-      <div class="step-top"><span class="step-icon">🔧</span><span class="step-pct" style="background:var(--success-l)">73.6%</span></div>
-      <div><span class="step-num">142</span><span class="step-denom">/193</span></div>
+      <div class="step-top"><span class="step-icon">🔧</span><span class="step-pct" style="background:var(--success-l)">75.6%</span></div>
+      <div><span class="step-num">146</span><span class="step-denom">/193</span></div>
       <div class="step-lbl">Installation</div>
       <div class="step-bar"><div class="step-fill" style="width:75.6%;background:var(--success)"></div></div>
     </div>
     <div class="step s-mig">
-      <div class="step-top"><span class="step-icon">🚀</span><span class="step-pct" style="background:var(--primary-l)">75.6%</span></div>
-      <div><span class="step-num">137</span><span class="step-denom">/193</span></div>
+      <div class="step-top"><span class="step-icon">🚀</span><span class="step-pct" style="background:var(--warning-l)">73.1%</span></div>
+      <div><span class="step-num">141</span><span class="step-denom">/193</span></div>
       <div class="step-lbl">Migration</div>
       <div class="step-bar"><div class="step-fill" style="width:73.1%;background:var(--warning)"></div></div>
     </div>
@@ -410,8 +410,16 @@ const TODAY_FRAC = (_elapsed%7)/7;
 const _todayLabel= _todayGMT7.getDate()+'/'+(String(_todayGMT7.getMonth()+1).padStart(2,'0'));
 
 // ── Hardcoded data from Excel ─────────────────────────────────────────────────
-const WK_LABELS  = ['W.1\n(2/2)','W.2\n(9/2)','W.3\n(16/2)','W.4\n(23/2)','W.5\n(2/3)','W.6\n(9/3)','W.7\n(16/3)','W.8\n(23/3)','W.9\n(30/3)'];
-const WK_SHORT   = ['W.1\n2/2-8/2','W.2\n9/2-15/2','W.3\n16/2-22/2','W.4\n23/2-1/3','W.5\n2/3-8/3','W.6\n9/3-15/3','W.7\n16/3-22/3','W.8\n23/3-29/3','W.9\n30/3-5/4'];
+const WK_LABELS  = [
+  ['W.1','2/2-8/2'],['W.2','9/2-15/2'],['W.3','16/2-22/2'],
+  ['W.4','23/2-1/3'],['W.5','2/3-8/3'],['W.6','9/3-15/3'],
+  ['W.7','16/3-22/3'],['W.8','23/3-29/3'],['W.9','30/3-5/4']
+];
+const WK_SHORT   = [
+  ['W.1','2/2-8/2'],['W.2','9/2-15/2'],['W.3','16/2-22/2'],
+  ['W.4','23/2-1/3'],['W.5','2/3-8/3'],['W.6','9/3-15/3'],
+  ['W.7','16/3-22/3'],['W.8','23/3-29/3'],['W.9','30/3-5/4']
+];
 const TOTAL_PLAN = 193;
 const WK_PLAN    = [35,10,9,52,14,18,11,28,16];
 const WK_CFG  = [27, 10, 9, 52, 14, 18, 11, 5, null];
