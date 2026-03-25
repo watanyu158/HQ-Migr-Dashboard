@@ -570,9 +570,9 @@ const WK_SHORT   = [
   ['W.7','16/3-22/3'],['W.8','23/3-29/3'],['W.9','30/3-5/4']
 ];
 const TOTAL_PLAN = 193;
-const WK_PLAN    = [35,10,9,52,14,18,11,28,16];
-const WK_CFG  = [27, 10, 9, 52, 14, 18, 11, 5, null];
-const WK_MIG  = [22, 10, 9, 52, 14, 18, 11, 5, null];
+const WK_PLAN = [35, 10, 9, 52, 14, 18, 11, 28, 16];
+const WK_CFG = [27, 10, 9, 52, 14, 18, 11, 6, null];
+const WK_MIG = [22, 10, 9, 52, 14, 18, 11, 6, null];
 
 // Cumulative % (carry-forward actual to today)
 const CUM_PLAN_PCT = [18.13, 23.32, 27.98, 54.92, 62.18, 71.5, 77.2, 91.71, 100];
@@ -594,14 +594,14 @@ const CUM_CFG_PCT = WK_CFG.map(v=>{ if(v!==null) cumCfg+=v; return cumCfg>0?Math
 const CUM_CFG_ACT = carryFwd(CUM_CFG_PCT.map((v,i)=>WK_CFG[i]!==null?v:null));
 
 // Burndown
-const BD_PLAN = [193, 158, 148, 139, 87, 73, 55, 44, 16];
+const BD_PLAN = [158, 148, 139, 87, 73, 55, 44, 16, 0];
 let cumMig=0;
 const BD_ACT_RAW = WK_MIG.map(v=>{ if(v!==null){cumMig+=v;return TOTAL_PLAN-cumMig;} return null; });
 const BD_ACT  = carryFwd(BD_ACT_RAW);
 
 // Daily
-const DAILY_LABELS = ['3ก.พ.','4ก.พ.','5ก.พ.','6ก.พ.','7ก.พ.','8ก.พ.','9ก.พ.','10ก.พ.','11ก.พ.','12ก.พ.','13ก.พ.','14ก.พ.','15ก.พ.','16ก.พ.','17ก.พ.','18ก.พ.','19ก.พ.','20ก.พ.','21ก.พ.','22ก.พ.','23ก.พ.','24ก.พ.','25ก.พ.','26ก.พ.','27ก.พ.','28ก.พ.','1มี.ค.','2มี.ค.','3มี.ค.','4มี.ค.','5มี.ค.','6มี.ค.','7มี.ค.','8มี.ค.','9มี.ค.','10มี.ค.','11มี.ค.','12มี.ค.','13มี.ค.','14มี.ค.','15มี.ค.','16มี.ค.','17มี.ค.','18มี.ค.','19มี.ค.','20มี.ค.','21มี.ค.','22มี.ค.','23มี.ค.','24มี.ค.','25มี.ค.','26มี.ค.','27มี.ค.','28มี.ค.','29มี.ค.','30มี.ค.','31มี.ค.','1เม.ย.','2เม.ย.','3เม.ย.'];
-const DAILY_PLAN   = [35,0,0,0,0,0,0,0,10,0,0,0,0,0,0,5,0,4,0,0,15,0,20,0,17,0,0,14,0,0,0,0,0,0,10,0,8,0,0,0,0,11,0,0,0,0,0,0,0,6,14,0,8,0,0,7,0,3,0,6];
+const DAILY_LABELS = ['3/ก.พ.', '4/ก.พ.', '5/ก.พ.', '6/ก.พ.', '7/ก.พ.', '8/ก.พ.', '9/ก.พ.', '10/ก.พ.', '11/ก.พ.', '12/ก.พ.', '13/ก.พ.', '14/ก.พ.', '15/ก.พ.', '16/ก.พ.', '17/ก.พ.', '18/ก.พ.', '19/ก.พ.', '20/ก.พ.', '21/ก.พ.', '22/ก.พ.', '23/ก.พ.', '24/ก.พ.', '25/ก.พ.', '26/ก.พ.', '27/ก.พ.', '28/ก.พ.', '1/มี.ค.', '2/มี.ค.', '3/มี.ค.', '4/มี.ค.', '5/มี.ค.', '6/มี.ค.', '7/มี.ค.', '8/มี.ค.', '9/มี.ค.', '10/มี.ค.', '11/มี.ค.', '12/มี.ค.', '13/มี.ค.', '14/มี.ค.', '15/มี.ค.', '16/มี.ค.', '17/มี.ค.', '18/มี.ค.', '19/มี.ค.', '20/มี.ค.', '21/มี.ค.', '22/มี.ค.', '23/มี.ค.', '24/มี.ค.', '25/มี.ค.', '26/มี.ค.', '27/มี.ค.', '28/มี.ค.', '29/มี.ค.', '30/มี.ค.', '31/มี.ค.', '1/เม.ย.', '2/เม.ย.', '3/เม.ย.'];
+const DAILY_PLAN = [35, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 5, 0, 4, 0, 0, 15, 0, 20, 0, 17, 0, 0, 14, 0, 0, 0, 0, 0, 0, 10, 0, 8, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 7, 14, 0, 7, 0, 0, 7, 0, 3, 0, 6];
 const DAILY_ACT    = [22,0,0,0,0,0,0,0,10,0,0,0,0,0,0,5,0,4,0,0,15,0,20,0,17,0,0,14,0,0,0,0,0,0,10,0,8,0,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null];
 const CUM_PLAN_D   = [18.13,18.13,18.13,18.13,18.13,18.13,18.13,18.13,23.32,23.32,23.32,23.32,23.32,23.32,23.32,25.91,25.91,27.98,27.98,27.98,35.75,35.75,46.11,46.11,54.92,54.92,54.92,62.18,62.18,62.18,62.18,62.18,62.18,62.18,67.36,67.36,71.50,71.50,71.50,71.50,71.50,77.20,77.20,77.20,77.20,77.20,77.20,77.20,77.20,80.31,87.56,87.56,91.71,91.71,91.71,95.34,95.34,96.89,96.89,100];
 const CUM_ACT_D_RAW= [11.4,11.4,11.4,11.4,11.4,11.4,11.4,11.4,16.58,16.58,16.58,16.58,16.58,16.58,16.58,19.17,19.17,21.24,21.24,21.24,29.02,29.02,39.38,39.38,48.19,48.19,48.19,55.44,55.44,55.44,55.44,55.44,55.44,55.44,60.62,60.62,64.77,64.77,65.28,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null];
@@ -1044,7 +1044,90 @@ buildGauge();
 buildBurndown();
 buildCumWeekly();
 buildHeatmap();
-buildLocTable();
+buildLocTable()
+
+async function loadData(){
+  try{
+    const r=await fetch(`${API}/api/dashboard`);
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const d=await r.json();
+    const {meta,insight,weekly,daily,locations,wk,wk_dates:wkd,today_wk}=d;
+
+    // อัพเดท arrays
+    WK.length=0;            wk.forEach(v=>WK.push(v));
+    WK_DATES.length=0;      (wkd||[]).forEach(v=>WK_DATES.push(v));
+    PLAN_ALL.length=0;      weekly.plan_cum_pct.forEach(v=>PLAN_ALL.push(v));
+    ACT_ALL_RAW.length=0;   weekly.act_cum_pct.forEach(v=>ACT_ALL_RAW.push(v));
+    WK_PLAN.length=0;       weekly.plan.forEach(v=>WK_PLAN.push(v));
+    WK_CFG.length=0;        weekly.cfg.forEach(v=>WK_CFG.push(v));
+    WK_MIG.length=0;        weekly.mig.forEach(v=>WK_MIG.push(v));
+    WK_MIG_CUM.length=0;    (weekly.mig_cum||[]).forEach(v=>WK_MIG_CUM.push(v));
+    BD_PLAN.length=0;       weekly.bd_plan.forEach(v=>BD_PLAN.push(v));
+    BD_ACT.length=0;        weekly.bd_act.forEach(v=>BD_ACT.push(v));
+    DAILY_LABELS.length=0;  daily.labels.forEach(v=>DAILY_LABELS.push(v));
+    DAILY_PLAN.length=0;    daily.plan.forEach(v=>DAILY_PLAN.push(v));
+    DAILY_MIG.length=0;     daily.mig.forEach(v=>DAILY_MIG.push(v));
+    DAILY_PLAN_CUM.length=0;daily.plan_cum_pct.forEach(v=>DAILY_PLAN_CUM.push(v));
+    DAILY_ACT_CUM.length=0; daily.act_cum_pct.forEach(v=>DAILY_ACT_CUM.push(v));
+    window.TODAY_WK=today_wk;
+
+    // carry-forward ACT_ALL
+    let _l=null; ACT_ALL.length=0;
+    WK.forEach((_,i)=>{if(ACT_ALL_RAW[i]!=null)_l=ACT_ALL_RAW[i]; ACT_ALL.push(i<=TODAY_WK?_l:null);});
+
+    // อัพเดท UI
+    const el=id=>document.getElementById(id);
+    const thM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    const fd=new Date(insight.finish_date+'T00:00:00');
+    const finTH=`${fd.getDate()} ${thM[fd.getMonth()]} ${(fd.getFullYear()+543)%100}`;
+    const daysLeft=insight.days_left;
+
+    if(el('ts-mig'))  el('ts-mig').textContent=`${meta.mig}/${meta.total}`;
+    if(el('ts-cfg'))  el('ts-cfg').textContent=`${meta.cfg}/${meta.total}`;
+    if(el('pill-rem'))el('pill-rem').textContent=meta.remaining;
+    if(el('pill-hold'))el('pill-hold').textContent=meta.hold;
+    if(el('ov-mig')) el('ov-mig').textContent=meta.mig;
+    if(el('ov-cfg')) el('ov-cfg').textContent=meta.cfg;
+
+    // Insight
+    document.querySelectorAll('.ins-big em').forEach(em=>em.textContent=insight.need_more);
+    document.querySelectorAll('.ins-pct-tag').forEach(t=>{
+      if(t.textContent.includes('%'))t.textContent='↑'+insight.pct_more+'% จากอัตราปัจจุบัน';
+    });
+    const rv=document.querySelectorAll('.ins-rate-val');
+    if(rv[0])rv[0].textContent=insight.daily_rate;
+    if(rv[1])rv[1].textContent=insight.req_rate;
+    document.querySelectorAll('.ins-warn').forEach(w=>{
+      if(w.textContent.includes('ถ้าไม่เพิ่ม'))
+        w.textContent=`⚠ ถ้าไม่เพิ่ม → เสร็จ ${finTH} — ช้ากว่าเป้า ${insight.days_late} วัน`;
+    });
+    document.querySelectorAll('.ins-kpi-val').forEach((el,i)=>{
+      if(i===0)el.textContent=insight.daily_rate;
+      if(i===1)el.textContent=insight.req_rate;
+      if(i===2)el.textContent='+'+insight.need_more;
+    });
+    document.querySelectorAll('.ip-val').forEach(el=>{
+      const lbl=el.nextElementSibling?.textContent||'';
+      if(lbl==='คาดเสร็จ')el.textContent=finTH;
+      if(lbl==='วันเหลือ')el.innerHTML=`<span style="color:var(--success)">${daysLeft}</span>`;
+    });
+    document.querySelectorAll('.ip-sub').forEach(el=>{
+      if(el.textContent.includes('ช้า')&&!el.textContent.includes('กว่าเป้า'))
+        el.textContent='ช้า '+insight.days_late+' วัน';
+    });
+    const gEl=document.getElementById('gauge-pct-lbl');
+    if(gEl) gEl.textContent=insight.gauge_pct+'%';
+
+    // Rebuild charts
+    buildGauge(); buildBurndown(); buildDonut();
+    buildProgressCharts(); buildLocList(); buildPlanTab();
+    buildTypeBar();
+
+    console.log(`✓ HQ Dynamic: cfg=${meta.cfg} mig=${meta.mig}/${meta.total}`);
+  }catch(e){ console.warn('loadData failed:',e.message); }
+}
+
+;
 </script>
 </body>
 </html>
