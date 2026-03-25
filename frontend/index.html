@@ -377,7 +377,7 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
   </div>
 
   <!-- Device Type chart -->
-  <div class="card" style="margin-top:14px">
+  <div class="card" id="type-bar-card" style="margin-top:14px;page-break-before:always;break-before:page">
     <div class="ch"><div class="chi" style="background:var(--primary-l);color:var(--primary)">📊</div>แยกตามประเภทอุปกรณ์ — แผน vs ติดตั้งแล้ว</div>
     <div style="height:480px"><canvas id="type-bar-c"></canvas></div>
   </div>
@@ -945,11 +945,8 @@ async function exportPDF(){
     mn.querySelectorAll('canvas').forEach(cv=>{const d=imgs[cv.id];if(d){const i=document.createElement('img');i.src=d.url;i.style.cssText=`display:block;width:${d.w}px;height:${d.h}px;max-width:100%`;cv.parentNode.replaceChild(i,cv);}else cv.style.display='none';});
     ['tab-weekly','tab-daily','tab-location','tab-plan'].forEach((id,i)=>{const el=mn.querySelector(`#${id}`);if(el)el.style.pageBreakBefore='always';});
     // type-bar card ขึ้นหน้าใหม่
-    const tbCard=mn.querySelector('#tab-weekly #type-bar-c');
-    if(tbCard){
-      const card=tbCard.closest('.card');
-      if(card){card.style.pageBreakBefore='always';card.style.breakBefore='page';}
-    }
+    const tbCard=mn.querySelector('#type-bar-card');
+    if(tbCard){tbCard.style.pageBreakBefore='always';tbCard.style.breakBefore='page';tbCard.style.pageBreakInside='avoid';}
     const date=new Date().toLocaleDateString('th-TH');
     const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>HQ Migration Progress Dashboard</title>
 <style>@page{size:A4 landscape;margin:8mm 10mm}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;box-sizing:border-box}body{font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;background:#fff;margin:0}
