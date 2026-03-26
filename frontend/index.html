@@ -248,8 +248,8 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
     <div class="card" style="display:flex;flex-direction:column;justify-content:space-between;gap:14px">
       <div class="ch" style="margin-bottom:0"><div class="chi" style="background:var(--success-l);color:var(--success)">⏱</div>ความตรงต่อเวลา</div>
       <div style="display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;justify-content:center">
-        <div style="position:relative;width:150px;height:150px">
-          <canvas id="donut-c" style="width:150px!important;height:150px!important"></canvas>
+        <div style="position:relative;width:150px;height:150px;flex-shrink:0">
+          <canvas id="donut-c" width="150" height="150"></canvas>
           <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
             <div style="font-size:24px;font-weight:700;color:var(--success)" id="donut-ontime-pct">91.6%</div>
             <div style="font-size:11px;color:var(--text2)">ตรงเวลา</div>
@@ -279,6 +279,32 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
   </div>
 </div>
 
+
+
+<div class="tab-body" id="tab-weekly">
+  <div class="g2" style="margin-bottom:14px">
+    <div class="card"><div class="ch"><div class="chi" style="background:var(--primary-l);color:var(--primary)">📊</div>ผลงานรายสัปดาห์</div><div style="height:220px"><canvas id="weekly-bar-c"></canvas></div></div>
+    <div class="card"><div class="ch"><div class="chi" style="background:var(--warning-l);color:var(--warning)">📈</div>% สะสมรายสัปดาห์</div><div style="height:220px"><canvas id="cum-cfg-c"></canvas></div></div>
+  </div>
+  <div class="card" style="margin-bottom:14px"><div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">📋</div>ตารางสรุปรายสัปดาห์</div><div id="weekly-table" style="overflow-x:auto;margin-top:4px"></div></div>
+</div>
+
+<div class="tab-body" id="tab-daily">
+  <div class="g2" style="margin-bottom:14px">
+    <div class="card"><div class="ch"><div class="chi" style="background:var(--primary-l);color:var(--primary)">📊</div>ผลงานรายวัน</div><div style="height:220px"><canvas id="daily-bar-c"></canvas></div></div>
+    <div class="card"><div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">📈</div>% สะสมรายวัน</div><div style="height:220px"><canvas id="daily-cum-c"></canvas></div></div>
+  </div>
+</div>
+
+<div class="tab-body" id="tab-location">
+  <div class="card" style="margin-bottom:14px"><div class="ch"><div class="chi" style="background:var(--info-l);color:var(--info)">📍</div>สรุปตามสถานที่</div><div id="loc-table" style="overflow-x:auto;margin-top:4px"></div></div>
+</div>
+
+<div class="tab-body" id="tab-plan">
+  <div class="card" style="margin-bottom:14px"><div class="ch"><div class="chi" style="background:var(--warning-l);color:var(--warning)">📅</div>แผนงาน vs ความคืบหน้า</div><div style="height:300px"><canvas id="plan-c"></canvas></div></div>
+</div>
+
+</main>
 
 <script>
 const API = window.location.hostname==='localhost'?'http://localhost:3001':'https://hq-migr-api.onrender.com';
@@ -753,11 +779,14 @@ function buildDonut(onTimeQty, lateQty, pendingQty){
   const ex=Chart.getChart(cv); if(ex) ex.destroy();
   new Chart(cv,{type:'doughnut',
     data:{datasets:[{
-      data:[onTimeQty, lateQty, pendingQty],
+      data:[onTimeQty, Math.max(0,lateQty), pendingQty],
       backgroundColor:['#2bc48a','#ff6b6b','#e2e8f0'],
       borderWidth:3, borderColor:'#fff'
     }]},
-    options:{cutout:'70%',responsive:false,maintainAspectRatio:false,
+    options:{
+      responsive:false,
+      maintainAspectRatio:false,
+      cutout:'70%',
       plugins:{legend:{display:false},
         tooltip:{backgroundColor:'rgba(30,45,77,.92)',titleColor:'#fff',
           bodyColor:'rgba(255,255,255,.8)',padding:8,cornerRadius:8}}}
