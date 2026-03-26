@@ -602,6 +602,8 @@ const API = window.location.hostname==='localhost'?'http://localhost:3001':'http
 
 // ── Today GMT+7 ────────────────────────────────────────────────────────────────
 const _todayGMT7 = new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Bangkok'}));
+const _projStart = new Date(2026,1,3);
+const _projEnd   = new Date(2026,3,3);
 const _projDays  = Math.round((_projEnd-_projStart)/(24*60*60*1000));
 const _elapsed   = Math.max(0,Math.round((_todayGMT7-_projStart)/(24*60*60*1000)));
 const TODAY_WK   = Math.max(0,Math.min(8,Math.floor(_elapsed/7)));

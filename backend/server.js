@@ -36,7 +36,7 @@ function calcDashboard(wb) {
   const act_cum_pct   = wkRows[13].slice(1, N_WK+1).map(pct);
 
   // Week labels
-  const wk = wkRows[3].slice(1, N_WK+1).map(v => v ? String(v).split('\n')[0] : '');
+  const wk = wkRows[3].slice(1, N_WK+1).map(v => v ? String(v).split('\n')[0].replace(/\r/g,'') : '');
   const wk_dates = wkRows[3].slice(1, N_WK+1).map(v => {
     if (!v) return '';
     const parts = String(v).split('\n');
@@ -76,7 +76,7 @@ function calcDashboard(wb) {
   for (let i = 1; i < dayRows[3].length; i++) {
     const raw = dayRows[3][i];
     if (raw === null) continue;
-    dayLabels.push(String(raw).replace('\n', '/'));
+    dayLabels.push(String(raw).replace(/\r/g,'').replace('\n', '/'));
     planDay.push(typeof dayRows[4][i] === 'number' ? dayRows[4][i] : 0);
     migDay.push(typeof dayRows[5][i] === 'number' ? dayRows[5][i] : 0);
     planCumD.push(pct(dayRows[8][i]) || 0);
