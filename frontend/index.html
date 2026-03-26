@@ -1076,6 +1076,7 @@ async function manualRefresh(){
   const btns=document.querySelectorAll('[onclick*="manualRefresh"]');
   btns.forEach(b=>{b._o=b.textContent;b.textContent='⏳ โหลด...';b.disabled=true;});
   try{ await fetch(API+'/api/cache/refresh',{method:'POST'}); }catch(e){}
+  await loadData();
   const now=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
   const ts=document.getElementById('sync-ts'); if(ts) ts.textContent=now;
   btns.forEach(b=>{b.textContent=b._o||'↺ รีเฟรช';b.disabled=false;});
