@@ -21,7 +21,7 @@
 body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--text);font-size:14px}
 
 /* ── Topbar ── */
-.topbar{background:linear-gradient(135deg,#3a56e4,#6c4de4);color:#fff;padding:0 20px;height:54px;display:flex;align-items:center;justify-content:space-between;gap:8px;box-shadow:0 4px 20px rgba(67,97,238,.3);position:sticky;top:0;z-index:100}
+.topbar{background:linear-gradient(135deg,#3a56e4,#6c4de4);color:#fff;padding:0 20px;height:54px;display:flex;align-items:center;justify-content:space-between;gap:8px;box-shadow:0 4px 20px rgba(67,97,238,.3);position:sticky;top:0;z-index:100;flex-wrap:wrap}
 .tb-l{display:flex;align-items:center;gap:10px}
 .tb-logo{width:30px;height:30px;background:rgba(255,255,255,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
 .tb-title{font-size:14px;font-weight:600}
@@ -69,7 +69,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--t
 .ins-pill.warning .ip-v{color:var(--warning)}
 
 /* ── Main layout ── */
-main{padding:14px 20px;max-width:1400px;margin:0 auto}
+main{padding:14px 20px;max-width:1400px;margin:0 auto;box-sizing:border-box}
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;box-shadow:var(--sh)}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
@@ -167,11 +167,64 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
 .wk-stat-total{color:var(--text2);font-size:12px}
 .wk-stat-pct{font-size:11px;font-weight:600;padding:1px 7px;border-radius:99px}
 
+
+/* ══ RESPONSIVE ════════════════════════════════════════════════════════════ */
+
+/* Tablet: 641–900px */
+@media(max-width:900px){
+  .g3{grid-template-columns:1fr 1fr}
+  .ins-pills{grid-template-columns:repeat(3,1fr)}
+  main{padding:10px 12px}
+}
+
+/* Mobile: ≤640px */
 @media(max-width:640px){
-  .g2,.g3,.g4,.step-row,.ins-pills{grid-template-columns:1fr}
-  .ins-panels{flex-direction:column}
-  .ins-gauge-card{min-width:unset}
-  .tb-stats{display:none}
+  /* Layout */
+  main{padding:8px 10px}
+  .g2,.g3,.g4,.step-row{grid-template-columns:1fr}
+
+  /* Topbar */
+  .topbar{height:auto;padding:8px 12px;flex-wrap:wrap;gap:6px}
+  .tb-l{gap:8px}
+  .tb-title{font-size:13px!important}
+  .tb-sub{font-size:10px}
+  .tb-stats{display:flex;flex-wrap:wrap;gap:6px;font-size:11px}
+  .tb-stat .v{font-size:12px}
+  .tb-stat .l{font-size:9px}
+  .tb-div{display:none}
+
+  /* Tabs */
+  .tabs{flex-wrap:wrap;gap:3px}
+  .tab{font-size:11px;padding:5px 8px}
+
+  /* Cards */
+  .card{padding:10px}
+
+  /* Insight */
+  .ins-panels{flex-direction:column;gap:10px}
+  .ins-gauge-card{min-width:unset;padding:10px 12px}
+  .ins-alert-card{padding:10px 12px}
+  .ins-big{font-size:13px}
+  .ins-big em{font-size:18px}
+  .ins-rate-row{gap:5px;padding:6px 10px}
+  .ins-rate-val{font-size:15px}
+  .ins-rate-target{font-size:15px}
+  .ins-rate-arrow{font-size:12px}
+  .ins-forecast{font-size:11px;padding:6px 10px}
+  .ins-kpi-table{font-size:11px}
+  .ins-kpi-val{font-size:13px}
+  .ins-pills{grid-template-columns:repeat(3,1fr);gap:6px;padding-top:8px}
+  .ins-pill .ip-v{font-size:16px}
+  .ins-pill .ip-l{font-size:9px}
+
+  /* Overview */
+  .shdr{padding:12px}
+  .shdr-stats{gap:12px}
+  .ov-bar-wrap{min-width:unset;width:100%}
+  .step-card{padding:10px 12px}
+
+  /* Charts */
+  canvas{max-width:100%}
 }
 </style>
 </head>
