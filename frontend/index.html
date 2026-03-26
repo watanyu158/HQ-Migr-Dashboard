@@ -102,6 +102,9 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
 .ip-val{font-size:18px;font-weight:700;line-height:1;color:var(--text)}
 .ip-lbl{font-size:11px;color:var(--text2)}
 .ip-sub{font-size:10px;color:var(--text3)}
+
+.ins-kpi-title{font-size:11px;font-weight:600;color:var(--text2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.4px}
+.ins-kpi-gap .ins-kpi-val,.ins-kpi-gap .ins-kpi-unit{color:var(--danger)!important}
 </style>
 </head>
 <body>
@@ -153,11 +156,22 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
         <div class="ins-gc"><div class="gp" id="gauge-pct">46%</div></div>
       </div>
       <div class="ins-kpi-table">
-        <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px">ประเมินความตรงต่อเวลา</div>
-        <div class="ins-kpi-row"><span class="ins-kpi-lbl">สะสมจริง</span><span class="ins-kpi-val" id="kpi-act" style="color:var(--warning)">73.58</span><span class="ins-kpi-unit">%</span></div>
-        <div class="ins-kpi-row"><span class="ins-kpi-lbl">เป้าหมาย</span><span class="ins-kpi-val" id="kpi-plan" style="color:var(--primary)">91.71</span><span class="ins-kpi-unit">%</span></div>
-        <div class="ins-kpi-row" style="border-top:1px solid var(--border);padding-top:3px;margin-top:2px"><span class="ins-kpi-lbl">ส่วนต่าง</span><span class="ins-kpi-val" id="kpi-diff" style="color:var(--danger)">-18.1</span><span class="ins-kpi-unit" style="color:var(--danger)">%</span></div>
-        <div class="ins-kpi-row"><span class="ins-kpi-lbl">ล่าช้า</span><span class="ins-kpi-val" id="kpi-late" style="color:var(--danger)">11</span><span class="ins-kpi-unit" style="color:var(--danger)">วัน</span></div>
+        <div class="ins-kpi-title">ประสิทธิภาพ</div>
+        <div class="ins-kpi-row">
+          <span class="ins-kpi-lbl">ทำได้จริง</span>
+          <span class="ins-kpi-val" id="kpi-act" style="color:var(--warning)">73.58</span>
+          <span class="ins-kpi-unit">%</span>
+        </div>
+        <div class="ins-kpi-row">
+          <span class="ins-kpi-lbl">เป้าหมาย</span>
+          <span class="ins-kpi-val" id="kpi-plan" style="color:var(--primary)">91.71</span>
+          <span class="ins-kpi-unit">%</span>
+        </div>
+        <div class="ins-kpi-row ins-kpi-gap">
+          <span class="ins-kpi-lbl">ส่วนต่าง</span>
+          <span class="ins-kpi-val" id="kpi-diff" style="color:var(--danger)">-18.1</span>
+          <span class="ins-kpi-unit" style="color:var(--danger)">%</span>
+        </div>
       </div>
     </div>
   </div>
@@ -263,8 +277,10 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
     <div class="card"><div class="ch"><div class="chi" style="background:var(--danger-l);color:var(--danger)">📉</div>Burndown Chart</div><div style="height:200px"><canvas id="burndown-c"></canvas></div></div>
     <div class="card"><div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">📈</div>% สะสม — แผน vs จริง</div><div style="height:200px"><canvas id="cum-weekly-c"></canvas></div></div>
   </div>
-  <div class="card" style="margin-bottom:14px"><div class="ch"><div class="chi"
+</div>
 
+
+<script>
 const API = window.location.hostname==='localhost'?'http://localhost:3001':'https://hq-migr-api.onrender.com';
 
 // Today GMT+7
@@ -760,39 +776,6 @@ window.addEventListener('DOMContentLoaded',async()=>{
   await loadData();
 });
 
-    if(_e('gauge-pct'))  _e('gauge-pct').textContent=ins.gauge_pct+'%';
-    if(_e('kpi-act'))    _e('kpi-act').textContent=actLast.toFixed(2);
-    if(_e('kpi-plan'))   _e('kpi-plan').textContent=planLast.toFixed(2);
-    if(_e('kpi-diff'))   _e('kpi-diff').textContent=(gap>=0?'+':'')+gap;
-    if(_e('kpi-late'))   _e('kpi-late').textContent=ins.days_late;
-    // pills — SVB style
-    const fd2=new Date(ins.finish_date+'T00:00:00');
-    const finTH2=fd2.getDate()+' '+thM[fd2.getMonth()]+' '+((fd2.getFullYear()+543)%100);
-    if(_e('pill-finish'))  _e('pill-finish').textContent=finTH2;
-    if(_e('pill-late'))    _e('pill-late').textContent=ins.days_late>0?'ช้า '+ins.days_late+' วัน':'ก่อนกำหนด';
-    if(_e('pill-rem'))     _e('pill-rem').textContent=meta.remaining;
-    if(_e('pill-days'))    _e('pill-days').textContent=ins.days_left;
-    if(_e('pill-over'))    _e('pill-over').textContent=meta.overdue||0;
-    if(_e('pill-hold'))    _e('pill-hold').textContent=meta.hold||0;
-    if(_e('pill-ontime'))  _e('pill-ontime').textContent=(meta.on_time_pct||0)+'%';
-    if(_e('pill-ontime-sub')) _e('pill-ontime-sub').textContent=(meta.on_time_qty||0)+'/'+meta.mig;
-
-    buildGauge(); buildBurndown(); buildCumWeekly();
-    buildWeeklyBar(); buildCumCfg(); buildWeeklyTable();
-    buildDailyBar(); buildDailyCum();
-    buildHeatmap(); buildLocTable(); buildPlanTab();
-    if(device_summary) buildDeviceSummary(device_summary);
-    if(categories&&locations) buildCatLocTable(locations,categories);
-
-    const sl=_e('sync-ts');
-    if(sl) sl.textContent=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-    console.log('HQ: mig='+meta.mig+'/'+meta.total+' rate='+ins.daily_rate+' W.'+(today_wk+1));
-  }catch(e){
-    console.error('HQ loadData error:',e.message);
-  }finally{
-    hideLoading();
-  }
-}
 
 // manualRefresh
 async function manualRefresh(){
