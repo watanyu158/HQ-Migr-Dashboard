@@ -663,7 +663,7 @@ let lastD=null;
 const CUM_ACT_D = CUM_ACT_D_RAW.map(v=>{ if(v!==null) lastD=v; return lastD; });
 
 // Location data
-const LOC_DATA = [
+let LOC_DATA = [
   {n:'อาคารสำนักงานใหญ่',               tor:94,  cfg:95,  inst:95,  mig:95},
   {n:'อาคารสายงานวิศวกรรมฯ (สงวท.)',    tor:58,  cfg:46,  inst:46,  mig:41},
   {n:'อาคารสันทนาการ สนญ.',              tor:6,   cfg:4,   inst:4,   mig:4},
@@ -982,6 +982,9 @@ function showLoading(){
   ['step-cfg-bar','step-inst-bar','step-mig-bar','ov-mig-b','ov-cfg-b'].forEach(id=>{
     const e=document.getElementById(id);if(e)e.style.width='0%';
   });
+  // reset heatmap
+  const hg=document.getElementById('hm-grid');
+  if(hg) hg.innerHTML='<div style="padding:20px;color:var(--text2);font-size:12px;opacity:.5">⏳ กำลังโหลด...</div>';
   const fc=document.getElementById('ins-forecast');
   if(fc)fc.innerHTML='<strong>⏳ กำลังคำนวณ...</strong>';
 }
@@ -1009,6 +1012,12 @@ async function loadData(){
     CUM_PLAN_D.length=0;    daily.plan_cum_pct.forEach(v=>CUM_PLAN_D.push(v));
     CUM_ACT_D_RAW.length=0; daily.act_cum_pct.forEach(v=>CUM_ACT_D_RAW.push(v));
     window.TODAY_WK=today_wk;
+
+    // อัพเดท LOC_DATA จาก API
+    if(d.locations && d.locations.length>0){
+      LOC_DATA.length=0;
+      d.locations.forEach(l=>LOC_DATA.push({n:l.n, tor:l.tor, mig:l.mig, cfg:l.mig}));
+    }
 
     const _e=id=>document.getElementById(id);
     const thM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
