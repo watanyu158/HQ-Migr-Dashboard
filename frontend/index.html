@@ -7,1551 +7,370 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root{
-  --bg:#f0f4ff;--card:#fff;--border:#e8edf5;
   --primary:#4361ee;--primary-l:#eef1ff;
-  --success:#2bc48a;--success-l:#e6faf3;
+  --success:#2bc48a;--success-l:#e8faf3;
   --warning:#ff9f43;--warning-l:#fff5e6;
-  --danger:#ee4b4b;--danger-l:#fff0f0;
-  --info:#22b8cf;--info-l:#e6f9fb;
-  --text:#1e2d4d;--text2:#5a6a8a;--text3:#94a3c4;
-  --r:14px;--rsm:10px;
-  --sh:0 2px 12px rgba(67,97,238,.07);
+  --danger:#ff6b6b;--danger-l:#fff0f0;
+  --info:#3b9eff;--info-l:#e8f4ff;
+  --text:#1e2d4d;--text2:#64748b;--text3:#94a3b8;
+  --bg:#f0f4ff;--card:#fff;--border:#e2e8f4;
+  --r:12px;--rsm:8px;--sh:0 1px 4px rgba(67,97,238,.07);
 }
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--text);font-size:14px}
-
-/* ── Topbar ── */
-.topbar{background:linear-gradient(135deg,#3a56e4,#6c4de4);color:#fff;padding:0 20px;height:54px;display:flex;align-items:center;justify-content:space-between;gap:8px;box-shadow:0 4px 20px rgba(67,97,238,.3);position:sticky;top:0;z-index:100;flex-wrap:wrap}
-.tb-l{display:flex;align-items:center;gap:10px}
-.tb-logo{width:30px;height:30px;background:rgba(255,255,255,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
-.tb-title{font-size:14px;font-weight:600}
-.tb-sub{font-size:10px;opacity:.7}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+.topbar{background:linear-gradient(135deg,#3a56e4,#6c4de4);color:#fff;padding:0 20px;
+  min-height:54px;display:flex;align-items:center;justify-content:space-between;
+  gap:8px;box-shadow:0 4px 20px rgba(67,97,238,.3);position:sticky;top:0;z-index:100;flex-wrap:wrap}
+.tb-l{display:flex;align-items:center;gap:10px;flex:1}
+.tb-logo{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.tb-title{font-size:15px;font-weight:700}
+.tb-sub{font-size:10px;opacity:.8;margin-top:1px}
 .tb-stats{display:flex;gap:14px}
-.tb-stat .v{font-size:14px;font-weight:700;line-height:1}
-.tb-stat .l{font-size:10px;opacity:.7}
-.tb-div{width:1px;height:24px;background:rgba(255,255,255,.2)}
-.tbtn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:7px;color:#fff;padding:5px 11px;font-size:12px;cursor:pointer;font-family:inherit;transition:.2s}
-.tbtn:hover{background:rgba(255,255,255,.28)}
-
-/* ── Insights ── */
-.insights-box{background:linear-gradient(135deg,#fffbeb,#fff7e0);border-bottom:2px solid #fcd34d;padding:14px 20px}
+.tb-stat .v{font-size:14px;font-weight:700}
+.tb-stat .l{font-size:10px;opacity:.8}
+.tb-div{width:1px;height:28px;background:rgba(255,255,255,.25)}
+.tbtn{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);
+  color:#fff;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600}
+main{padding:14px 20px;max-width:1400px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;box-shadow:var(--sh)}
+.ch{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px}
+.chi{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.scard{border-radius:var(--rsm);padding:15px 16px;border:1px solid var(--border);background:#fff;box-shadow:var(--sh);position:relative;overflow:hidden}
+.sl{font-size:11px;font-weight:500;margin-bottom:5px}
+.sn{font-size:26px;font-weight:700;line-height:1}
+.ss{font-size:11px;color:var(--text2);margin-top:4px}
+.sbar{height:5px;background:var(--border);border-radius:99px;margin-top:9px;overflow:hidden}
+.sf{height:100%;border-radius:99px;transition:width 1s ease}
+.sbadge{position:absolute;top:14px;right:14px;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600}
 .ins-panels{display:flex;gap:14px;margin-bottom:12px;align-items:stretch}
-.ins-alert-card{flex:1;background:#fff;border:1px solid #fed7aa;border-left:4px solid var(--danger);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
-.ins-alert-head{display:flex;align-items:flex-start;gap:10px}
+.ins-alert-card{flex:1;background:#fff;border:1px solid #fed7aa;border-left:4px solid var(--danger);border-radius:12px;padding:14px 18px}
+.ins-alert-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
 .ins-icon{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#ff9f43,#ff6b35);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
 .ins-big{font-size:15px;font-weight:700;color:#b45309;line-height:1.3}
 .ins-big em{font-size:22px;font-style:normal;color:#d97706;margin-right:2px}
-.ins-rate-row{display:flex;align-items:center;gap:8px;background:#f8faff;border-radius:8px;padding:8px 12px;flex-wrap:wrap}
+.ins-pct-tag{font-size:11px;font-weight:600;background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:99px;display:inline-block;margin-top:3px}
+.ins-rate-row{display:flex;align-items:center;gap:8px;background:#f8faff;border-radius:8px;padding:8px 12px;flex-wrap:wrap;margin-top:8px}
 .ins-rate-lbl{font-size:12px;color:var(--text2)}
 .ins-rate-val{font-size:18px;font-weight:700;color:var(--text)}
-.ins-rate-target{color:var(--danger);font-size:18px;font-weight:700}
+.ins-rate-target{font-size:18px;font-weight:700;color:var(--danger)}
 .ins-rate-arrow{font-size:14px;color:var(--text3)}
 .ins-rate-unit{font-size:12px;color:var(--text2)}
-.ins-warn{font-size:12px;color:var(--danger);font-weight:500}
-.ins-forecast{background:#fff0f0;border:1px solid #fca5a5;border-radius:8px;padding:8px 12px;font-size:12px;color:#991b1b;line-height:1.6}
-.ins-forecast strong{font-size:14px}
+.ins-forecast{background:#fff0f0;border:1px solid #fca5a5;border-radius:8px;padding:8px 12px;font-size:12px;color:#991b1b;line-height:1.6;margin-top:8px}
 .ins-gauge-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:20px;flex-shrink:0;min-width:220px}
-.ins-gauge-wrap{position:relative;width:90px;height:90px;flex-shrink:0}
-.ins-gauge-wrap canvas{position:absolute;inset:0;width:90px!important;height:90px!important}
-.ins-gc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:6px}
-.ins-gc .gp{font-size:18px;font-weight:700;color:var(--warning)}
-.ins-kpi-table{display:flex;flex-direction:column;gap:5px;flex:1}
-.ins-kpi-row{display:flex;align-items:baseline;gap:6px}
+.ins-gauge-wrap{position:relative;width:110px;height:110px}
+.ins-gc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gp{font-size:20px;font-weight:800;color:var(--primary)}
+.ins-kpi-table{flex:1}
+.ins-kpi-row{display:flex;align-items:center;gap:6px;padding:3px 0}
 .ins-kpi-lbl{font-size:12px;color:var(--text2);flex:1}
-.ins-kpi-val{font-size:15px;font-weight:700;color:var(--text);min-width:24px;text-align:right}
-.ins-kpi-unit{font-size:11px;color:var(--text2);min-width:24px}
+.ins-kpi-val{font-size:15px;font-weight:700;min-width:24px;text-align:right}
+.ins-kpi-unit{font-size:11px;color:var(--text2)}
 .ins-pills{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;border-top:1px solid rgba(253,211,77,.5);padding-top:10px}
-.ins-pill{background:#fff;border:1px solid var(--border);border-radius:10px;padding:8px 10px;text-align:center}
-.ins-pill .ip-v{font-size:17px;font-weight:700;color:var(--text)}
-.ins-pill .ip-l{font-size:10px;color:var(--text2);margin-top:2px}
-.ins-pill.danger .ip-v{color:var(--danger)}
-.ins-pill.success .ip-v{color:var(--success)}
-.ins-pill.warning .ip-v{color:var(--warning)}
-
-/* ── Main layout ── */
-main{padding:14px 20px;max-width:1400px;margin:0 auto;box-sizing:border-box}
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;box-shadow:var(--sh)}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.mb14{margin-bottom:14px}
-.ch{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px}
-.chi{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
-
-/* ── Tabs ── */
-.tabs{display:flex;gap:4px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:5px;margin-bottom:14px;box-shadow:var(--sh)}
-.tab{padding:7px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:500;color:var(--text2);transition:.18s;white-space:nowrap}
+.ins-pill{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:8px 12px;text-align:center}
+.ins-pill.warning{background:var(--warning-l);border-color:#fed7aa}
+.ins-pill.success{background:var(--success-l);border-color:#bbf7d0}
+.ins-pill.danger{background:var(--danger-l);border-color:#fca5a5}
+.ip-v{font-size:18px;font-weight:700;line-height:1}
+.ip-l{font-size:10px;color:var(--text2);margin-top:3px}
+.tabs{display:flex;gap:4px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:5px;margin-bottom:14px;flex-wrap:wrap}
+.tab{padding:7px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:500;color:var(--text2);transition:.2s}
 .tab:hover{background:var(--primary-l);color:var(--primary)}
 .tab.on{background:var(--primary);color:#fff;font-weight:600}
 .tab-body{display:none}
-
-/* ── Summary cards ── */
-.scard{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px;box-shadow:var(--sh)}
-.scard-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
-.scard-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.scard-badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px}
-.scard-num{font-size:26px;font-weight:800;line-height:1;margin-bottom:3px}
-.scard-lbl{font-size:11px;color:var(--text2)}
-.scard-bar{height:5px;background:var(--border);border-radius:3px;margin-top:10px;overflow:hidden}
-.scard-bar-fill{height:100%;border-radius:3px;transition:.6s}
-
-/* ── Progress 3-step ── */
-.step-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
-.step{background:var(--card);border:1px solid var(--border);border-radius:var(--rsm);padding:12px;box-shadow:var(--sh)}
-.step-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-.step-icon{font-size:18px}
-.step-pct{font-size:13px;font-weight:700;padding:2px 8px;border-radius:99px}
-.step-num{font-size:22px;font-weight:800;line-height:1}
-.step-denom{font-size:13px;color:var(--text2)}
-.step-lbl{font-size:11px;color:var(--text2);margin-top:2px}
-.step-bar{height:6px;border-radius:3px;margin-top:8px;overflow:hidden;background:var(--border)}
-.step-fill{height:100%;border-radius:3px;transition:.6s}
-.s-cfg  .step-num,.s-cfg  .step-pct{color:var(--primary)} .s-cfg  .step-fill{background:var(--primary)}
-.s-inst .step-num,.s-inst .step-pct{color:var(--success)} .s-inst .step-fill{background:var(--success)}
-.s-mig  .step-num,.s-mig  .step-pct{color:var(--warning)} .s-mig  .step-fill{background:var(--warning)}
-
-/* ── Summary header card ── */
-.summary-hdr{background:linear-gradient(135deg,#4361ee,#6c4de4);color:#fff;border-radius:var(--r);padding:16px 20px;margin-bottom:14px}
-.shdr-title{font-size:16px;font-weight:700;margin-bottom:4px}
-.shdr-sub{font-size:12px;opacity:.8}
-.shdr-stats{display:flex;gap:24px;margin-top:12px;flex-wrap:wrap}
-.shdr-stat .v{font-size:22px;font-weight:800;line-height:1}
-.shdr-stat .l{font-size:11px;opacity:.75;margin-top:2px}
-
-/* ── Location heatmap ── */
-.hm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
-.hm-cell{background:var(--card);border:1px solid var(--border);border-radius:var(--rsm);padding:10px 12px;position:relative;overflow:hidden}
-.hm-cell::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
-.hm-cell.hm-100::before{background:var(--success)}
-.hm-cell.hm-hi::before{background:#38bdf8}
-.hm-cell.hm-mid::before{background:var(--warning)}
-.hm-cell.hm-lo::before{background:var(--danger)}
-.hm-cell.hm-0::before{background:var(--border)}
-.hm-name{font-size:11px;font-weight:600;margin-bottom:6px;line-height:1.3;color:var(--text)}
-.hm-bar{height:5px;background:var(--border);border-radius:3px;margin:5px 0;overflow:hidden}
-.hm-bfill{height:100%;border-radius:3px;transition:.5s}
+.hm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-top:4px}
+.hm-cell{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+.hm-name{font-size:11px;font-weight:600;color:var(--text);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hm-pct{font-size:18px;font-weight:700;line-height:1}
+.hm-bar{height:4px;background:var(--border);border-radius:99px;overflow:hidden;margin:4px 0}
+.hm-bfill{height:100%;border-radius:99px}
 .hm-nums{display:flex;justify-content:space-between;font-size:10px;color:var(--text2)}
-.hm-pct{font-size:14px;font-weight:700;color:var(--text)}
-
-/* ── Plan tab ── */
-.pcard{background:var(--bg);border-radius:8px;padding:10px 12px;margin-bottom:0}
-.pc-l{font-size:11px;color:var(--text2);margin-bottom:3px}
-.pc-v{font-size:15px;font-weight:700;color:var(--text)}
-.pc-v.red{color:var(--danger)}
-.pc-v.grn{color:var(--success)}
-.fpc{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px;box-shadow:var(--sh)}
-.fpc-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.fpc-name{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600}
-.fpc-pct{font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px}
-.fpc-big{font-size:24px;font-weight:800;line-height:1;margin-bottom:2px}
-.fpc-sub{font-size:11px;color:var(--text2);margin-bottom:8px}
-.fpc-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:10px}
-.fpc-fill{height:100%;border-radius:3px;transition:.6s}
-.fpc-cats{display:flex;flex-direction:column;gap:6px}
-.fcc{display:flex;align-items:center;gap:6px;font-size:11px}
-.cl2{color:var(--text2);min-width:50px}
-.cv2{font-weight:600;min-width:60px}
-.cb{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
-.cbf{height:100%;border-radius:2px}
-.fpc-dates{display:flex;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid var(--border)}
-.fdate{flex:1}.dl{font-size:10px;color:var(--text2)}.dv{font-size:12px;font-weight:600}
-
-/* ── Weekly chart with legend ── */
-.wk-chart-wrap{position:relative}
-.wk-chart-legend{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:11px;color:var(--text2)}
-.wk-leg-item{display:flex;align-items:center;gap:4px}
-.wk-leg-dot{width:10px;height:10px;border-radius:2px}
-.wk-leg-line{width:18px;height:2px;border-top:2px dashed}
-.wk-stat-row{display:flex;align-items:center;gap:6px;background:var(--primary-l);border-radius:8px;padding:5px 10px;font-size:11px;margin-bottom:8px}
-.wk-stat-done{font-size:13px;font-weight:700;color:var(--primary)}
-.wk-stat-total{color:var(--text2);font-size:12px}
-.wk-stat-pct{font-size:11px;font-weight:600;padding:1px 7px;border-radius:99px}
-
-
-/* ══ RESPONSIVE ════════════════════════════════════════════════════════════ */
-
-/* Tablet: 641–900px */
-@media(max-width:900px){
-  .g3{grid-template-columns:1fr 1fr}
-  .ins-pills{grid-template-columns:repeat(3,1fr)}
-  main{padding:10px 12px}
-}
-
-/* Mobile: ≤640px */
 @media(max-width:640px){
-  /* Layout */
   main{padding:8px 10px}
-  .g2,.g3,.g4,.step-row{grid-template-columns:1fr}
-
-  /* Topbar */
-  .topbar{height:auto;padding:8px 12px;flex-wrap:wrap;gap:6px}
-  .tb-l{gap:8px}
-  .tb-title{font-size:13px!important}
-  .tb-sub{font-size:10px}
-  .tb-stats{display:flex;flex-wrap:wrap;gap:6px;font-size:11px}
-  .tb-stat .v{font-size:12px}
-  .tb-stat .l{font-size:9px}
-  .tb-div{display:none}
-
-  /* Tabs */
-  .tabs{flex-wrap:wrap;gap:3px}
-  .tab{font-size:11px;padding:5px 8px}
-
-  /* Cards */
-  .card{padding:10px}
-
-  /* Insight */
-  .ins-panels{flex-direction:column;gap:10px}
-  .ins-gauge-card{min-width:unset;padding:10px 12px}
-  .ins-alert-card{padding:10px 12px}
-  .ins-big{font-size:13px}
-  .ins-big em{font-size:18px}
-  .ins-rate-row{gap:5px;padding:6px 10px}
-  .ins-rate-val{font-size:15px}
-  .ins-rate-target{font-size:15px}
-  .ins-rate-arrow{font-size:12px}
-  .ins-forecast{font-size:11px;padding:6px 10px}
-  .ins-kpi-table{font-size:11px}
-  .ins-kpi-val{font-size:13px}
-  .ins-pills{grid-template-columns:repeat(3,1fr);gap:6px;padding-top:8px}
-  .ins-pill .ip-v{font-size:16px}
-  .ins-pill .ip-l{font-size:9px}
-
-  /* Overview */
-  .shdr{padding:12px}
-  .shdr-stats{gap:12px}
-  .ov-bar-wrap{min-width:unset;width:100%}
-  .step-card{padding:10px 12px}
-
-  /* Charts */
-  canvas{max-width:100%}
+  .g2,.g4{grid-template-columns:1fr}
+  .ins-panels{flex-direction:column}
+  .ins-gauge-card{min-width:unset}
+  .ins-pills{grid-template-columns:repeat(3,1fr)}
 }
 </style>
 </head>
 <body>
 
-<!-- ── Topbar ── -->
 <div class="topbar">
   <div class="tb-l">
-    <div class="tb-logo" style="font-size:20px;background:rgba(255,255,255,.15)">✈</div>
+    <div class="tb-logo" style="background:rgba(255,255,255,.15)">✈</div>
     <div>
-      <div class="tb-title" style="font-size:15px;letter-spacing:.3px">SDA Migration Progress Dashboard - <span style="background:linear-gradient(90deg,#ffd700,#ffaa00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800">HQ</span></div>
-      <div class="tb-sub">รายงานสรุปการติดตั้งอุปกรณ์ SDA | ข้อมูลล่าสุด: <span id="last-install-lbl">23 มี.ค. 69</span> | ซิงค์ <span id="sync-ts">--</span></div>
+      <div class="tb-title">SDA Migration Dashboard – <span style="background:linear-gradient(90deg,#ffd700,#ffaa00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800"> HQ</span></div>
+      <div class="tb-sub">ข้อมูลล่าสุด: <span id="last-install-lbl">กำลังโหลด...</span> | ซิงค์ <span id="sync-ts">--</span></div>
     </div>
   </div>
   <div class="tb-stats">
-    <div class="tb-stat"><div class="v" id="tb-done">142/193</div><div class="l">Migration</div></div>
+    <div class="tb-stat"><div class="v" id="tb-done">–/193</div><div class="l">Migration</div></div>
     <div class="tb-div"></div>
-    <div class="tb-stat"><div class="v" id="tb-pct" style="color:#ffd700">73.6%</div><div class="l">% สะสม</div></div>
+    <div class="tb-stat"><div class="v" id="tb-pct" style="color:#ffd700">–%</div><div class="l">% สะสม</div></div>
     <div class="tb-div"></div>
-    <div class="tb-stat"><div class="v" id="tb-wk">W.7</div><div class="l">สัปดาห์ปัจจุบัน</div></div>
+    <div class="tb-stat"><div class="v" id="tb-wk">–</div><div class="l">สัปดาห์ปัจจุบัน</div></div>
   </div>
-  <div style="display:flex;gap:6px">
-    <button class="tbtn" onclick="manualRefresh()">↺ รีเฟรช</button>
-    <button class="tbtn" onclick="exportPDF()">⬇ PDF</button>
-  </div>
+  <button class="tbtn" onclick="manualRefresh()">↺ รีเฟรช</button>
 </div>
 
-<!-- ── Insights ── -->
-<div class="insights-box" id="ins-box">
+<div style="background:linear-gradient(135deg,#fffbeb,#fef3c7);border-bottom:1px solid #fde68a;padding:14px 20px" id="ins-box">
   <div class="ins-panels">
     <div class="ins-alert-card">
       <div class="ins-alert-head">
         <div class="ins-icon">🚀</div>
         <div>
-          <div class="ins-big">ต้องเพิ่ม <em id="ins-need-more">3.27</em> อุปกรณ์/วัน<br><span class="ins-pct-tag" id="ins-rate-pct-tag">↑120% จากอัตราปัจจุบัน</span></div>
-          <div style="font-size:12px;color:var(--text2);margin-top:3px">W.8 (23/3-29/3) | เป้าหมาย 193 เครื่อง | เสร็จแล้ว 142 เครื่อง</div>
+          <div class="ins-big">ต้องเพิ่ม <em id="ins-need-more">3.27</em> อุปกรณ์/วัน<br>
+            <span class="ins-pct-tag" id="ins-rate-pct-tag">↑120% จากอัตราปัจจุบัน</span>
+          </div>
         </div>
       </div>
       <div class="ins-rate-row">
         <span class="ins-rate-lbl">อัตราปัจจุบัน</span>
-        <span class="ins-rate-val" id="ins-rate-now">2.7</span>
+        <span class="ins-rate-val" id="ins-rate-now">2.73</span>
         <span class="ins-rate-unit">เครื่อง/วัน</span>
         <span class="ins-rate-arrow">→</span>
         <span class="ins-rate-lbl">ต้องเพิ่มเป็น</span>
         <span class="ins-rate-target" id="ins-rate-req">6</span>
-        <span class="ins-rate-unit">เครื่อง/วัน (<span id="ins-rate-pct">+122%</span>)</span>
+        <span class="ins-rate-unit">เครื่อง/วัน (<span id="ins-rate-pct">+120%</span>)</span>
       </div>
       <div class="ins-forecast" id="ins-forecast">
-        <strong>⚠ ถ้าไม่เพิ่มอัตรา:</strong> คาดว่าจะเสร็จ <strong>12 เม.ย. 2569</strong> —
-        ช้ากว่าเป้าหมาย (3 เม.ย.) <strong style="color:var(--danger)">9 วัน</strong> |
-        ยังเหลือ <strong>52 เครื่อง</strong> ใน <strong>10 วัน</strong>
+        ⚠ ถ้าไม่เพิ่มอัตรา: คาดว่าจะเสร็จ <strong>14 เม.ย. 69</strong> — ช้ากว่าเป้า <strong style="color:var(--danger)">11 วัน</strong> | เหลือ <strong>51 เครื่อง</strong> ใน <strong>9 วัน</strong>
       </div>
     </div>
     <div class="ins-gauge-card">
-      <div class="ins-gauge-section">
-        <div class="ins-gauge-wrap"><canvas id="gauge-c"></canvas><div class="ins-gc"><div class="gp" id="gauge-pct">46%</div></div></div>
+      <div class="ins-gauge-wrap"><canvas id="gauge-c"></canvas>
+        <div class="ins-gc"><div class="gp" id="gauge-pct">46%</div></div>
       </div>
       <div class="ins-kpi-table">
-        <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:2px;text-transform:uppercase;letter-spacing:.4px">ประเมินความตรงต่อเวลา</div>
-        <div class="ins-kpi-row">
-          <span class="ins-kpi-lbl">สะสมจริง</span>
-          <span class="ins-kpi-val" id="kpi-act" style="color:var(--warning)">0</span>
-          <span class="ins-kpi-unit">%</span>
-        </div>
-        <div class="ins-kpi-row">
-          <span class="ins-kpi-lbl">เป้าหมาย</span>
-          <span class="ins-kpi-val" id="kpi-plan" style="color:var(--primary)">91.71</span>
-          <span class="ins-kpi-unit">%</span>
-        </div>
-        <div class="ins-kpi-row" style="border-top:1px solid var(--border);padding-top:5px;margin-top:3px">
-          <span class="ins-kpi-lbl">ส่วนต่าง</span>
-          <span class="ins-kpi-val" id="kpi-diff" style="color:var(--danger)">-18.6</span>
-          <span class="ins-kpi-unit" style="color:var(--danger)">%</span>
-        </div>
-        <div class="ins-kpi-row">
-          <span class="ins-kpi-lbl" style="font-size:11px">ล่าช้า</span>
-          <span class="ins-kpi-val" id="kpi-late" style="color:var(--danger);font-size:13px">11</span>
-          <span class="ins-kpi-unit" style="color:var(--danger)">วัน</span>
-        </div>
+        <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px">ประเมินความตรงต่อเวลา</div>
+        <div class="ins-kpi-row"><span class="ins-kpi-lbl">สะสมจริง</span><span class="ins-kpi-val" id="kpi-act" style="color:var(--warning)">73.58</span><span class="ins-kpi-unit">%</span></div>
+        <div class="ins-kpi-row"><span class="ins-kpi-lbl">เป้าหมาย</span><span class="ins-kpi-val" id="kpi-plan" style="color:var(--primary)">91.71</span><span class="ins-kpi-unit">%</span></div>
+        <div class="ins-kpi-row" style="border-top:1px solid var(--border);padding-top:3px;margin-top:2px"><span class="ins-kpi-lbl">ส่วนต่าง</span><span class="ins-kpi-val" id="kpi-diff" style="color:var(--danger)">-18.1</span><span class="ins-kpi-unit" style="color:var(--danger)">%</span></div>
+        <div class="ins-kpi-row"><span class="ins-kpi-lbl">ล่าช้า</span><span class="ins-kpi-val" id="kpi-late" style="color:var(--danger)">11</span><span class="ins-kpi-unit" style="color:var(--danger)">วัน</span></div>
       </div>
     </div>
   </div>
   <div class="ins-pills">
-    <div class="ins-pill"><div class="ins-pill ip-v">193</div><div class="ip-l">อุปกรณ์ตามแผน</div></div>
-    <div class="ins-pill warning"><div class="ins-pill ip-v" id="pill-mig">142</div><div class="ip-l">Migration แล้ว</div></div>
-    <div class="ins-pill success"><div class="ins-pill ip-v" id="pill-cfg">147</div><div class="ip-l">Config แล้ว</div></div>
-    <div class="ins-pill danger"><div class="ins-pill ip-v" id="pill-rem">51</div><div class="ip-l">คงเหลือ</div></div>
-    <div class="ins-pill"><div class="ins-pill ip-v" id="pill-rate">2.7</div><div class="ip-l">เครื่อง/วัน</div></div>
+    <div class="ins-pill"><div class="ip-v">193</div><div class="ip-l">อุปกรณ์ตามแผน</div></div>
+    <div class="ins-pill warning"><div class="ip-v" id="pill-mig">142</div><div class="ip-l">Migration แล้ว</div></div>
+    <div class="ins-pill success"><div class="ip-v" id="pill-cfg">147</div><div class="ip-l">Config แล้ว</div></div>
+    <div class="ins-pill danger"><div class="ip-v" id="pill-rem">51</div><div class="ip-l">คงเหลือ</div></div>
+    <div class="ins-pill"><div class="ip-v" id="pill-rate">2.73</div><div class="ip-l">เครื่อง/วัน</div></div>
   </div>
 </div>
 
-<!-- ── Tabs ── -->
 <main>
 <div class="tabs">
-  <div class="tab on"  onclick="showTab('overview',this)">📊 ภาพรวม</div>
-  <div class="tab"     onclick="showTab('weekly',this)">📈 รายสัปดาห์</div>
-  <div class="tab"     onclick="showTab('daily',this)">📆 รายวัน</div>
-  <div class="tab"     onclick="showTab('location',this)">📍 สถานที่</div>
-  <div class="tab"     onclick="showTab('plan',this)">📅 แผนงาน</div>
+  <div class="tab on" onclick="showTab('overview',this)">📊 ภาพรวม</div>
+  <div class="tab"    onclick="showTab('weekly',this)">📈 รายสัปดาห์</div>
+  <div class="tab"    onclick="showTab('daily',this)">📆 รายวัน</div>
+  <div class="tab"    onclick="showTab('location',this)">📍 สถานที่</div>
+  <div class="tab"    onclick="showTab('plan',this)">📅 แผนงาน</div>
 </div>
 
-<!-- ══ Tab: Overview ══ -->
 <div class="tab-body" id="tab-overview" style="display:block">
-
-  <!-- Summary header -->
-  <div class="summary-hdr">
-    <div class="shdr-title">รายงานสรุปการติดตั้งอุปกรณ์ SDA — สำนักงานใหญ่ (HQ)</div>
-    <div class="shdr-sub">ช่วงดำเนินงาน: 3 ก.พ. – 3 เม.ย. 2569 | 9 สัปดาห์</div>
-    <div class="shdr-stats">
-      <div class="shdr-stat"><div class="v">193</div><div class="l">อุปกรณ์ตามแผน</div></div>
-      <div class="shdr-stat"><div class="v" id="ov-mig">142</div><div class="l">Migration แล้ว</div></div>
-      <div class="shdr-stat"><div class="v" id="ov-cfg">147</div><div class="l">Config แล้ว</div></div>
-      <div class="shdr-stat"><div class="v" id="ov-pct">73.6%</div><div class="l">% ความคืบหน้า</div></div>
-    </div>
+  <div class="g4" style="margin-bottom:14px">
+    <div class="scard all"><div class="sl" style="color:var(--primary)">🏗 Migration ทั้งหมด</div><div class="sn" id="ov-all">–/–</div><div class="ss" id="ov-all-sub">กำลังโหลด...</div><div class="sbar"><div class="sf" id="ov-all-b" style="width:0%;background:var(--primary)"></div></div><div class="sbadge" id="ov-all-badge" style="background:var(--primary-l);color:var(--primary)">–%</div></div>
+    <div class="scard sw"><div class="sl" style="color:#4361ee">🔀 Switch</div><div class="sn" id="ov-sw">–/–</div><div class="ss" id="ov-sw-sub">กำลังโหลด...</div><div class="sbar"><div class="sf" id="ov-sw-b" style="width:0%;background:#4361ee"></div></div><div class="sbadge" id="ov-sw-badge" style="background:var(--primary-l);color:#4361ee">–%</div></div>
+    <div class="scard ap"><div class="sl" style="color:#065f46">📶 AP</div><div class="sn" id="ov-ap">–/–</div><div class="ss" id="ov-ap-sub">กำลังโหลด...</div><div class="sbar"><div class="sf" id="ov-ap-b" style="width:0%;background:#2bc48a"></div></div><div class="sbadge" id="ov-ap-badge" style="background:var(--success-l);color:#065f46">–%</div></div>
+    <div class="scard inf"><div class="sl" style="color:#92400e">⚡ Infra</div><div class="sn" id="ov-inf">–/–</div><div class="ss" id="ov-inf-sub">กำลังโหลด...</div><div class="sbar"><div class="sf" id="ov-inf-b" style="width:0%;background:#ff9f43"></div></div><div class="sbadge" id="ov-inf-badge" style="background:var(--warning-l);color:#92400e">–%</div></div>
   </div>
-
-
-
-  <!-- Burndown + Cumulative weekly -->
-  <div class="g2 mb14">
-    <div class="card">
-      <div class="ch"><div class="chi" style="background:var(--primary-l);color:var(--primary)">📉</div>Burn-down Chart</div>
-      <div style="height:220px"><canvas id="burndown-c"></canvas></div>
-      <div class="wk-chart-legend">
-        <div class="wk-leg-item"><div class="wk-leg-line" style="border-color:#94a3c4"></div><span>แผน</span></div>
-        <div class="wk-leg-item"><div class="wk-leg-dot" style="background:var(--success)"></div><span>จริง</span></div>
-        <div class="wk-leg-item" style="margin-left:6px;color:var(--danger);font-weight:600">| วันนี้</div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="ch"><div class="chi" style="background:var(--warning-l);color:var(--warning)">📊</div>% สะสม Migration vs แผน</div>
-      <div style="height:220px"><canvas id="cum-weekly-c"></canvas></div>
-    </div>
+  <div class="card" style="margin-bottom:14px"><div class="ch"><div class="chi" style="background:var(--primary-l);color:var(--primary)">📊</div>Migration แยกประเภทอุปกรณ์</div><div style="height:200px"><canvas id="dev-bar-c"></canvas></div></div>
+  <div class="g2" style="margin-bottom:14px">
+    <div class="card"><div class="ch"><div class="chi" style="background:var(--danger-l);color:var(--danger)">📉</div>Burndown Chart</div><div style="height:200px"><canvas id="burndown-c"></canvas></div></div>
+    <div class="card"><div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">📈</div>% สะสม — แผน vs จริง</div><div style="height:200px"><canvas id="cum-weekly-c"></canvas></div></div>
   </div>
-
-  <!-- Location heatmap -->
-  <div class="card">
-    <div class="ch"><div class="chi" style="background:var(--info-l);color:var(--info)">🗺️</div>Location Heatmap — สรุปตามสถานที่</div>
-    <div class="hm-grid" id="hm-grid"></div>
-  </div>
+  <div class="card" style="margin-bottom:14px"><div class="ch"><div class="chi" style="background:var(--info-l);color:var(--info)">🗺️</div>Location Heatmap — สรุปตามสถานที่</div><div class="hm-grid" id="hm-grid"></div></div>
+  <div class="card" style="margin-bottom:14px"><div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">📋</div>รายละเอียดแยกสถานที่ — Switch / AP / Infra</div><div id="cat-loc-table" style="margin-top:4px">⏳ กำลังโหลด...</div></div>
 </div>
 
-
-<!-- ══ Device Summary: Switch / AP / Infra ══ -->
-<div class="card" style="margin-bottom:14px" id="device-summary-card">
-  <div class="ch">
-    <div class="chi" style="background:var(--primary-l);color:var(--primary)">📡</div>
-    สรุปความคืบหน้า Migration — Switch / AP / Infra
-  </div>
-  <!-- 3 big stat cards -->
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px" id="dev-stat-row">
-    <!-- filled by JS -->
-  </div>
-  <!-- bar chart -->
-  <div style="height:200px"><canvas id="dev-bar-c"></canvas></div>
-</div>
-<div class="card" style="margin-bottom:14px">
-  <div class="ch">
-    <div class="chi" style="background:var(--success-l);color:var(--success)">📋</div>
-    รายละเอียดแยกสถานที่ — Switch / AP / Infra
-  </div>
-  <div id="cat-loc-table" style="margin-top:4px"></div>
-</div>
-
-<!-- ══ Tab: Weekly ══ -->
 <div class="tab-body" id="tab-weekly">
-  <!-- W1: Migration bar -->
-  <div class="card mb14">
-    <div class="ch"><div class="chi" style="background:var(--primary-l);color:var(--primary)">📊</div>จำนวนอุปกรณ์รายสัปดาห์ — แผน vs Migration จริง</div>
-    <div class="wk-stat-row">
-      <span class="wk-stat-done" id="wstat-mig-done">142</span>
-      <span class="wk-stat-total">/ 193 เครื่อง</span>
-      <span class="wk-stat-pct" id="wstat-mig-pct" style="background:var(--warning-l);color:var(--warning)">73.6%</span>
-      <span style="font-size:11px;color:var(--text2);margin-left:4px">Migration สะสม</span>
-    </div>
-    <div style="height:240px"><canvas id="wk-bar-c"></canvas></div>
-    <div class="wk-chart-legend">
-      <div class="wk-leg-item"><div class="wk-leg-dot" style="background:rgba(148,163,196,.5)"></div><span>แผน</span></div>
-      <div class="wk-leg-item"><div class="wk-leg-dot" style="background:var(--warning)"></div><span>Migration จริง</span></div>
-    </div>
+  <div class="g2" style="margin-bottom:14px">
+    <div class="card"><div class="ch"><div class="chi" style="background:var(--primary-l);color:var(--primary)">📊</div>ผลงานรายสัปดาห์</div><div style="height:220px"><canvas id="weekly-bar-c"></canvas></div></div>
+    <div class="card"><div class="ch"><div class="chi" style="background:var(--warning-l);color:var(--warning)">📈</div>% สะสมรายสัปดาห์</div><div style="height:220px"><canvas id="cum-cfg-c"></canvas></div></div>
   </div>
-
-  <!-- Cum Config vs Plan -->
-  <div class="g2">
-    <div class="card">
-      <div class="ch"><div class="chi" style="background:var(--primary-l);color:var(--primary)">📈</div>% สะสม Config vs แผน</div>
-      <div class="wk-stat-row">
-        <span class="wk-stat-done" style="color:var(--primary)" id="wstat-cfg-done">147</span>
-        <span class="wk-stat-total">/ 193 เครื่อง</span>
-        <span class="wk-stat-pct" id="wstat-cfg-pct" style="background:var(--primary-l);color:var(--primary)">76.2%</span>
-        <span style="font-size:11px;color:var(--text2);margin-left:4px">Config สะสม</span>
-      </div>
-      <div style="height:200px"><canvas id="cum-cfg-c"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="ch"><div class="chi" style="background:var(--warning-l);color:var(--warning)">📈</div>% สะสม Migration vs แผน</div>
-      <div class="wk-stat-row">
-        <span class="wk-stat-done" style="color:var(--warning)" id="wstat-mig-done2">142</span>
-        <span class="wk-stat-total">/ 193 เครื่อง</span>
-        <span class="wk-stat-pct" id="wstat-mig-pct2" style="background:var(--warning-l);color:var(--warning)">73.6%</span>
-        <span style="font-size:11px;color:var(--text2);margin-left:4px">Migration สะสม</span>
-      </div>
-      <div style="height:200px"><canvas id="cum-mig-c"></canvas></div>
-    </div>
-  </div>
-
-  <!-- Device Type chart -->
-  <div class="card" id="type-bar-card" style="margin-top:14px;page-break-before:always;break-before:page">
-    <div class="ch"><div class="chi" style="background:var(--primary-l);color:var(--primary)">📊</div>แยกตามประเภทอุปกรณ์ — แผน vs ติดตั้งแล้ว</div>
-    <div style="height:480px"><canvas id="type-bar-c"></canvas></div>
-  </div>
+  <div class="card" style="margin-bottom:14px"><div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">📋</div>ตารางสรุปรายสัปดาห์</div><div id="weekly-table" style="overflow-x:auto;margin-top:4px"></div></div>
 </div>
 
-<!-- ══ Tab: Daily ══ -->
 <div class="tab-body" id="tab-daily">
-  <div class="card mb14">
-    <div class="ch"><div class="chi" style="background:var(--info-l);color:var(--info)">📆</div>จำนวนอุปกรณ์รายวัน — แผน vs Migration จริง</div>
-    <div style="height:240px"><canvas id="daily-bar-c"></canvas></div>
-  </div>
-  <div class="card">
-    <div class="ch"><div class="chi" style="background:var(--warning-l);color:var(--warning)">📈</div>% สะสมรายวัน — แผน vs จริง</div>
-    <div style="height:220px"><canvas id="daily-cum-c"></canvas></div>
+  <div class="g2" style="margin-bottom:14px">
+    <div class="card"><div class="ch"><div class="chi" style="background:var(--primary-l);color:var(--primary)">📊</div>ผลงานรายวัน</div><div style="height:220px"><canvas id="daily-bar-c"></canvas></div></div>
+    <div class="card"><div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">📈</div>% สะสมรายวัน</div><div style="height:220px"><canvas id="daily-cum-c"></canvas></div></div>
   </div>
 </div>
 
-<!-- ══ Tab: Location ══ -->
 <div class="tab-body" id="tab-location">
-  <div class="card">
-    <div class="ch"><div class="chi" style="background:var(--info-l);color:var(--info)">📍</div>รายละเอียดแยกตามสถานที่</div>
-    <div style="overflow-x:auto">
-      <table style="width:100%;border-collapse:collapse;font-size:13px" id="loc-table">
-        <thead>
-          <tr style="background:var(--primary-l)">
-            <th style="padding:8px 10px;text-align:left;font-weight:600;color:var(--primary);border-bottom:2px solid var(--primary)">สถานที่</th>
-            <th style="padding:8px 10px;text-align:center;font-weight:600;color:var(--primary);border-bottom:2px solid var(--primary)">TOR</th>
-            <th style="padding:8px 10px;text-align:center;font-weight:600;color:var(--primary);border-bottom:2px solid var(--primary)">Config</th>
-            <th style="padding:8px 10px;text-align:center;font-weight:600;color:var(--primary);border-bottom:2px solid var(--primary)">Install</th>
-            <th style="padding:8px 10px;text-align:center;font-weight:600;color:var(--primary);border-bottom:2px solid var(--primary)">Migration</th>
-            <th style="padding:8px 10px;min-width:140px;font-weight:600;color:var(--primary);border-bottom:2px solid var(--primary)">ความคืบหน้า</th>
-          </tr>
-        </thead>
-        <tbody id="loc-tbody"></tbody>
-      </table>
-    </div>
-  </div>
+  <div class="card" style="margin-bottom:14px"><div class="ch"><div class="chi" style="background:var(--info-l);color:var(--info)">📍</div>สรุปตามสถานที่</div><div id="loc-table" style="overflow-x:auto;margin-top:4px"></div></div>
 </div>
 
-
-<!-- ══ Tab: Plan ══ -->
 <div class="tab-body" id="tab-plan">
-
-  <div style="background:linear-gradient(90deg,var(--primary-l),var(--hold-l));border-radius:var(--rsm);padding:9px 13px;display:flex;align-items:center;gap:7px;margin-bottom:13px;font-size:13px;font-weight:600;color:var(--primary)">📅 การวางแผนโครงการ</div>
-
-  <div class="g3" style="margin-bottom:14px">
-    <!-- ระยะเวลา -->
-    <div class="card">
-      <div class="ch" style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:9px">📅 ระยะเวลาโครงการ</div>
-      <div class="g2" style="gap:7px">
-        <div class="pcard"><div class="pc-l">วันเริ่มต้น</div><div class="pc-v">2 ก.พ. 69</div></div>
-        <div class="pcard"><div class="pc-l">วันสิ้นสุด</div><div class="pc-v">3 เม.ย. 69</div></div>
-        <div class="pcard"><div class="pc-l">จำนวนวันทั้งหมด</div><div class="pc-v">60 วัน</div></div>
-        <div class="pcard"><div class="pc-l">วันที่เหลือ</div><div class="pc-v red">10 วัน</div></div>
-      </div>
-    </div>
-    <!-- เป้าหมาย -->
-    <div class="card">
-      <div class="ch" style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:9px">📈 เป้าหมายตามแผน</div>
-      <div class="pcard" style="margin-bottom:7px"><div class="pc-l">เป้าหมายอุปกรณ์/วัน</div><div class="pc-v">3.2/วัน</div></div>
-      <div class="pcard" style="margin-bottom:7px"><div class="pc-l">เป้าหมายปัจจุบัน</div><div class="pc-v red">5.2/วัน</div></div>
-      <div class="pcard"><div class="pc-l">อุปกรณ์ที่เหลือ</div><div class="pc-v">52 เครื่อง</div></div>
-    </div>
-    <!-- ประเมิน -->
-    <div class="card">
-      <div class="ch" style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:9px">✅ การประเมินโครงการ</div>
-      <div class="pcard" style="margin-bottom:7px"><div class="pc-l">ความคืบหน้าตามแผน (W.8)</div><div class="pc-v">91.71%</div></div>
-      <div class="pcard" style="margin-bottom:7px">
-        <div class="pc-l">ความคืบหน้าปัจจุบัน</div>
-        <div class="pc-v grn">73.6%</div>
-        <div style="height:5px;background:#f0f4ff;border-radius:99px;margin-top:5px;overflow:hidden">
-          <div style="height:100%;width:73.6%;background:var(--success);border-radius:99px"></div>
-        </div>
-      </div>
-      <div class="pcard"><div class="pc-l">สถานะ</div><div class="pc-v red">↘ ช้ากว่าแผน 18.6%</div></div>
-    </div>
-  </div>
-
-  <!-- ข้อมูลการติดตั้งจริง -->
-  <div class="card" style="margin-bottom:14px">
-    <div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">⚡</div>ข้อมูลการติดตั้งจริง</div>
-    <div class="g3" style="margin-bottom:11px">
-      <div class="pcard"><div class="pc-l">Migration ที่ทำแล้ว</div><div class="pc-v" id="pc-mig" style="font-size:20px">142/193 เครื่อง</div></div>
-      <div class="pcard"><div class="pc-l">เฉลี่ยที่ทำได้/วัน</div><div class="pc-v" style="font-size:20px">2.82/วัน</div></div>
-      <div class="pcard"><div class="pc-l">คาดว่าจะเสร็จ</div><div class="pc-v red" style="font-size:20px">12 เม.ย. 69 <span style="font-size:12px">(ช้า 9 วัน)</span></div></div>
-    </div>
-    <div style="font-size:12px;color:var(--text2);margin-bottom:5px">ประสิทธิภาพเทียบกับเป้าหมายปัจจุบัน:</div>
-    <div style="display:flex;align-items:center;gap:9px">
-      <span style="font-size:12px;color:var(--text2);white-space:nowrap">ทำได้ 2.82/วัน จากเป้า 5.2/วัน</span>
-      <div style="flex:1;height:11px;background:#f0f4ff;border-radius:99px;overflow:hidden">
-        <div style="height:100%;width:54.2%;background:linear-gradient(90deg,var(--danger),#ff8a8a);border-radius:99px"></div>
-      </div>
-      <span style="font-size:12px;font-weight:700;color:var(--danger)">54.2%</span>
-    </div>
-    <div style="text-align:right;font-size:11px;color:var(--danger);margin-top:3px">⚠ ต่ำกว่าเป้าหมาย — ต้องเพิ่มอัตรา +84%</div>
-  </div>
-
-  <!-- รายละเอียดแยก Location -->
-  <div id="plan-loc-list" style="page-break-before:always;break-before:page"></div>
-
+  <div class="card" style="margin-bottom:14px"><div class="ch"><div class="chi" style="background:var(--warning-l);color:var(--warning)">📅</div>แผนงาน vs ความคืบหน้า</div><div style="height:300px"><canvas id="plan-c"></canvas></div></div>
 </div>
-
 </main>
-
-<!-- ══ Tab: Plan ══ -->
-<div class="tab-body" id="tab-plan">
-
-  <div style="background:linear-gradient(90deg,var(--primary-l),var(--hold-l));border-radius:var(--rsm);padding:9px 13px;display:flex;align-items:center;gap:7px;margin-bottom:13px;font-size:13px;font-weight:600;color:var(--primary)">📅 การวางแผนโครงการ</div>
-
-  <div class="g3" style="margin-bottom:14px">
-    <!-- ระยะเวลา -->
-    <div class="card">
-      <div class="ch" style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:9px">📅 ระยะเวลาโครงการ</div>
-      <div class="g2" style="gap:7px">
-        <div class="pcard"><div class="pc-l">วันเริ่มต้น</div><div class="pc-v">2 ก.พ. 69</div></div>
-        <div class="pcard"><div class="pc-l">วันสิ้นสุด</div><div class="pc-v">3 เม.ย. 69</div></div>
-        <div class="pcard"><div class="pc-l">จำนวนวันทั้งหมด</div><div class="pc-v">60 วัน</div></div>
-        <div class="pcard"><div class="pc-l">วันที่เหลือ</div><div class="pc-v red">10 วัน</div></div>
-      </div>
-    </div>
-    <!-- เป้าหมาย -->
-    <div class="card">
-      <div class="ch" style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:9px">📈 เป้าหมายตามแผน</div>
-      <div class="pcard" style="margin-bottom:7px"><div class="pc-l">เป้าหมายอุปกรณ์/วัน</div><div class="pc-v">3.2/วัน</div></div>
-      <div class="pcard" style="margin-bottom:7px"><div class="pc-l">เป้าหมายปัจจุบัน</div><div class="pc-v red">5.2/วัน</div></div>
-      <div class="pcard"><div class="pc-l">อุปกรณ์ที่เหลือ</div><div class="pc-v">52 เครื่อง</div></div>
-    </div>
-    <!-- ประเมิน -->
-    <div class="card">
-      <div class="ch" style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:9px">✅ การประเมินโครงการ</div>
-      <div class="pcard" style="margin-bottom:7px"><div class="pc-l">ความคืบหน้าตามแผน (W.8)</div><div class="pc-v">91.71%</div></div>
-      <div class="pcard" style="margin-bottom:7px">
-        <div class="pc-l">ความคืบหน้าปัจจุบัน</div>
-        <div class="pc-v grn">73.6%</div>
-        <div style="height:5px;background:#f0f4ff;border-radius:99px;margin-top:5px;overflow:hidden">
-          <div style="height:100%;width:73.6%;background:var(--success);border-radius:99px"></div>
-        </div>
-      </div>
-      <div class="pcard"><div class="pc-l">สถานะ</div><div class="pc-v red">↘ ช้ากว่าแผน 18.6%</div></div>
-    </div>
-  </div>
-
-  <!-- ข้อมูลการติดตั้งจริง -->
-  <div class="card" style="margin-bottom:14px">
-    <div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">⚡</div>ข้อมูลการติดตั้งจริง</div>
-    <div class="g3" style="margin-bottom:11px">
-      <div class="pcard"><div class="pc-l">Migration ที่ทำแล้ว</div><div class="pc-v" id="pc-mig" style="font-size:20px">142/193 เครื่อง</div></div>
-      <div class="pcard"><div class="pc-l">เฉลี่ยที่ทำได้/วัน</div><div class="pc-v" style="font-size:20px">2.82/วัน</div></div>
-      <div class="pcard"><div class="pc-l">คาดว่าจะเสร็จ</div><div class="pc-v red" style="font-size:20px">12 เม.ย. 69 <span style="font-size:12px">(ช้า 9 วัน)</span></div></div>
-    </div>
-    <div style="font-size:12px;color:var(--text2);margin-bottom:5px">ประสิทธิภาพเทียบกับเป้าหมายปัจจุบัน:</div>
-    <div style="display:flex;align-items:center;gap:9px">
-      <span style="font-size:12px;color:var(--text2);white-space:nowrap">ทำได้ 2.82/วัน จากเป้า 5.2/วัน</span>
-      <div style="flex:1;height:11px;background:#f0f4ff;border-radius:99px;overflow:hidden">
-        <div style="height:100%;width:54.2%;background:linear-gradient(90deg,var(--danger),#ff8a8a);border-radius:99px"></div>
-      </div>
-      <span style="font-size:12px;font-weight:700;color:var(--danger)">54.2%</span>
-    </div>
-    <div style="text-align:right;font-size:11px;color:var(--danger);margin-top:3px">⚠ ต่ำกว่าเป้าหมาย — ต้องเพิ่มอัตรา +84%</div>
-  </div>
-
-  <!-- รายละเอียดแยก Location -->
-  <div id="plan-loc-list" style="page-break-before:always;break-before:page"></div>
-
-</div>
-
-<div class="g4" style="margin-bottom:14px">
-  <div class="scard all">
-    <div class="sl" style="color:var(--primary)">🏗 Migration ทั้งหมด</div>
-    <div class="sn" id="ov-all">–/–</div>
-    <div class="ss" id="ov-all-sub">กำลังโหลด...</div>
-    <div class="sbar"><div class="sf" id="ov-all-b" style="width:0%;background:var(--primary)"></div></div>
-    <div class="sbadge" id="ov-all-badge" style="background:var(--primary-l);color:var(--primary)">–%</div>
-  </div>
-  <div class="scard sw">
-    <div class="sl" style="color:#4361ee">🔀 Switch</div>
-    <div class="sn" id="ov-sw">–/–</div>
-    <div class="ss" id="ov-sw-sub">กำลังโหลด...</div>
-    <div class="sbar"><div class="sf" id="ov-sw-b" style="width:0%;background:#4361ee"></div></div>
-    <div class="sbadge" id="ov-sw-badge" style="background:var(--primary-l);color:#4361ee">–%</div>
-  </div>
-  <div class="scard ap">
-    <div class="sl" style="color:#065f46">📶 AP</div>
-    <div class="sn" id="ov-ap">–/–</div>
-    <div class="ss" id="ov-ap-sub">กำลังโหลด...</div>
-    <div class="sbar"><div class="sf" id="ov-ap-b" style="width:0%;background:#2bc48a"></div></div>
-    <div class="sbadge" id="ov-ap-badge" style="background:var(--success-l);color:#065f46">–%</div>
-  </div>
-  <div class="scard inf">
-    <div class="sl" style="color:#92400e">⚡ Infra</div>
-    <div class="sn" id="ov-inf">–/–</div>
-    <div class="ss" id="ov-inf-sub">กำลังโหลด...</div>
-    <div class="sbar"><div class="sf" id="ov-inf-b" style="width:0%;background:#ff9f43"></div></div>
-    <div class="sbadge" id="ov-inf-badge" style="background:var(--warning-l);color:#92400e">–%</div>
-  </div>
-</div>
-
-<!-- ── Insights ── -->
-<div class="insights-box" id="ins-box">
-  <div class="ins-panels">
-    <div class="ins-alert-card">
-      <div class="ins-alert-head">
-        <div class="ins-icon">🚀</div>
-        <div>
-          <div class="ins-big">ต้องเพิ่ม <em id="ins-need-more">3.27</em> อุปกรณ์/วัน<br><span class="ins-pct-tag" id="ins-rate-pct-tag">↑120% จากอัตราปัจจุบัน</span></div>
-          <div style="font-size:12px;color:var(--text2);margin-top:3px">W.8 (23/3-29/3) | เป้าหมาย 193 เครื่อง | เสร็จแล้ว 142 เครื่อง</div>
-        </div>
-      </div>
-      <div class="ins-rate-row">
-        <span class="ins-rate-lbl">อัตราปัจจุบัน</span>
-        <span class="ins-rate-val" id="ins-rate-now">2.7</span>
-        <span class="ins-rate-unit">เครื่อง/วัน</span>
-        <span class="ins-rate-arrow">→</span>
-        <span class="ins-rate-lbl">ต้องเพิ่มเป็น</span>
-        <span class="ins-rate-target" id="ins-rate-req">6</span>
-        <span class="ins-rate-unit">เครื่อง/วัน (<span id="ins-rate-pct">+122%</span>)</span>
-      </div>
-      <div class="ins-forecast" id="ins-forecast">
-        <strong>⚠ ถ้าไม่เพิ่มอัตรา:</strong> คาดว่าจะเสร็จ <strong>12 เม.ย. 2569</strong> —
-        ช้ากว่าเป้าหมาย (3 เม.ย.) <strong style="color:var(--danger)">9 วัน</strong> |
-        ยังเหลือ <strong>52 เครื่อง</strong> ใน <strong>10 วัน</strong>
-      </div>
-    </div>
-    <div class="ins-gauge-card">
-      <div class="ins-gauge-section">
-        <div class="ins-gauge-wrap"><canvas id="gauge-c"></canvas><div class="ins-gc"><div class="gp" id="gauge-pct">46%</div></div></div>
-      </div>
-      <div class="ins-kpi-table">
-        <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:2px;text-transform:uppercase;letter-spacing:.4px">ประเมินความตรงต่อเวลา</div>
-        <div class="ins-kpi-row">
-          <span class="ins-kpi-lbl">สะสมจริง</span>
-          <span class="ins-kpi-val" id="kpi-act" style="color:var(--warning)">0</span>
-          <span class="ins-kpi-unit">%</span>
-        </div>
-        <div class="ins-kpi-row">
-          <span class="ins-kpi-lbl">เป้าหมาย</span>
-          <span class="ins-kpi-val" id="kpi-plan" style="color:var(--primary)">91.71</span>
-          <span class="ins-kpi-unit">%</span>
-        </div>
-        <div class="ins-kpi-row" style="border-top:1px solid var(--border);padding-top:5px;margin-top:3px">
-          <span class="ins-kpi-lbl">ส่วนต่าง</span>
-          <span class="ins-kpi-val" id="kpi-diff" style="color:var(--danger)">-18.6</span>
-          <span class="ins-kpi-unit" style="color:var(--danger)">%</span>
-        </div>
-        <div class="ins-kpi-row">
-          <span class="ins-kpi-lbl" style="font-size:11px">ล่าช้า</span>
-          <span class="ins-kpi-val" id="kpi-late" style="color:var(--danger);font-size:13px">11</span>
-          <span class="ins-kpi-unit" style="color:var(--danger)">วัน</span>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="ins-pills">
-    <div class="ins-pill"><div class="ins-pill ip-v">193</div><div class="ip-l">อุปกรณ์ตามแผน</div></div>
-    <div class="ins-pill warning"><div class="ins-pill ip-v" id="pill-mig">142</div><div class="ip-l">Migration แล้ว</div></div>
-    <div class="ins-pill success"><div class="ins-pill ip-v" id="pill-cfg">147</div><div class="ip-l">Config แล้ว</div></div>
-    <div class="ins-pill danger"><div class="ins-pill ip-v" id="pill-rem">51</div><div class="ip-l">คงเหลือ</div></div>
-    <div class="ins-pill"><div class="ins-pill ip-v" id="pill-rate">2.7</div><div class="ip-l">เครื่อง/วัน</div></div>
-  </div>
-</div>
-
-<!-- ── Tabs ── -->
-<main>
-<div class="tabs">
-  <div class="tab on"  onclick="showTab('overview',this)">📊 ภาพรวม</div>
-  <div class="tab"     onclick="showTab('weekly',this)">📈 รายสัปดาห์</div>
-  <div class="tab"     onclick="showTab('daily',this)">📆 รายวัน</div>
-  <div class="tab"     onclick="showTab('location',this)">📍 สถานที่</div>
-  <div class="tab"     onclick="showTab('plan',this)">📅 แผนงาน</div>
-</div>
-
-<!-- ══ Tab: Overview ══ -->
-<div class="tab-body" id="tab-overview" style="display:block">
-
-  <!-- Summary header -->
-  <div class="summary-hdr">
-    <div class="shdr-title">รายงานสรุปการติดตั้งอุปกรณ์ SDA — สำนักงานใหญ่ (HQ)</div>
-    <div class="shdr-sub">ช่วงดำเนินงาน: 3 ก.พ. – 3 เม.ย. 2569 | 9 สัปดาห์</div>
-    <div class="shdr-stats">
-      <div class="shdr-stat"><div class="v">193</div><div class="l">อุปกรณ์ตามแผน</div></div>
-      <div class="shdr-stat"><div class="v" id="ov-mig">142</div><div class="l">Migration แล้ว</div></div>
-      <div class="shdr-stat"><div class="v" id="ov-cfg">147</div><div class="l">Config แล้ว</div></div>
-      <div class="shdr-stat"><div class="v" id="ov-pct">73.6%</div><div class="l">% ความคืบหน้า</div></div>
-    </div>
-  </div>
-
-
-
-  <!-- Burndown + Cumulative weekly -->
-  <div class="g2 mb14">
-    <div class="card">
-      <div class="ch"><div class="chi" style="background:var(--primary-l);color:var(--primary)">📉</div>Burn-down Chart</div>
-      <div style="height:220px"><canvas id="burndown-c"></canvas></div>
-      <div class="wk-chart-legend">
-        <div class="wk-leg-item"><div class="wk-leg-line" style="border-color:#94a3c4"></div><span>แผน</span></div>
-        <div class="wk-leg-item"><div class="wk-leg-dot" style="background:var(--success)"></div><span>จริง</span></div>
-        <div class="wk-leg-item" style="margin-left:6px;color:var(--danger);font-weight:600">| วันนี้</div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="ch"><div class="chi" style="background:var(--warning-l);color:var(--warning)">📊</div>% สะสม Migration vs แผน</div>
-      <div style="height:220px"><canvas id="cum-weekly-c"></canvas></div>
-    </div>
-  </div>
-
-  <!-- Location heatmap -->
-  <div class="card">
-    <div class="ch"><div class="chi" style="background:var(--info-l);color:var(--info)">🗺️</div>Location Heatmap — สรุปตามสถานที่</div>
-    <div class="hm-grid" id="hm-grid"></div>
-  </div>
-</div>
-
-
-<!-- ══ Device Summary: Switch / AP / Infra ══ -->
-<div class="card" style="margin-bottom:14px" id="device-summary-card">
-  <div class="ch">
-    <div class="chi" style="background:var(--primary-l);color:var(--primary)">📡</div>
-    สรุปความคืบหน้า Migration — Switch / AP / Infra
-  </div>
-  <!-- 3 big stat cards -->
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px" id="dev-stat-row">
-    <!-- filled by JS -->
-  </div>
-  <!-- bar chart -->
-  <div style="height:200px"><canvas id="dev-bar-c"></canvas></div>
-</div>
-<div class="card" style="margin-bottom:14px">
-  <div class="ch">
-    <div class="chi" style="background:var(--success-l);color:var(--success)">📋</div>
-    รายละเอียดแยกสถานที่ — Switch / AP / Infra
-  </div>
-  <div id="cat-loc-table" style="margin-top:4px"></div>
-</div>
-
-<!-- ══ Tab: Weekly ══ -->
-<div class="tab-body" id="tab-weekly">
-  <!-- W1: Migration bar -->
-  <div class="card mb14">
-    <div class="ch"><div class="chi" style="background:var(--primary-l);color:var(--primary)">📊</div>จำนวนอุปกรณ์รายสัปดาห์ — แผน vs Migration จริง</div>
-    <div class="wk-stat-row">
-      <span class="wk-stat-done" id="wstat-mig-done">142</span>
-      <span class="wk-stat-total">/ 193 เครื่อง</span>
-      <span class="wk-stat-pct" id="wstat-mig-pct" style="background:var(--warning-l);color:var(--warning)">73.6%</span>
-      <span style="font-size:11px;color:var(--text2);margin-left:4px">Migration สะสม</span>
-    </div>
-    <div style="height:240px"><canvas id="wk-bar-c"></canvas></div>
-    <div class="wk-chart-legend">
-      <div class="wk-leg-item"><div class="wk-leg-dot" style="background:rgba(148,163,196,.5)"></div><span>แผน</span></div>
-      <div class="wk-leg-item"><div class="wk-leg-dot" style="background:var(--warning)"></div><span>Migration จริง</span></div>
-    </div>
-  </div>
-
-  <!-- Cum Config vs Plan -->
-  <div class="g2">
-    <div class="card">
-      <div class="ch"><div class="chi" style="background:var(--primary-l);color:var(--primary)">📈</div>% สะสม Config vs แผน</div>
-      <div class="wk-stat-row">
-        <span class="wk-stat-done" style="color:var(--primary)" id="wstat-cfg-done">147</span>
-        <span class="wk-stat-total">/ 193 เครื่อง</span>
-        <span class="wk-stat-pct" id="wstat-cfg-pct" style="background:var(--primary-l);color:var(--primary)">76.2%</span>
-        <span style="font-size:11px;color:var(--text2);margin-left:4px">Config สะสม</span>
-      </div>
-      <div style="height:200px"><canvas id="cum-cfg-c"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="ch"><div class="chi" style="background:var(--warning-l);color:var(--warning)">📈</div>% สะสม Migration vs แผน</div>
-      <div class="wk-stat-row">
-        <span class="wk-stat-done" style="color:var(--warning)" id="wstat-mig-done2">142</span>
-        <span class="wk-stat-total">/ 193 เครื่อง</span>
-        <span class="wk-stat-pct" id="wstat-mig-pct2" style="background:var(--warning-l);color:var(--warning)">73.6%</span>
-        <span style="font-size:11px;color:var(--text2);margin-left:4px">Migration สะสม</span>
-      </div>
-      <div style="height:200px"><canvas id="cum-mig-c"></canvas></div>
-    </div>
-  </div>
-
-  <!-- Device Type chart -->
-  <div class="card" id="type-bar-card" style="margin-top:14px;page-break-before:always;break-before:page">
-    <div class="ch"><div class="chi" style="background:var(--primary-l);color:var(--primary)">📊</div>แยกตามประเภทอุปกรณ์ — แผน vs ติดตั้งแล้ว</div>
-    <div style="height:480px"><canvas id="type-bar-c"></canvas></div>
-  </div>
-</div>
-
-<!-- ══ Tab: Daily ══ -->
-<div class="tab-body" id="tab-daily">
-  <div class="card mb14">
-    <div class="ch"><div class="chi" style="background:var(--info-l);color:var(--info)">📆</div>จำนวนอุปกรณ์รายวัน — แผน vs Migration จริง</div>
-    <div style="height:240px"><canvas id="daily-bar-c"></canvas></div>
-  </div>
-  <div class="card">
-    <div class="ch"><div class="chi" style="background:var(--warning-l);color:var(--warning)">📈</div>% สะสมรายวัน — แผน vs จริง</div>
-    <div style="height:220px"><canvas id="daily-cum-c"></canvas></div>
-  </div>
-</div>
-
-<!-- ══ Tab: Location ══ -->
-<div class="tab-body" id="tab-location">
-  <div class="card">
-    <div class="ch"><div class="chi" style="background:var(--info-l);color:var(--info)">📍</div>รายละเอียดแยกตามสถานที่</div>
-    <div style="overflow-x:auto">
-      <table style="width:100%;border-collapse:collapse;font-size:13px" id="loc-table">
-        <thead>
-          <tr style="background:var(--primary-l)">
-            <th style="padding:8px 10px;text-align:left;font-weight:600;color:var(--primary);border-bottom:2px solid var(--primary)">สถานที่</th>
-            <th style="padding:8px 10px;text-align:center;font-weight:600;color:var(--primary);border-bottom:2px solid var(--primary)">TOR</th>
-            <th style="padding:8px 10px;text-align:center;font-weight:600;color:var(--primary);border-bottom:2px solid var(--primary)">Config</th>
-            <th style="padding:8px 10px;text-align:center;font-weight:600;color:var(--primary);border-bottom:2px solid var(--primary)">Install</th>
-            <th style="padding:8px 10px;text-align:center;font-weight:600;color:var(--primary);border-bottom:2px solid var(--primary)">Migration</th>
-            <th style="padding:8px 10px;min-width:140px;font-weight:600;color:var(--primary);border-bottom:2px solid var(--primary)">ความคืบหน้า</th>
-          </tr>
-        </thead>
-        <tbody id="loc-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-
-<!-- ══ Tab: Plan ══ -->
-<div class="tab-body" id="tab-plan">
-
-  <div style="background:linear-gradient(90deg,var(--primary-l),var(--hold-l));border-radius:var(--rsm);padding:9px 13px;display:flex;align-items:center;gap:7px;margin-bottom:13px;font-size:13px;font-weight:600;color:var(--primary)">📅 การวางแผนโครงการ</div>
-
-  <div class="g3" style="margin-bottom:14px">
-    <!-- ระยะเวลา -->
-    <div class="card">
-      <div class="ch" style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:9px">📅 ระยะเวลาโครงการ</div>
-      <div class="g2" style="gap:7px">
-        <div class="pcard"><div class="pc-l">วันเริ่มต้น</div><div class="pc-v">2 ก.พ. 69</div></div>
-        <div class="pcard"><div class="pc-l">วันสิ้นสุด</div><div class="pc-v">3 เม.ย. 69</div></div>
-        <div class="pcard"><div class="pc-l">จำนวนวันทั้งหมด</div><div class="pc-v">60 วัน</div></div>
-        <div class="pcard"><div class="pc-l">วันที่เหลือ</div><div class="pc-v red">10 วัน</div></div>
-      </div>
-    </div>
-    <!-- เป้าหมาย -->
-    <div class="card">
-      <div class="ch" style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:9px">📈 เป้าหมายตามแผน</div>
-      <div class="pcard" style="margin-bottom:7px"><div class="pc-l">เป้าหมายอุปกรณ์/วัน</div><div class="pc-v">3.2/วัน</div></div>
-      <div class="pcard" style="margin-bottom:7px"><div class="pc-l">เป้าหมายปัจจุบัน</div><div class="pc-v red">5.2/วัน</div></div>
-      <div class="pcard"><div class="pc-l">อุปกรณ์ที่เหลือ</div><div class="pc-v">52 เครื่อง</div></div>
-    </div>
-    <!-- ประเมิน -->
-    <div class="card">
-      <div class="ch" style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:9px">✅ การประเมินโครงการ</div>
-      <div class="pcard" style="margin-bottom:7px"><div class="pc-l">ความคืบหน้าตามแผน (W.8)</div><div class="pc-v">91.71%</div></div>
-      <div class="pcard" style="margin-bottom:7px">
-        <div class="pc-l">ความคืบหน้าปัจจุบัน</div>
-        <div class="pc-v grn">73.6%</div>
-        <div style="height:5px;background:#f0f4ff;border-radius:99px;margin-top:5px;overflow:hidden">
-          <div style="height:100%;width:73.6%;background:var(--success);border-radius:99px"></div>
-        </div>
-      </div>
-      <div class="pcard"><div class="pc-l">สถานะ</div><div class="pc-v red">↘ ช้ากว่าแผน 18.6%</div></div>
-    </div>
-  </div>
-
-  <!-- ข้อมูลการติดตั้งจริง -->
-  <div class="card" style="margin-bottom:14px">
-    <div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">⚡</div>ข้อมูลการติดตั้งจริง</div>
-    <div class="g3" style="margin-bottom:11px">
-      <div class="pcard"><div class="pc-l">Migration ที่ทำแล้ว</div><div class="pc-v" id="pc-mig" style="font-size:20px">142/193 เครื่อง</div></div>
-      <div class="pcard"><div class="pc-l">เฉลี่ยที่ทำได้/วัน</div><div class="pc-v" style="font-size:20px">2.82/วัน</div></div>
-      <div class="pcard"><div class="pc-l">คาดว่าจะเสร็จ</div><div class="pc-v red" style="font-size:20px">12 เม.ย. 69 <span style="font-size:12px">(ช้า 9 วัน)</span></div></div>
-    </div>
-    <div style="font-size:12px;color:var(--text2);margin-bottom:5px">ประสิทธิภาพเทียบกับเป้าหมายปัจจุบัน:</div>
-    <div style="display:flex;align-items:center;gap:9px">
-      <span style="font-size:12px;color:var(--text2);white-space:nowrap">ทำได้ 2.82/วัน จากเป้า 5.2/วัน</span>
-      <div style="flex:1;height:11px;background:#f0f4ff;border-radius:99px;overflow:hidden">
-        <div style="height:100%;width:54.2%;background:linear-gradient(90deg,var(--danger),#ff8a8a);border-radius:99px"></div>
-      </div>
-      <span style="font-size:12px;font-weight:700;color:var(--danger)">54.2%</span>
-    </div>
-    <div style="text-align:right;font-size:11px;color:var(--danger);margin-top:3px">⚠ ต่ำกว่าเป้าหมาย — ต้องเพิ่มอัตรา +84%</div>
-  </div>
-
-  <!-- รายละเอียดแยก Location -->
-  <div id="plan-loc-list" style="page-break-before:always;break-before:page"></div>
-
-</div>
-
-</main>
-
-<!-- ══ Tab: Plan ══ -->
-<div class="tab-body" id="tab-plan">
-
-  <div style="background:linear-gradient(90deg,var(--primary-l),var(--hold-l));border-radius:var(--rsm);padding:9px 13px;display:flex;align-items:center;gap:7px;margin-bottom:13px;font-size:13px;font-weight:600;color:var(--primary)">📅 การวางแผนโครงการ</div>
-
-  <div class="g3" style="margin-bottom:14px">
-    <!-- ระยะเวลา -->
-    <div class="card">
-      <div class="ch" style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:9px">📅 ระยะเวลาโครงการ</div>
-      <div class="g2" style="gap:7px">
-        <div class="pcard"><div class="pc-l">วันเริ่มต้น</div><div class="pc-v">2 ก.พ. 69</div></div>
-        <div class="pcard"><div class="pc-l">วันสิ้นสุด</div><div class="pc-v">3 เม.ย. 69</div></div>
-        <div class="pcard"><div class="pc-l">จำนวนวันทั้งหมด</div><div class="pc-v">60 วัน</div></div>
-        <div class="pcard"><div class="pc-l">วันที่เหลือ</div><div class="pc-v red">10 วัน</div></div>
-      </div>
-    </div>
-    <!-- เป้าหมาย -->
-    <div class="card">
-      <div class="ch" style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:9px">📈 เป้าหมายตามแผน</div>
-      <div class="pcard" style="margin-bottom:7px"><div class="pc-l">เป้าหมายอุปกรณ์/วัน</div><div class="pc-v">3.2/วัน</div></div>
-      <div class="pcard" style="margin-bottom:7px"><div class="pc-l">เป้าหมายปัจจุบัน</div><div class="pc-v red">5.2/วัน</div></div>
-      <div class="pcard"><div class="pc-l">อุปกรณ์ที่เหลือ</div><div class="pc-v">52 เครื่อง</div></div>
-    </div>
-    <!-- ประเมิน -->
-    <div class="card">
-      <div class="ch" style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:9px">✅ การประเมินโครงการ</div>
-      <div class="pcard" style="margin-bottom:7px"><div class="pc-l">ความคืบหน้าตามแผน (W.8)</div><div class="pc-v">91.71%</div></div>
-      <div class="pcard" style="margin-bottom:7px">
-        <div class="pc-l">ความคืบหน้าปัจจุบัน</div>
-        <div class="pc-v grn">73.6%</div>
-        <div style="height:5px;background:#f0f4ff;border-radius:99px;margin-top:5px;overflow:hidden">
-          <div style="height:100%;width:73.6%;background:var(--success);border-radius:99px"></div>
-        </div>
-      </div>
-      <div class="pcard"><div class="pc-l">สถานะ</div><div class="pc-v red">↘ ช้ากว่าแผน 18.6%</div></div>
-    </div>
-  </div>
-
-  <!-- ข้อมูลการติดตั้งจริง -->
-  <div class="card" style="margin-bottom:14px">
-    <div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">⚡</div>ข้อมูลการติดตั้งจริง</div>
-    <div class="g3" style="margin-bottom:11px">
-      <div class="pcard"><div class="pc-l">Migration ที่ทำแล้ว</div><div class="pc-v" id="pc-mig" style="font-size:20px">142/193 เครื่อง</div></div>
-      <div class="pcard"><div class="pc-l">เฉลี่ยที่ทำได้/วัน</div><div class="pc-v" style="font-size:20px">2.82/วัน</div></div>
-      <div class="pcard"><div class="pc-l">คาดว่าจะเสร็จ</div><div class="pc-v red" style="font-size:20px">12 เม.ย. 69 <span style="font-size:12px">(ช้า 9 วัน)</span></div></div>
-    </div>
-    <div style="font-size:12px;color:var(--text2);margin-bottom:5px">ประสิทธิภาพเทียบกับเป้าหมายปัจจุบัน:</div>
-    <div style="display:flex;align-items:center;gap:9px">
-      <span style="font-size:12px;color:var(--text2);white-space:nowrap">ทำได้ 2.82/วัน จากเป้า 5.2/วัน</span>
-      <div style="flex:1;height:11px;background:#f0f4ff;border-radius:99px;overflow:hidden">
-        <div style="height:100%;width:54.2%;background:linear-gradient(90deg,var(--danger),#ff8a8a);border-radius:99px"></div>
-      </div>
-      <span style="font-size:12px;font-weight:700;color:var(--danger)">54.2%</span>
-    </div>
-    <div style="text-align:right;font-size:11px;color:var(--danger);margin-top:3px">⚠ ต่ำกว่าเป้าหมาย — ต้องเพิ่มอัตรา +84%</div>
-  </div>
-
-  <!-- รายละเอียดแยก Location -->
-  <div id="plan-loc-list" style="page-break-before:always;break-before:page"></div>
-
-</div>
 
 <script>
+
 const API = window.location.hostname==='localhost'?'http://localhost:3001':'https://hq-migr-api.onrender.com';
 
-// ── Today GMT+7 ────────────────────────────────────────────────────────────────
+// Today GMT+7
 const _todayGMT7 = new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Bangkok'}));
 const _projStart = new Date(2026,1,3);
 const _projEnd   = new Date(2026,3,3);
 const _projDays  = Math.round((_projEnd-_projStart)/(24*60*60*1000));
 const _elapsed   = Math.max(0,Math.round((_todayGMT7-_projStart)/(24*60*60*1000)));
-const TODAY_WK   = Math.max(0,Math.min(8,Math.floor(_elapsed/7)));
-const TODAY_FRAC = (_elapsed%7)/7;
-const _todayLabel= _todayGMT7.getDate()+'/'+(String(_todayGMT7.getMonth()+1).padStart(2,'0'));
+let   TODAY_WK   = Math.max(0,Math.min(8,Math.floor(_elapsed/7)));
 
-// ── Hardcoded data from Excel ─────────────────────────────────────────────────
-const WK_LABELS  = [
-  ['W.1','2/2-8/2'],['W.2','9/2-15/2'],['W.3','16/2-22/2'],
-  ['W.4','23/2-1/3'],['W.5','2/3-8/3'],['W.6','9/3-15/3'],
-  ['W.7','16/3-22/3'],['W.8','23/3-29/3'],['W.9','30/3-5/4']
-];
-const WK_SHORT   = [
-  ['W.1','2/2-8/2'],['W.2','9/2-15/2'],['W.3','16/2-22/2'],
-  ['W.4','23/2-1/3'],['W.5','2/3-8/3'],['W.6','9/3-15/3'],
-  ['W.7','16/3-22/3'],['W.8','23/3-29/3'],['W.9','30/3-5/4']
-];
-const TOTAL_PLAN = 193;
-const WK_PLAN = [35, 10, 9, 52, 14, 18, 11, 28, 16];
-const WK_CFG = [27, 10, 9, 52, 14, 18, 11, 6, null];
-const WK_MIG = [22, 10, 9, 52, 14, 18, 11, 6, null];
+// Initial data
+const N_WK=9;
+let WK_LABELS = ['W.1', 'W.2', 'W.3', 'W.4', 'W.5', 'W.6', 'W.7', 'W.8', 'W.9'];
+let WK_PLAN   = [35, 10, 9, 52, 14, 18, 11, 28, 16];
+let WK_MIG    = [22, 10, 9, 52, 14, 18, 11, 6, null];
+let WK_CFG    = [27, 10, 9, 52, 14, 18, 11, 6, null];
+let CUM_PLAN  = [18.13, 23.32, 27.98, 54.92, 62.18, 71.5, 77.2, 91.71, 100];
+let CUM_ACT_RAW = [11.4, 16.58, 21.24, 48.19, 55.44, 64.77, 70.47, 73.58, null];
+let BD_PLAN   = [158, 148, 139, 87, 73, 55, 44, 16, 0];
+let BD_ACT    = [171, 161, 152, 100, 86, 68, 57, 51, null];
+let DAY_LABELS = ['3/ก.พ.', '4/ก.พ.', '5/ก.พ.', '6/ก.พ.', '7/ก.พ.', '8/ก.พ.', '9/ก.พ.', '10/ก.พ.', '11/ก.พ.', '12/ก.พ.', '13/ก.พ.', '14/ก.พ.', '15/ก.พ.', '16/ก.พ.', '17/ก.พ.', '18/ก.พ.', '19/ก.พ.', '20/ก.พ.', '21/ก.พ.', '22/ก.พ.', '23/ก.พ.', '24/ก.พ.', '25/ก.พ.', '26/ก.พ.', '27/ก.พ.', '28/ก.พ.', '1/มี.ค.', '2/มี.ค.', '3/มี.ค.', '4/มี.ค.', '5/มี.ค.', '6/มี.ค.', '7/มี.ค.', '8/มี.ค.', '9/มี.ค.', '10/มี.ค.', '11/มี.ค.', '12/มี.ค.', '13/มี.ค.', '14/มี.ค.', '15/มี.ค.', '16/มี.ค.', '17/มี.ค.', '18/มี.ค.', '19/มี.ค.', '20/มี.ค.', '21/มี.ค.', '22/มี.ค.', '23/มี.ค.', '24/มี.ค.', '25/มี.ค.', '26/มี.ค.', '27/มี.ค.', '28/มี.ค.', '29/มี.ค.', '30/มี.ค.', '31/มี.ค.', '1/เม.ย.', '2/เม.ย.', '3/เม.ย.'];
+let DAY_PLAN  = [35, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 5, 0, 4, 0, 0, 15, 0, 20, 0, 17, 0, 0, 14, 0, 0, 0, 0, 0, 0, 10, 0, 8, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 7, 14, 0, 7, 0, 0, 7, 0, 3, 0, 6];
+let DAY_MIG   = [22, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 5, 0, 4, 0, 0, 15, 0, 20, 0, 17, 0, 0, 14, 0, 0, 0, 0, 0, 0, 10, 0, 8, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+let DAY_CUM_PLAN = [18.13, 18.13, 18.13, 18.13, 18.13, 18.13, 18.13, 18.13, 23.32, 23.32, 23.32, 23.32, 23.32, 23.32, 23.32, 25.91, 25.91, 27.98, 27.98, 27.98, 35.75, 35.75, 46.11, 46.11, 54.92, 54.92, 54.92, 62.18, 62.18, 62.18, 62.18, 62.18, 62.18, 62.18, 67.36, 67.36, 71.5, 71.5, 71.5, 71.5, 71.5, 77.2, 77.2, 77.2, 77.2, 77.2, 77.2, 77.2, 77.2, 80.83, 88.08, 88.08, 91.71, 91.71, 91.71, 95.34, 95.34, 96.89, 96.89, 100];
+let DAY_CUM_ACT_RAW = [11.4, 11.4, 11.4, 11.4, 11.4, 11.4, 11.4, 11.4, 16.58, 16.58, 16.58, 16.58, 16.58, 16.58, 16.58, 19.17, 19.17, 21.24, 21.24, 21.24, 29.02, 29.02, 39.38, 39.38, 48.19, 48.19, 48.19, 55.44, 55.44, 55.44, 55.44, 55.44, 55.44, 55.44, 60.62, 60.62, 64.77, 64.77, 64.77, 64.77, 64.77, 70.47, 70.47, 70.47, 70.47, 70.47, 70.47, 70.47, 70.47, 72.54, null, null, null, null, null, null, null, null, null, null];
+let LOC_DATA  = [{"n": "อาคารสำนักงานใหญ่", "tor": 95, "mig": 95, "pct": 100}, {"n": "อาคารสันทนาการ สนญ.", "tor": 6, "mig": 6, "pct": 100}, {"n": "อาคารสายงานวิศวกรรมศาสตร์และเทคโนโลยีสารสนเทศ (สงวท.)", "tor": 54, "mig": 41, "pct": 76}, {"n": "อาคารสโมสรท่าอากาศยาน - สทย. (สงทภ.)", "tor": 9, "mig": 6, "pct": 67}, {"n": "อาคารจอดรถ", "tor": 12, "mig": 0, "pct": 0}, {"n": "คลังพัสดุ", "tor": 2, "mig": 0, "pct": 0}, {"n": "สถานีไฟฟ้าย่อย 1 อาคารข้างหลัง", "tor": 1, "mig": 0, "pct": 0}, {"n": "สำนักแพทย์", "tor": 2, "mig": 0, "pct": 0}, {"n": "อาคารกองประปา", "tor": 2, "mig": 0, "pct": 0}, {"n": "อาคารกองอาคาร", "tor": 2, "mig": 0, "pct": 0}, {"n": "อาคารบำบัดน้ำเสีย", "tor": 2, "mig": 0, "pct": 0}, {"n": "อาคารผู้โดยสายภายในประเทศ (T2)", "tor": 1, "mig": 0, "pct": 0}, {"n": "อาคารเสริมสร้างพลานามัย", "tor": 3, "mig": 0, "pct": 0}, {"n": "สถานีไฟฟ้าย่อย 1 อาคารข้างหน้า", "tor": 2, "mig": 0, "pct": 0}];
 
-// Cumulative % (carry-forward actual to today)
-const CUM_PLAN_PCT = [18.13, 23.32, 27.98, 54.92, 62.18, 71.5, 77.2, 91.71, 100];
-const CUM_ACT_RAW = [11.4, 16.58, 21.24, 48.19, 55.44, 64.77, 70.47, 73.58, null];
-
-// Carry-forward actual to TODAY_WK
-function carryFwd(arr){
-  let last=null;
-  return arr.map((v,i)=>{
-    if(v!==null) last=v;
-    return i<=TODAY_WK ? last : null;
-  });
-}
-const CUM_ACT_PCT = carryFwd(CUM_ACT_RAW);
-
-// Cumulative Config %
-let cumCfg=0;
-const CUM_CFG_PCT = WK_CFG.map(v=>{ if(v!==null) cumCfg+=v; return cumCfg>0?Math.round(cumCfg/TOTAL_PLAN*10000)/100:0; });
-const CUM_CFG_ACT = carryFwd(CUM_CFG_PCT.map((v,i)=>WK_CFG[i]!==null?v:null));
-
-// Burndown
-const BD_PLAN = [158, 148, 139, 87, 73, 55, 44, 16, 0];
-let cumMig=0;
-const BD_ACT_RAW = WK_MIG.map(v=>{ if(v!==null){cumMig+=v;return TOTAL_PLAN-cumMig;} return null; });
-const BD_ACT  = carryFwd(BD_ACT_RAW);
-
-// Daily
-const DAILY_LABELS = ['3/ก.พ.', '4/ก.พ.', '5/ก.พ.', '6/ก.พ.', '7/ก.พ.', '8/ก.พ.', '9/ก.พ.', '10/ก.พ.', '11/ก.พ.', '12/ก.พ.', '13/ก.พ.', '14/ก.พ.', '15/ก.พ.', '16/ก.พ.', '17/ก.พ.', '18/ก.พ.', '19/ก.พ.', '20/ก.พ.', '21/ก.พ.', '22/ก.พ.', '23/ก.พ.', '24/ก.พ.', '25/ก.พ.', '26/ก.พ.', '27/ก.พ.', '28/ก.พ.', '1/มี.ค.', '2/มี.ค.', '3/มี.ค.', '4/มี.ค.', '5/มี.ค.', '6/มี.ค.', '7/มี.ค.', '8/มี.ค.', '9/มี.ค.', '10/มี.ค.', '11/มี.ค.', '12/มี.ค.', '13/มี.ค.', '14/มี.ค.', '15/มี.ค.', '16/มี.ค.', '17/มี.ค.', '18/มี.ค.', '19/มี.ค.', '20/มี.ค.', '21/มี.ค.', '22/มี.ค.', '23/มี.ค.', '24/มี.ค.', '25/มี.ค.', '26/มี.ค.', '27/มี.ค.', '28/มี.ค.', '29/มี.ค.', '30/มี.ค.', '31/มี.ค.', '1/เม.ย.', '2/เม.ย.', '3/เม.ย.'];
-const DAILY_PLAN = [35, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 5, 0, 4, 0, 0, 15, 0, 20, 0, 17, 0, 0, 14, 0, 0, 0, 0, 0, 0, 10, 0, 8, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 7, 14, 0, 7, 0, 0, 7, 0, 3, 0, 6];
-const DAILY_ACT = [22, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 5, 0, 4, 0, 0, 15, 0, 20, 0, 17, 0, 0, 14, 0, 0, 0, 0, 0, 0, 10, 0, 8, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-const CUM_PLAN_D = [18.13, 18.13, 18.13, 18.13, 18.13, 18.13, 18.13, 18.13, 23.32, 23.32, 23.32, 23.32, 23.32, 23.32, 23.32, 25.91, 25.91, 27.98, 27.98, 27.98, 35.75, 35.75, 46.11, 46.11, 54.92, 54.92, 54.92, 62.18, 62.18, 62.18, 62.18, 62.18, 62.18, 62.18, 67.36, 67.36, 71.5, 71.5, 71.5, 71.5, 71.5, 77.2, 77.2, 77.2, 77.2, 77.2, 77.2, 77.2, 77.2, 80.83, 88.08, 88.08, 91.71, 91.71, 91.71, 95.34, 95.34, 96.89, 96.89, 100];
-const CUM_ACT_D_RAW = [11.4, 11.4, 11.4, 11.4, 11.4, 11.4, 11.4, 11.4, 16.58, 16.58, 16.58, 16.58, 16.58, 16.58, 16.58, 19.17, 19.17, 21.24, 21.24, 21.24, 29.02, 29.02, 39.38, 39.38, 48.19, 48.19, 48.19, 55.44, 55.44, 55.44, 55.44, 55.44, 55.44, 55.44, 60.62, 60.62, 64.77, 64.77, 64.77, 64.77, 64.77, 70.47, 70.47, 70.47, 70.47, 70.47, 70.47, 70.47, 70.47, 72.54, null, null, null, null, null, null, null, null, null, null];
-
-// Carry-forward daily actual
-let lastD=null;
-const CUM_ACT_D = CUM_ACT_D_RAW.map(v=>{ if(v!==null) lastD=v; return lastD; });
-
-// Location data
-let LOC_DATA = [
-  {n:'อาคารสำนักงานใหญ่',               tor:94,  cfg:95,  inst:95,  mig:95},
-  {n:'อาคารสายงานวิศวกรรมฯ (สงวท.)',    tor:58,  cfg:46,  inst:46,  mig:41},
-  {n:'อาคารสันทนาการ สนญ.',              tor:6,   cfg:4,   inst:4,   mig:4},
-  {n:'อาคารสโมสรท่าอากาศยาน (สงทภ.)',   tor:8,   cfg:1,   inst:1,   mig:1},
-  {n:'อาคารจอดรถ',                       tor:11,  cfg:0,   inst:0,   mig:0},
-  {n:'คลังพัสดุ',                        tor:2,   cfg:0,   inst:0,   mig:0},
-  {n:'สำนักแพทย์',                       tor:2,   cfg:0,   inst:0,   mig:0},
-  {n:'อาคารกองประปา',                    tor:2,   cfg:0,   inst:0,   mig:0},
-  {n:'อาคารกองอาคาร',                    tor:2,   cfg:0,   inst:0,   mig:0},
-  {n:'อาคารบำบัดน้ำเสีย',               tor:2,   cfg:0,   inst:0,   mig:0},
-  {n:'อาคารเสริมสร้างพลานามัย',          tor:3,   cfg:0,   inst:0,   mig:0},
-  {n:'อาคารผู้โดยสารภายในประเทศ (T2)',  tor:1,   cfg:0,   inst:0,   mig:0},
-  {n:'สถานีไฟฟ้าย่อย 1 (หน้า)',          tor:1,   cfg:0,   inst:0,   mig:0},
-  {n:'สถานีไฟฟ้าย่อย 1 (หลัง)',         tor:1,   cfg:0,   inst:0,   mig:0},
-];
-
-// ── Today line plugin ─────────────────────────────────────────────────────────
-const todayLine = (wkArr) => ({
-  id:'tdl',
-  afterDraw(chart){
-    const m=chart.getDatasetMeta(0);
-    const idx=TODAY_WK;
-    if(!m.data[idx]) return;
-    const {top,bottom}=chart.chartArea;
-    const x0=m.data[idx].x, x1=m.data[idx+1]?m.data[idx+1].x:x0;
-    const x=x0+(x1-x0)*TODAY_FRAC;
-    const cv=chart.ctx; cv.save();
-    cv.beginPath(); cv.moveTo(x,top); cv.lineTo(x,bottom);
-    cv.strokeStyle='#ee4b4b'; cv.lineWidth=1.5; cv.setLineDash([5,3]); cv.stroke();
-    cv.setLineDash([]);
-    cv.font='bold 10px Segoe UI';
-    const tw=cv.measureText(_todayLabel).width;
-    cv.fillStyle='#ee4b4b';
-    cv.beginPath(); cv.roundRect(x-tw/2-4,top-1,tw+8,16,4); cv.fill();
-    cv.fillStyle='#fff'; cv.textAlign='center'; cv.textBaseline='top';
-    cv.fillText(_todayLabel,x,top+2); cv.restore();
-  }
-});
-
-// ── Build Gauge ───────────────────────────────────────────────────────────────
-function buildGauge(){
-  const cv=document.getElementById('gauge-c');
-  const ex=Chart.getChart(cv); if(ex) ex.destroy();
-  const pct=73.1/100;
-  new Chart(cv,{type:'doughnut',data:{datasets:[{data:[pct,1-pct],backgroundColor:['#ff9f43','rgba(253,211,77,.2)'],borderWidth:0}]},
-    options:{cutout:'70%',circumference:180,rotation:-90,responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}}}});
-}
-
-// ── Build Burndown ────────────────────────────────────────────────────────────
-function buildBurndown(){
-  const cv=document.getElementById('burndown-c');
-  const ex=Chart.getChart(cv); if(ex) ex.destroy();
-  new Chart(cv,{type:'line',plugins:[todayLine(WK_SHORT)],
-    data:{labels:WK_SHORT,datasets:[
-      {label:'แผน',data:BD_PLAN,borderColor:'#94a3c4',borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false,tension:.3},
-      {label:'จริง',data:BD_ACT,borderColor:'#2bc48a',borderWidth:2.5,pointRadius:3,pointBackgroundColor:'#2bc48a',fill:false,tension:.3,spanGaps:false},
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-      plugins:{legend:{position:'bottom',labels:{font:{size:11}}},tooltip:{backgroundColor:'rgba(30,45,77,.92)',titleColor:'#fff',bodyColor:'rgba(255,255,255,.8)',padding:10,cornerRadius:8,callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.y??'-'} เหลือ`}}},
-      scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{min:0,grid:{color:'#f0f4ff'},ticks:{font:{size:10}}}}}
-  });
-}
-
-// ── Build Cum Weekly ──────────────────────────────────────────────────────────
-function buildCumWeekly(){
-  const cv=document.getElementById('cum-weekly-c');
-  const ex=Chart.getChart(cv); if(ex) ex.destroy();
-  new Chart(cv,{type:'line',plugins:[todayLine(WK_SHORT)],
-    data:{labels:WK_SHORT,datasets:[
-      {label:'% แผนสะสม',data:CUM_PLAN_PCT,borderColor:'#94a3c4',borderDash:[5,3],borderWidth:1.5,pointRadius:3,fill:false,tension:.3},
-      {label:'% จริงสะสม',data:CUM_ACT_PCT,borderColor:'#ff9f43',borderWidth:2.5,pointRadius:3,pointBackgroundColor:'#ff9f43',fill:true,backgroundColor:'rgba(255,159,67,.08)',tension:.3,spanGaps:false},
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-      plugins:{legend:{position:'bottom',labels:{font:{size:11}}},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.raw??'-'}%`}}},
-      scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{min:0,max:100,ticks:{callback:v=>v+'%',font:{size:10}},grid:{color:'#f0f4ff'}}}}
-  });
-}
-
-// ── Build Weekly Bar ──────────────────────────────────────────────────────────
-const HQ_TYPE_DATA = [
-  {n:'Access Switch Type 4',     plan:85, done:69},
-  {n:'Access Switch Type 2',     plan:85, done:54},
-  {n:'Access Control Type 1',    plan:4,  done:4},
-  {n:'SDN Controller',           plan:3,  done:3},
-  {n:'Extranet Switch Type 1',   plan:2,  done:2},
-  {n:'Wireless Controller',      plan:2,  done:2},
-  {n:'Core Switch Type 2',       plan:2,  done:2},
-  {n:'Fusion Switch Type 1',     plan:2,  done:2},
-  {n:'Distribute Switch Type 3', plan:2,  done:2},
-  {n:'Web Application Firewall', plan:1,  done:1},
-  {n:'Centralized Management',   plan:1,  done:0},
-  {n:'NGFW Type 1',              plan:2,  done:0},
-  {n:'NGFW Type 2',              plan:2,  done:0},
-];
-function buildWeeklyBar(){
-  const cv=document.getElementById('wk-bar-c');
-  const ex=Chart.getChart(cv); if(ex) ex.destroy();
-
-  // Plugin: แสดงตัวเลขบนสุดของแต่ละ bar
-  const dataLabelPlugin = {
-    id:'wkBarLabels',
-    afterDatasetsDraw(chart){
-      const ctx=chart.ctx;
-      chart.data.datasets.forEach((ds,di)=>{
-        const meta=chart.getDatasetMeta(di);
-        if(meta.hidden) return;
-        meta.data.forEach((bar,i)=>{
-          const val=ds.data[i];
-          if(val==null||val===0) return;
-          ctx.save();
-          ctx.font=`bold 9px Segoe UI`;
-          ctx.fillStyle=di===0?'#94a3c4':'#e67e00';
-          ctx.textAlign='center';
-          ctx.textBaseline='bottom';
-          ctx.fillText(val, bar.x, bar.y-2);
-          ctx.restore();
-        });
-      });
-    }
-  };
-
-  new Chart(cv,{type:'bar',
-    plugins:[dataLabelPlugin],
-    data:{labels:WK_SHORT,datasets:[
-      {label:'แผน',data:WK_PLAN,backgroundColor:'rgba(148,163,196,.4)',borderColor:'#94a3c4',borderWidth:1,borderRadius:3,order:2},
-      {label:'Migration จริง',data:WK_MIG,backgroundColor:'rgba(255,159,67,.75)',borderColor:'#ff9f43',borderWidth:1,borderRadius:3,order:1},
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-      layout:{padding:{top:20}},
-      plugins:{legend:{position:'bottom',labels:{font:{size:11}}}},
-      scales:{x:{grid:{display:false},ticks:{font:{size:9},maxRotation:0,minRotation:0}},y:{grid:{color:'#f0f4ff'},ticks:{font:{size:10}}}}}
-  });
-}
-
-// ── Build Cum Config ──────────────────────────────────────────────────────────
-function buildCumCfg(){
-  const cv=document.getElementById('cum-cfg-c');
-  const ex=Chart.getChart(cv); if(ex) ex.destroy();
-  new Chart(cv,{type:'line',plugins:[todayLine(WK_SHORT)],
-    data:{labels:WK_SHORT,datasets:[
-      {label:'% แผนสะสม',data:CUM_PLAN_PCT,borderColor:'#94a3c4',borderDash:[5,3],borderWidth:1.5,pointRadius:2,fill:false,tension:.3},
-      {label:'% Config สะสม',data:CUM_CFG_ACT,borderColor:'#4361ee',borderWidth:2.5,pointRadius:3,pointBackgroundColor:'#4361ee',fill:false,tension:.3,spanGaps:false},
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{position:'bottom',labels:{font:{size:11}}},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.raw??'-'}%`}}},
-      scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{min:0,max:100,ticks:{callback:v=>v+'%',font:{size:10}},grid:{color:'#f0f4ff'}}}}
-  });
-}
-
-// ── Build Cum Migration ───────────────────────────────────────────────────────
-function buildCumMig(){
-  const cv=document.getElementById('cum-mig-c');
-  const ex=Chart.getChart(cv); if(ex) ex.destroy();
-  new Chart(cv,{type:'line',plugins:[todayLine(WK_SHORT)],
-    data:{labels:WK_SHORT,datasets:[
-      {label:'% แผนสะสม',data:CUM_PLAN_PCT,borderColor:'#94a3c4',borderDash:[5,3],borderWidth:1.5,pointRadius:2,fill:false,tension:.3},
-      {label:'% Migration สะสม',data:CUM_ACT_PCT,borderColor:'#ff9f43',borderWidth:2.5,pointRadius:3,pointBackgroundColor:'#ff9f43',fill:true,backgroundColor:'rgba(255,159,67,.08)',tension:.3,spanGaps:false},
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{position:'bottom',labels:{font:{size:11}}},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.raw??'-'}%`}}},
-      scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{min:0,max:100,ticks:{callback:v=>v+'%',font:{size:10}},grid:{color:'#f0f4ff'}}}}
-  });
-}
-
-// ── Build Daily Bar ───────────────────────────────────────────────────────────
-function buildDailyBar(){
-  const cv=document.getElementById('daily-bar-c');
-  const ex=Chart.getChart(cv); if(ex) ex.destroy();
-  new Chart(cv,{type:'bar',
-    data:{labels:DAILY_LABELS,datasets:[
-      {label:'แผน',data:DAILY_PLAN,backgroundColor:'rgba(148,163,196,.4)',borderColor:'#94a3c4',borderWidth:1,order:2},
-      {label:'จริง',type:'line',data:DAILY_ACT,borderColor:'#ff9f43',borderWidth:2,pointRadius:(c)=>c.raw!=null?2:0,pointBackgroundColor:'#ff9f43',fill:false,tension:.2,order:1,spanGaps:false},
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-      plugins:{legend:{position:'bottom',labels:{font:{size:11}}}},
-      scales:{x:{grid:{display:false},ticks:{font:{size:8},maxRotation:45,maxTicksLimit:20}},y:{grid:{color:'#f0f4ff'},ticks:{font:{size:10}}}}}
-  });
-}
-
-// ── Build Daily Cumulative ────────────────────────────────────────────────────
-function buildDailyCum(){
-  const cv=document.getElementById('daily-cum-c');
-  const ex=Chart.getChart(cv); if(ex) ex.destroy();
-  new Chart(cv,{type:'line',
-    data:{labels:DAILY_LABELS,datasets:[
-      {label:'% แผนสะสม',data:CUM_PLAN_D,borderColor:'#94a3c4',borderDash:[5,3],borderWidth:1.5,pointRadius:0,fill:false,tension:.3},
-      {label:'% จริงสะสม',data:CUM_ACT_D,borderColor:'#ff9f43',borderWidth:2,pointRadius:0,fill:true,backgroundColor:'rgba(255,159,67,.08)',tension:.3},
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{position:'bottom',labels:{font:{size:11}}},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.raw??'-'}%`}}},
-      scales:{x:{grid:{display:false},ticks:{font:{size:8},maxRotation:45,maxTicksLimit:20}},y:{min:0,max:100,ticks:{callback:v=>v+'%',font:{size:10}},grid:{color:'#f0f4ff'}}}}
-  });
-}
-
-// ── Build Heatmap ─────────────────────────────────────────────────────────────
-function buildHeatmap(){
-  const grid=document.getElementById('hm-grid');
-  if(!grid) return;
-  grid.innerHTML = LOC_DATA.map(l=>{
-    const pct=l.tor>0?Math.round(l.mig/l.tor*100):0;
-    const cls=pct===100?'hm-100':pct>=70?'hm-hi':pct>=30?'hm-mid':pct>0?'hm-lo':'hm-0';
-    const bc=pct===100?'var(--success)':pct>=70?'#38bdf8':pct>=30?'var(--warning)':pct>0?'var(--danger)':'var(--border)';
-    return `<div class="hm-cell ${cls}">
-      <div class="hm-name">${l.n}</div>
-      <div class="hm-pct" style="color:${bc}">${pct}%</div>
-      <div class="hm-bar"><div class="hm-bfill" style="width:${pct}%;background:${bc}"></div></div>
-      <div class="hm-nums"><span>${l.mig}/${l.tor}</span><span style="color:var(--text3)">Migration</span></div>
-    </div>`;
-  }).join('');
-}
-
-// ── Build Location Table ──────────────────────────────────────────────────────
-function buildLocTable(){
-  const tbody=document.getElementById('loc-tbody');
-  if(!tbody) return;
-  tbody.innerHTML=LOC_DATA.map(l=>{
-    const pct=l.tor>0?Math.round(l.mig/l.tor*100):0;
-    const bc=pct>=80?'var(--success)':pct>=30?'var(--warning)':'var(--primary)';
-    return `<tr style="border-bottom:1px solid var(--border)">
-      <td style="padding:8px 10px">${l.n}</td>
-      <td style="text-align:center;font-weight:600;padding:8px 10px">${l.tor}</td>
-      <td style="text-align:center;color:var(--primary);padding:8px 10px">${l.cfg}</td>
-      <td style="text-align:center;color:var(--success);padding:8px 10px">${l.inst}</td>
-      <td style="text-align:center;color:var(--warning);font-weight:600;padding:8px 10px">${l.mig}</td>
-      <td style="padding:8px 10px">
-        <div style="display:flex;align-items:center;gap:8px">
-          <div style="flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden">
-            <div style="height:100%;border-radius:4px;background:${bc};width:${pct}%"></div>
-          </div>
-          <span style="font-size:12px;font-weight:600;min-width:32px">${pct}%</span>
-        </div>
-      </td>
-    </tr>`;
-  }).join('');
-}
-
-
-// ── Build Plan Location cards ─────────────────────────────────────────────
-function buildPlanTab(){
-  const w=document.getElementById('plan-loc-list');
-  if(!w||w.innerHTML) return;
-
-  // Location data พร้อม schedule
-  const locs=[
-    {n:'อาคารสำนักงานใหญ่',        tor:94,  mig:95,  s:'3 ก.พ. 69', e:'14 มี.ค. 69', c:'#4361ee'},
-    {n:'อาคารสายงานวิศวกรรมฯ',     tor:58,  mig:41,  s:'3 ก.พ. 69', e:'20 มี.ค. 69', c:'#2bc48a'},
-    {n:'อาคารสันทนาการ สนญ.',       tor:6,   mig:4,   s:'21 มี.ค. 69',e:'25 มี.ค. 69',c:'#ff9f43'},
-    {n:'อาคารสโมสรท่าอากาศยาน',     tor:8,   mig:1,   s:'26 มี.ค. 69',e:'31 มี.ค. 69',c:'#9b59b6'},
-    {n:'อาคารจอดรถ',               tor:11,  mig:0,   s:'1 เม.ย. 69', e:'2 เม.ย. 69',  c:'#e74c3c'},
-    {n:'อาคาร/สถานที่อื่นๆ',       tor:16,  mig:0,   s:'2 เม.ย. 69', e:'3 เม.ย. 69',  c:'#95a5a6'},
-  ];
-
-  const pairs=[];
-  for(let i=0;i<locs.length;i+=2) pairs.push(locs.slice(i,i+2));
-
-  w.innerHTML=`<div style="display:flex;align-items:center;gap:7px;margin-bottom:12px;font-size:13px;font-weight:600;color:var(--text)">
-    <div class="chi" style="background:var(--primary-l);color:var(--primary)">📍</div>
-    ความก้าวหน้าแยกตามสถานที่
-  </div>`+
-  pairs.map(pair=>`<div class="g2" style="margin-bottom:9px">${pair.map(f=>{
-    const p=f.tor>0?Math.min(100,Math.round(f.mig/f.tor*100)):0;
-    const pbg=p>=80?'var(--success-l);color:#065f46':p>=30?'var(--warning-l);color:#92400e':'var(--primary-l);color:var(--primary)';
-    return `<div class="fpc">
-      <div class="fpc-h">
-        <div class="fpc-name"><div style="width:9px;height:9px;border-radius:50%;background:${f.c}"></div>${f.n}</div>
-        <div class="fpc-pct" style="background:${pbg}">${p}%</div>
-      </div>
-      <div class="fpc-big">${f.mig}/${f.tor}</div>
-      <div class="fpc-sub">Migration / TOR</div>
-      <div class="fpc-bar"><div class="fpc-fill" style="width:${p}%;background:${f.c}"></div></div>
-      <div class="fpc-dates">
-        <div class="fdate"><div class="dl">เริ่ม</div><div class="dv">${f.s}</div></div>
-        <div class="fdate"><div class="dl">สิ้นสุด</div><div class="dv">${f.e}</div></div>
-      </div>
-    </div>`;
-  }).join('')}</div>`).join('');
-}
-
-// ── Show tab ──────────────────────────────────────────────────────────────────
-let _wkBuilt=false, _dayBuilt=false;
-function showTab(name,el){
+// showTab
+function showTab(id,el){
   document.querySelectorAll('.tab-body').forEach(t=>t.style.display='none');
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
-  document.getElementById('tab-'+name).style.display='block';
+  const tb=document.getElementById('tab-'+id);
+  if(tb) tb.style.display='block';
   if(el) el.classList.add('on');
-  if(name==='weekly' && !_wkBuilt){ _wkBuilt=true; buildWeeklyBar(); buildCumCfg(); buildCumMig(); buildTypeBar(); }
-  if(name==='daily'  && !_dayBuilt){ _dayBuilt=true; buildDailyBar(); buildDailyCum(); }
-  if(name==='plan') buildPlanTab();
 }
 
-// ── Refresh ───────────────────────────────────────────────────────────────────
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// showLoading
 function showLoading(){
-  const ids=[
-    'tb-done','tb-pct','tb-wk',
-    'ov-mig','ov-cfg','ov-pct',
-    'step-cfg-pct','step-cfg-num','step-inst-pct','step-inst-num','step-mig-pct','step-mig-num',
-    'gauge-pct','kpi-act','kpi-plan','kpi-diff','kpi-late',
-    'pill-mig','pill-cfg','pill-rem','pill-rate','pc-mig',
-    'ins-need-more','ins-rate-pct-tag','ins-rate-now','ins-rate-req','ins-rate-pct'];
-  ids.forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML='<span style="opacity:.35">–</span>';});
-  ['step-cfg-bar','step-inst-bar','step-mig-bar','ov-mig-b','ov-cfg-b'].forEach(id=>{
-    const e=document.getElementById(id);if(e)e.style.width='0%';
+  ['tb-done','tb-pct','tb-wk',
+   'ov-all','ov-all-badge','ov-sw','ov-sw-badge','ov-ap','ov-ap-badge','ov-inf','ov-inf-badge',
+   'ins-need-more','ins-rate-now','ins-rate-req','ins-rate-pct','ins-rate-pct-tag',
+   'gauge-pct','kpi-act','kpi-plan','kpi-diff','kpi-late',
+   'pill-mig','pill-cfg','pill-rem','pill-rate'].forEach(id=>{
+    const e=document.getElementById(id);
+    if(e) e.innerHTML='<span style="opacity:.35">–</span>';
   });
-  // reset heatmap
+  ['ov-all-b','ov-sw-b','ov-ap-b','ov-inf-b'].forEach(id=>{
+    const e=document.getElementById(id); if(e) e.style.width='0%';
+  });
+  const fc=document.getElementById('ins-forecast');
+  if(fc) fc.innerHTML='<strong>⏳ กำลังคำนวณ...</strong>';
   const hg=document.getElementById('hm-grid');
   if(hg) hg.innerHTML='<div style="padding:20px;color:var(--text2);font-size:12px;opacity:.5">⏳ กำลังโหลด...</div>';
   const clt=document.getElementById('cat-loc-table');
   if(clt) clt.innerHTML='<div style="padding:20px;color:var(--text2);font-size:12px;opacity:.5">⏳ กำลังโหลด...</div>';
-  const dsr=document.getElementById('dev-stat-row');
-  if(dsr) dsr.innerHTML='<div style="padding:20px;color:var(--text2);font-size:12px;opacity:.5;grid-column:span 3">⏳ กำลังโหลด...</div>';
-  const fc=document.getElementById('ins-forecast');
-  if(fc)fc.innerHTML='<strong>⏳ กำลังคำนวณ...</strong>';
 }
-
 function hideLoading(){}
 
-async function loadData(){
-  showLoading();
-  try{
-    const r=await fetch(`${API}/api/dashboard`);
-    if(!r.ok)throw new Error('HTTP '+r.status);
-    const d=await r.json();
-    const {meta,insight:ins,weekly,daily,locations,wk,today_wk,last_install_date}=d;
-
-    WK_PLAN.length=0;       weekly.plan.forEach(v=>WK_PLAN.push(v));
-    WK_CFG.length=0;        weekly.cfg.forEach(v=>WK_CFG.push(v));
-    WK_MIG.length=0;        weekly.mig.forEach(v=>WK_MIG.push(v));
-    CUM_PLAN_PCT.length=0;  weekly.plan_cum_pct.forEach(v=>CUM_PLAN_PCT.push(v));
-    CUM_ACT_RAW.length=0;   weekly.act_cum_pct.forEach(v=>CUM_ACT_RAW.push(v));
-    BD_PLAN.length=0;       weekly.bd_plan.forEach(v=>BD_PLAN.push(v));
-    BD_ACT.length=0;        weekly.bd_act.forEach(v=>BD_ACT.push(v));
-    DAILY_LABELS.length=0;  daily.labels.forEach(v=>DAILY_LABELS.push(v));
-    DAILY_PLAN.length=0;    daily.plan.forEach(v=>DAILY_PLAN.push(v));
-    DAILY_ACT.length=0;     daily.mig.forEach(v=>DAILY_ACT.push(v));
-    CUM_PLAN_D.length=0;    daily.plan_cum_pct.forEach(v=>CUM_PLAN_D.push(v));
-    CUM_ACT_D_RAW.length=0; daily.act_cum_pct.forEach(v=>CUM_ACT_D_RAW.push(v));
-    window.TODAY_WK=today_wk;
-
-    // อัพเดท LOC_DATA จาก API
-    if(d.locations && d.locations.length>0){
-      LOC_DATA.length=0;
-      d.locations.forEach(l=>LOC_DATA.push({n:l.n, tor:l.tor, mig:l.mig, cfg:l.mig}));
-    }
-
-    const _e=id=>document.getElementById(id);
-    const thM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-    const fd=new Date(ins.finish_date+'T00:00:00');
-    const finTH=fd.getDate()+' '+thM[fd.getMonth()]+' '+((fd.getFullYear()+543)%100);
-    const migPct=(meta.mig/meta.total*100).toFixed(1);
-    const cfgPct=(meta.cfg/meta.total*100).toFixed(1);
-
-    // topbar
-    if(_e('tb-done')) _e('tb-done').textContent=meta.mig+'/'+meta.total;
-    if(_e('tb-pct'))  _e('tb-pct').textContent=migPct+'%';
-    if(_e('tb-wk'))   _e('tb-wk').textContent='W.'+(today_wk+1);
-
-    // last install date
-    if(last_install_date && _e('last-install-lbl')){
-      const ld=new Date(last_install_date+'T00:00:00');
-      _e('last-install-lbl').textContent=ld.getDate()+' '+thM[ld.getMonth()]+' '+((ld.getFullYear()+543)%100);
-    }
-
-    // step cards
-    if(_e('step-cfg-pct'))  _e('step-cfg-pct').textContent=cfgPct+'%';
-    if(_e('step-cfg-num'))  _e('step-cfg-num').textContent=meta.cfg;
-    if(_e('step-cfg-bar'))  _e('step-cfg-bar').style.width=cfgPct+'%';
-    if(_e('step-inst-pct')) _e('step-inst-pct').textContent=cfgPct+'%';
-    if(_e('step-inst-num')) _e('step-inst-num').textContent=meta.cfg;
-    if(_e('step-inst-bar')) _e('step-inst-bar').style.width=cfgPct+'%';
-    if(_e('step-mig-pct'))  _e('step-mig-pct').textContent=migPct+'%';
-    if(_e('step-mig-num'))  _e('step-mig-num').textContent=meta.mig;
-    if(_e('step-mig-bar'))  _e('step-mig-bar').style.width=migPct+'%';
-
-    // overview
-    if(_e('ov-mig'))   _e('ov-mig').textContent=meta.mig;
-    if(_e('ov-cfg'))   _e('ov-cfg').textContent=meta.cfg;
-    if(_e('ov-pct'))   _e('ov-pct').textContent=migPct+'%';
-    if(_e('ov-mig-b')) _e('ov-mig-b').style.width=migPct+'%';
-    if(_e('ov-cfg-b')) _e('ov-cfg-b').style.width=cfgPct+'%';
-    if(_e('pc-mig'))   _e('pc-mig').textContent=meta.mig+'/'+meta.total+' เครื่อง';
-
-    // insight
-    if(_e('ins-need-more'))    _e('ins-need-more').textContent=Number(ins.need_more).toFixed(1);
-    if(_e('ins-rate-pct-tag')) _e('ins-rate-pct-tag').textContent='↑'+ins.pct_more+'% จากอัตราปัจจุบัน';
-    if(_e('ins-rate-now'))     _e('ins-rate-now').textContent=Number(ins.daily_rate).toFixed(2);
-    if(_e('ins-rate-req'))     _e('ins-rate-req').textContent=ins.req_rate;
-    if(_e('ins-rate-pct'))     _e('ins-rate-pct').textContent='+'+ins.pct_more+'%';
-    if(_e('ins-forecast'))     _e('ins-forecast').innerHTML=
-      '<strong>⚠ ถ้าไม่เพิ่มอัตรา:</strong> คาดว่าจะเสร็จ <strong>'+finTH+'</strong> — '+
-      'ช้ากว่าเป้าหมาย (3 เม.ย.) <strong style="color:var(--danger)">'+ins.days_late+' วัน</strong> | '+
-      'ยังเหลือ <strong>'+meta.remaining+' เครื่อง</strong> ใน <strong>'+ins.days_left+' วัน</strong>';
-    if(_e('gauge-pct'))  _e('gauge-pct').textContent=ins.gauge_pct+'%';
-    const actLast=weekly.act_cum_pct.filter(v=>v!=null).pop()||0;
-    const planLast=weekly.plan_cum_pct[today_wk]||0;
-    const gap=Math.round((actLast-planLast)*10)/10;
-    if(_e('kpi-act'))  _e('kpi-act').textContent=actLast.toFixed(2);
-    if(_e('kpi-plan')) _e('kpi-plan').textContent=planLast.toFixed(2);
-    if(_e('kpi-diff')) _e('kpi-diff').textContent=(gap>=0?'+':'')+gap;
-    if(_e('kpi-late')) _e('kpi-late').textContent=ins.days_late;
-    if(_e('pill-mig'))  _e('pill-mig').textContent=meta.mig;
-    if(_e('pill-cfg'))  _e('pill-cfg').textContent=meta.cfg;
-    if(_e('pill-rem'))  _e('pill-rem').textContent=meta.remaining;
-    if(_e('pill-rate')) _e('pill-rate').textContent=Number(ins.daily_rate).toFixed(2);
-
-    // rebuild charts
-    ['buildGauge','buildBurndown','buildHeatmap','buildLocTable','buildPlanTab','buildTypeBar',
-     'buildCumWeekly','buildWeeklyBar','buildCumCfg','buildCumMig','buildDailyBar','buildDailyCum'].forEach(fn=>{
-      if(typeof window[fn]==='function')window[fn]();
-    });
-
-    const sl=_e('sync-ts');
-    if(sl)sl.textContent=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-    console.log('HQ: mig='+meta.mig+'/'+meta.total+' rate='+ins.daily_rate+' W.'+(today_wk+1));
-  }catch(e){
-    console.error('HQ loadData error:',e.message);
-  }finally{
-    hideLoading();
-  }
+// buildGauge
+function buildGauge(){
+  const cv=document.getElementById('gauge-c');
+  if(!cv) return;
+  const ex=Chart.getChart(cv); if(ex) ex.destroy();
+  const actLast=CUM_ACT_RAW.filter(v=>v!=null).pop()||0;
+  const planLast=CUM_PLAN[TODAY_WK]||0;
+  const pct=planLast>0?Math.round(actLast/planLast*100):0;
+  const gPct=Math.min(150,pct);
+  const col=gPct>=90?'#2bc48a':gPct>=60?'#4361ee':'#ff9f43';
+  new Chart(cv,{type:'doughnut',data:{datasets:[
+    {data:[gPct,Math.max(0,150-gPct)],backgroundColor:[col,'#f0f4ff'],borderWidth:0,circumference:270,rotation:225}
+  ]},options:{cutout:'75%',plugins:{legend:{display:false},tooltip:{enabled:false}}}});
 }
 
-window.addEventListener('DOMContentLoaded',async()=>{
-  await loadData();
-});
+// buildBurndown
+function buildBurndown(){
+  const cv=document.getElementById('burndown-c');
+  if(!cv) return;
+  const ex=Chart.getChart(cv); if(ex) ex.destroy();
+  new Chart(cv,{type:'line',
+    data:{labels:WK_LABELS,datasets:[
+      {label:'แผน',data:BD_PLAN,borderColor:'#4361ee',borderWidth:2,borderDash:[5,3],
+        backgroundColor:'rgba(67,97,238,.08)',fill:true,tension:.3,pointRadius:3},
+      {label:'จริง',data:BD_ACT,borderColor:'#2bc48a',borderWidth:2,
+        backgroundColor:'rgba(43,196,138,.1)',fill:true,tension:.3,
+        pointRadius:4,pointBackgroundColor:'#2bc48a',spanGaps:true},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10,padding:10}}},
+      scales:{
+        x:{grid:{color:'#f0f4ff'},ticks:{font:{size:9}}},
+        y:{grid:{color:'#f0f4ff'},ticks:{font:{size:9}}}
+      }
+    }
+  });
+}
 
-// ── Category Bar Chart ───────────────────────────────────────────────────────
+// buildCumWeekly
+function buildCumWeekly(){
+  const cv=document.getElementById('cum-weekly-c');
+  if(!cv) return;
+  const ex=Chart.getChart(cv); if(ex) ex.destroy();
+  let last=null;
+  const actLine=CUM_ACT_RAW.map((v,i)=>{if(v!=null)last=v;return i<=TODAY_WK?last:null;});
+  new Chart(cv,{type:'line',
+    data:{labels:WK_LABELS,datasets:[
+      {label:'แผน %',data:CUM_PLAN,borderColor:'#4361ee',borderWidth:2,borderDash:[5,3],
+        tension:.3,pointRadius:3,fill:false},
+      {label:'จริง %',data:actLine,borderColor:'#2bc48a',borderWidth:2.5,
+        tension:.3,pointRadius:4,pointBackgroundColor:'#2bc48a',fill:false,spanGaps:true},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10}}},
+      scales:{
+        x:{grid:{color:'#f0f4ff'},ticks:{font:{size:9}}},
+        y:{min:0,max:100,grid:{color:'#f0f4ff'},ticks:{callback:v=>v+'%',font:{size:9}}}
+      }
+    }
+  });
+}
 
-
-// ── Category × Location Table ─────────────────────────────────────────────────
-
-
-
-// ── Device Summary: Switch / AP / Infra ────────────────────────────────────
+// buildDeviceSummary
 function buildDeviceSummary(ds){
   if(!ds||!ds.length) return;
-  const colors = {'Switch':'#4361ee','AP':'#2bc48a','Infra':'#ff9f43'};
-  const bgL   = {'Switch':'#eef1ff','AP':'#e8faf3','Infra':'#fff5e6'};
-
-  // stat cards
-  const row=document.getElementById('dev-stat-row');
-  if(row){
-    row.innerHTML=ds.map(d=>{
-      const col=colors[d.n]||'#64748b';
-      const bg=bgL[d.n]||'#f8faff';
-      const rem=d.tor-d.mig;
-      return `<div style="background:${bg};border-radius:10px;padding:14px 16px;border:1px solid ${col}33">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
-          <span style="font-size:13px;font-weight:700;color:${col}">${d.n}</span>
-          <span style="font-size:18px;font-weight:800;color:${col}">${d.pct}%</span>
-        </div>
-        <div style="font-size:22px;font-weight:700;color:var(--text);margin-bottom:4px">
-          ${d.mig}<span style="font-size:13px;font-weight:400;color:var(--text2)">/${d.tor}</span>
-        </div>
-        <div style="height:6px;background:rgba(0,0,0,.08);border-radius:3px;overflow:hidden;margin-bottom:6px">
-          <div style="height:100%;width:${d.pct}%;background:${col};border-radius:3px;transition:width .8s ease"></div>
-        </div>
-        <div style="font-size:11px;color:var(--text2)">เหลือ <strong>${rem}</strong> เครื่อง</div>
-      </div>`;
-    }).join('');
-  }
-
-  // bar chart
+  const colMap={'Switch':'#4361ee','AP':'#2bc48a','Infra':'#ff9f43'};
+  const map={'Switch':'sw','AP':'ap','Infra':'inf'};
+  const totalTor=ds.reduce((s,d)=>s+d.tor,0);
+  const totalMig=ds.reduce((s,d)=>s+d.mig,0);
+  const totalPct=totalTor>0?Math.round(totalMig/totalTor*100):0;
+  const _e=id=>document.getElementById(id);
+  if(_e('ov-all'))       _e('ov-all').textContent=totalMig+'/'+totalTor;
+  if(_e('ov-all-sub'))   _e('ov-all-sub').textContent='Migration ทั้งหมด ('+totalPct+'%)';
+  if(_e('ov-all-b'))     _e('ov-all-b').style.width=totalPct+'%';
+  if(_e('ov-all-badge')) _e('ov-all-badge').textContent=totalPct+'%';
+  ds.forEach(d=>{
+    const k=map[d.n]; if(!k) return;
+    if(_e('ov-'+k))         _e('ov-'+k).textContent=d.mig+'/'+d.tor;
+    if(_e('ov-'+k+'-sub'))  _e('ov-'+k+'-sub').textContent=d.n+' Migration ('+d.pct+'%)';
+    if(_e('ov-'+k+'-b'))    _e('ov-'+k+'-b').style.width=d.pct+'%';
+    if(_e('ov-'+k+'-badge'))_e('ov-'+k+'-badge').textContent=d.pct+'%';
+  });
   const cv=document.getElementById('dev-bar-c');
   if(!cv) return;
   const ex=Chart.getChart(cv); if(ex) ex.destroy();
-  new Chart(cv,{
-    type:'bar',
-    data:{
-      labels: ds.map(d=>d.n),
-      datasets:[
-        {label:'Migration แล้ว', data:ds.map(d=>d.mig),
-         backgroundColor:ds.map(d=>(colors[d.n]||'#64748b')+'cc'),
-         borderColor:ds.map(d=>colors[d.n]||'#64748b'),
-         borderWidth:1.5, borderRadius:8},
-        {label:'คงเหลือ', data:ds.map(d=>d.tor-d.mig),
-         backgroundColor:ds.map(d=>(colors[d.n]||'#94a3b8')+'30'),
-         borderColor:ds.map(d=>(colors[d.n]||'#94a3b8')+'60'),
-         borderWidth:1, borderRadius:8},
-      ]
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{
-        legend:{position:'bottom',labels:{font:{size:11},boxWidth:12,padding:16}},
-        tooltip:{
-          callbacks:{
-            label:ctx=>{
-              const d=ds[ctx.dataIndex];
-              if(ctx.datasetIndex===0) return ` Done: ${d.mig}/${d.tor} (${d.pct}%)`;
-              return ` คงเหลือ: ${d.tor-d.mig} เครื่อง`;
-            }
-          }
-        }
-      },
+  new Chart(cv,{type:'bar',
+    data:{labels:ds.map(d=>d.n),datasets:[
+      {label:'Migration แล้ว',data:ds.map(d=>d.mig),
+        backgroundColor:ds.map(d=>(colMap[d.n]||'#64748b')+'cc'),
+        borderColor:ds.map(d=>colMap[d.n]||'#64748b'),borderWidth:1.5,borderRadius:8},
+      {label:'คงเหลือ',data:ds.map(d=>d.tor-d.mig),
+        backgroundColor:ds.map(d=>(colMap[d.n]||'#94a3b8')+'28'),
+        borderColor:ds.map(d=>(colMap[d.n]||'#94a3b8')+'50'),borderWidth:1,borderRadius:8},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:12,padding:16}},
+        tooltip:{callbacks:{label:ctx=>{
+          const d=ds[ctx.dataIndex];
+          return ctx.datasetIndex===0?' Done: '+d.mig+'/'+d.tor+' ('+d.pct+'%)'
+                                     :' เหลือ: '+(d.tor-d.mig)+' เครื่อง';
+        }}}},
       scales:{
         x:{stacked:true,grid:{display:false},ticks:{font:{size:12}}},
         y:{stacked:true,grid:{color:'#f0f4ff'},ticks:{font:{size:10}}}
@@ -1560,178 +379,294 @@ function buildDeviceSummary(ds){
   });
 }
 
-// ── Category × Location Table ─────────────────────────────────────────────────
-function buildCatLocTable(locations, categories){
+// buildHeatmap
+function buildHeatmap(){
+  const grid=document.getElementById('hm-grid');
+  if(!grid) return;
+  grid.innerHTML=LOC_DATA.map(l=>{
+    const pct=l.tor>0?Math.round(l.mig/l.tor*100):0;
+    const bc=pct===100?'var(--success)':pct>=70?'#38bdf8':pct>=30?'var(--warning)':pct>0?'var(--danger)':'var(--border)';
+    return '<div class="hm-cell"><div class="hm-name">'+l.n+'</div>'
+      +'<div class="hm-pct" style="color:'+bc+'">'+pct+'%</div>'
+      +'<div class="hm-bar"><div class="hm-bfill" style="width:'+pct+'%;background:'+bc+'"></div></div>'
+      +'<div class="hm-nums"><span>'+l.mig+'/'+l.tor+'</span><span style="color:var(--text3)">Migration</span></div>'
+      +'</div>';
+  }).join('');
+}
+
+// buildCatLocTable
+function buildCatLocTable(locations,categories){
   const el=document.getElementById('cat-loc-table');
   if(!el||!locations||!categories) return;
   const catNames=['Switch','AP','Infra'];
   const colColors={'Switch':'var(--primary)','AP':'var(--success)','Infra':'var(--warning)'};
-
-  let html=`<table style="width:100%;border-collapse:collapse;font-size:11px">
-    <thead><tr style="border-bottom:2px solid var(--border)">
-      <th style="text-align:left;padding:5px 8px;color:var(--text2)">สถานที่</th>
-      ${catNames.map(n=>`<th style="text-align:center;padding:5px 8px;color:${colColors[n]}">${n}</th>`).join('')}
-      <th style="text-align:center;padding:5px 8px;color:var(--text2)">รวม Switch+Infra</th>
-    </tr></thead><tbody>`;
-
+  let html='<table style="width:100%;border-collapse:collapse;font-size:11px">'
+    +'<thead><tr style="border-bottom:2px solid var(--border)">'
+    +'<th style="text-align:left;padding:5px 8px;color:var(--text2)">สถานที่</th>'
+    +catNames.map(n=>'<th style="text-align:center;padding:5px 8px;color:'+colColors[n]+'">'+n+'</th>').join('')
+    +'<th style="text-align:center;padding:5px 8px;color:var(--text2)">รวม Switch+Infra</th>'
+    +'</tr></thead><tbody>';
   locations.filter(l=>l.tor>0).forEach(l=>{
     const sw=l.cats&&l.cats['Switch']||{tor:0,mig:0};
     const inf=l.cats&&l.cats['Infra']||{tor:0,mig:0};
-    // AP loc จาก api ไม่มีตรงๆ — แสดง Switch+Infra เท่านั้น
     const tot=sw.tor+inf.tor; const tmig=sw.mig+inf.mig;
     const pct=tot>0?Math.round(tmig/tot*100):0;
     const bc=pct>=100?'var(--success)':pct>=70?'#38bdf8':pct>=30?'var(--warning)':pct>0?'var(--danger)':'var(--border)';
-    const cell=v=>v.tor?`<td style="text-align:center;padding:5px 8px"><b>${v.mig}/${v.tor}</b><br><span style="color:var(--text2);font-size:10px">${Math.round(v.mig/v.tor*100)}%</span></td>`
-                       :`<td style="text-align:center;padding:5px 8px;color:var(--text3)">–</td>`;
-    html+=`<tr style="border-bottom:1px solid var(--border)">
-      <td style="padding:5px 8px;font-weight:500;font-size:11px">${l.n}</td>
-      ${cell(sw)}<td style="text-align:center;padding:5px 8px;color:var(--text3)">–</td>${cell(inf)}
-      <td style="text-align:center;padding:5px 8px">
-        <b>${tmig}/${tot}</b>
-        <div style="height:4px;background:var(--border);border-radius:2px;margin-top:3px">
-          <div style="height:100%;width:${pct}%;background:${bc};border-radius:2px"></div>
-        </div>
-      </td>
-    </tr>`;
+    const cell=v=>v.tor?'<td style="text-align:center;padding:5px 8px"><b>'+v.mig+'/'+v.tor+'</b><br><span style="color:var(--text2);font-size:10px">'+Math.round(v.mig/v.tor*100)+'%</span></td>'
+                       :'<td style="text-align:center;padding:5px 8px;color:var(--text3)">–</td>';
+    html+='<tr style="border-bottom:1px solid var(--border)">'
+      +'<td style="padding:5px 8px;font-weight:500">'+l.n+'</td>'
+      +cell(sw)+'<td style="text-align:center;padding:5px 8px;color:var(--text3)">–</td>'+cell(inf)
+      +'<td style="text-align:center;padding:5px 8px"><b>'+tmig+'/'+tot+'</b>'
+      +'<div style="height:4px;background:var(--border);border-radius:2px;margin-top:3px">'
+      +'<div style="height:100%;width:'+pct+'%;background:'+bc+';border-radius:2px"></div></div></td></tr>';
   });
-  html+=`</tbody></table>`;
+  html+='</tbody></table>';
   el.innerHTML=html;
 }
 
+// buildWeeklyBar
+function buildWeeklyBar(){
+  const cv=document.getElementById('weekly-bar-c');
+  if(!cv) return;
+  const ex=Chart.getChart(cv); if(ex) ex.destroy();
+  new Chart(cv,{type:'bar',
+    data:{labels:WK_LABELS,datasets:[
+      {label:'แผน',data:WK_PLAN,backgroundColor:'rgba(67,97,238,.25)',borderColor:'#4361ee',borderWidth:1.5,borderRadius:4},
+      {label:'Migration',data:WK_MIG,backgroundColor:'rgba(43,196,138,.7)',borderColor:'#2bc48a',borderWidth:1.5,borderRadius:4},
+      {label:'Config',data:WK_CFG,backgroundColor:'rgba(255,159,67,.6)',borderColor:'#ff9f43',borderWidth:1.5,borderRadius:4},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10}}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{grid:{color:'#f0f4ff'},ticks:{font:{size:9}}}}
+    }
+  });
+}
+
+// buildCumCfg (weekly cumulative)
+function buildCumCfg(){
+  const cv=document.getElementById('cum-cfg-c');
+  if(!cv) return;
+  const ex=Chart.getChart(cv); if(ex) ex.destroy();
+  let last=null;
+  const actLine=CUM_ACT_RAW.map((v,i)=>{if(v!=null)last=v;return i<=TODAY_WK?last:null;});
+  new Chart(cv,{type:'line',
+    data:{labels:WK_LABELS,datasets:[
+      {label:'แผน %',data:CUM_PLAN,borderColor:'#4361ee',borderWidth:2,borderDash:[5,3],tension:.3,pointRadius:3,fill:false},
+      {label:'จริง %',data:actLine,borderColor:'#2bc48a',borderWidth:2.5,tension:.3,pointRadius:4,pointBackgroundColor:'#2bc48a',fill:false,spanGaps:true},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10}}},
+      scales:{x:{grid:{color:'#f0f4ff'},ticks:{font:{size:9}}},y:{min:0,max:100,grid:{color:'#f0f4ff'},ticks:{callback:v=>v+'%',font:{size:9}}}}
+    }
+  });
+}
+
+// buildWeeklyTable
+function buildWeeklyTable(){
+  const el=document.getElementById('weekly-table');
+  if(!el) return;
+  let html='<table style="width:100%;border-collapse:collapse;font-size:12px">'
+    +'<thead><tr style="border-bottom:2px solid var(--border)">'
+    +'<th style="text-align:left;padding:6px 8px">สัปดาห์</th>'
+    +'<th style="text-align:center;padding:6px 8px;color:var(--primary)">แผน</th>'
+    +'<th style="text-align:center;padding:6px 8px;color:var(--success)">Migration</th>'
+    +'<th style="text-align:center;padding:6px 8px;color:var(--warning)">Config</th>'
+    +'<th style="text-align:center;padding:6px 8px;color:var(--primary)">% สะสม (จริง)</th>'
+    +'</tr></thead><tbody>';
+  WK_LABELS.forEach((w,i)=>{
+    const plan=WK_PLAN[i]||0,mig=WK_MIG[i],cfg=WK_CFG[i];
+    const cum=CUM_ACT_RAW[i];
+    const active=i===TODAY_WK?'background:var(--primary-l);font-weight:600':'';
+    html+='<tr style="border-bottom:1px solid var(--border);'+active+'">'
+      +'<td style="padding:6px 8px">'+w+'</td>'
+      +'<td style="text-align:center;padding:6px 8px">'+plan+'</td>'
+      +'<td style="text-align:center;padding:6px 8px;color:var(--success)">'+(mig!=null?mig:'–')+'</td>'
+      +'<td style="text-align:center;padding:6px 8px;color:var(--warning)">'+(cfg!=null?cfg:'–')+'</td>'
+      +'<td style="text-align:center;padding:6px 8px">'+(cum!=null?cum+'%':'–')+'</td>'
+      +'</tr>';
+  });
+  html+='</tbody></table>';
+  el.innerHTML=html;
+}
+
+// buildDailyBar
+function buildDailyBar(){
+  const cv=document.getElementById('daily-bar-c');
+  if(!cv) return;
+  const ex=Chart.getChart(cv); if(ex) ex.destroy();
+  const step=Math.max(1,Math.ceil(DAY_LABELS.length/20));
+  new Chart(cv,{type:'bar',
+    data:{labels:DAY_LABELS,datasets:[
+      {label:'แผน',data:DAY_PLAN,backgroundColor:'rgba(67,97,238,.25)',borderColor:'#4361ee',borderWidth:1,borderRadius:3},
+      {label:'Migration',data:DAY_MIG,backgroundColor:'rgba(43,196,138,.7)',borderColor:'#2bc48a',borderWidth:1,borderRadius:3},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10}}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:8},maxTicksLimit:15}},y:{grid:{color:'#f0f4ff'},ticks:{font:{size:9}}}}
+    }
+  });
+}
+
+// buildDailyCum
+function buildDailyCum(){
+  const cv=document.getElementById('daily-cum-c');
+  if(!cv) return;
+  const ex=Chart.getChart(cv); if(ex) ex.destroy();
+  let last=null;
+  const actLine=DAY_CUM_ACT_RAW.map(v=>{if(v!=null)last=v;return last;});
+  new Chart(cv,{type:'line',
+    data:{labels:DAY_LABELS,datasets:[
+      {label:'แผน %',data:DAY_CUM_PLAN,borderColor:'#4361ee',borderWidth:2,borderDash:[4,3],tension:.2,pointRadius:0,fill:false},
+      {label:'จริง %',data:actLine,borderColor:'#2bc48a',borderWidth:2,tension:.2,pointRadius:0,fill:false,spanGaps:true},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10}}},
+      scales:{x:{grid:{color:'#f0f4ff'},ticks:{font:{size:8},maxTicksLimit:15}},y:{min:0,max:100,grid:{color:'#f0f4ff'},ticks:{callback:v=>v+'%',font:{size:9}}}}
+    }
+  });
+}
+
+// buildLocTable
+function buildLocTable(){
+  const el=document.getElementById('loc-table');
+  if(!el) return;
+  let html='<table style="width:100%;border-collapse:collapse;font-size:12px">'
+    +'<thead><tr style="border-bottom:2px solid var(--border)">'
+    +'<th style="text-align:left;padding:6px 8px">สถานที่</th>'
+    +'<th style="text-align:center;padding:6px 8px;color:var(--warning)">Migration</th>'
+    +'<th style="text-align:center;padding:6px 8px;color:var(--text2)">TOR</th>'
+    +'<th style="text-align:center;padding:6px 8px;color:var(--primary)">%</th>'
+    +'</tr></thead><tbody>';
+  LOC_DATA.forEach(l=>{
+    const pct=l.tor>0?Math.round(l.mig/l.tor*100):0;
+    const col=pct>=100?'var(--success)':pct>=70?'#38bdf8':pct>=30?'var(--warning)':pct>0?'var(--danger)':'var(--text3)';
+    html+='<tr style="border-bottom:1px solid var(--border)">'
+      +'<td style="padding:6px 8px;font-weight:500">'+l.n+'</td>'
+      +'<td style="text-align:center;padding:6px 8px;font-weight:700;color:'+col+'">'+l.mig+'</td>'
+      +'<td style="text-align:center;padding:6px 8px;color:var(--text2)">'+l.tor+'</td>'
+      +'<td style="text-align:center;padding:6px 8px">'
+        +'<div style="display:flex;align-items:center;gap:6px;justify-content:center">'
+        +'<div style="width:60px;height:5px;background:var(--border);border-radius:99px;overflow:hidden">'
+        +'<div style="height:100%;width:'+pct+'%;background:'+col+';border-radius:99px"></div></div>'
+        +'<span style="color:'+col+';font-weight:600">'+pct+'%</span>'
+        +'</div></td></tr>';
+  });
+  html+='</tbody></table>';
+  el.innerHTML=html;
+}
+
+// buildPlanTab
+function buildPlanTab(){
+  const cv=document.getElementById('plan-c');
+  if(!cv) return;
+  const ex=Chart.getChart(cv); if(ex) ex.destroy();
+  let last=null;
+  const actLine=CUM_ACT_RAW.map((v,i)=>{if(v!=null)last=v;return i<=TODAY_WK?last:null;});
+  new Chart(cv,{type:'line',
+    data:{labels:WK_LABELS,datasets:[
+      {label:'แผน %',data:CUM_PLAN,borderColor:'#4361ee',borderWidth:2,borderDash:[6,3],tension:.3,pointRadius:4,fill:false},
+      {label:'จริง %',data:actLine,borderColor:'#2bc48a',borderWidth:2.5,tension:.3,pointRadius:5,pointBackgroundColor:'#2bc48a',fill:false,spanGaps:true},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:12,padding:16}}},
+      scales:{
+        x:{grid:{color:'#f0f4ff'},ticks:{font:{size:10}}},
+        y:{min:0,max:100,grid:{color:'#f0f4ff'},ticks:{callback:v=>v+'%',font:{size:10}}}
+      }
+    }
+  });
+}
+
+// loadData
+async function loadData(){
+  showLoading();
+  try{
+    const r=await fetch(API+'/api/dashboard');
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const d=await r.json();
+    const {meta,insight:ins,weekly,daily,locations,wk,today_wk,last_install_date,device_summary,categories}=d;
+
+    WK_LABELS.length=0;  wk.forEach(v=>WK_LABELS.push(v));
+    WK_PLAN.length=0;    weekly.plan.forEach(v=>WK_PLAN.push(v));
+    WK_MIG.length=0;     weekly.mig.forEach(v=>WK_MIG.push(v));
+    WK_CFG.length=0;     weekly.cfg.forEach(v=>WK_CFG.push(v));
+    CUM_PLAN.length=0;   weekly.plan_cum_pct.forEach(v=>CUM_PLAN.push(v));
+    CUM_ACT_RAW.length=0; weekly.act_cum_pct.forEach(v=>CUM_ACT_RAW.push(v));
+    BD_PLAN.length=0;    weekly.bd_plan.forEach(v=>BD_PLAN.push(v));
+    BD_ACT.length=0;     weekly.bd_act.forEach(v=>BD_ACT.push(v));
+    DAY_LABELS.length=0; daily.labels.forEach(v=>DAY_LABELS.push(v));
+    DAY_PLAN.length=0;   daily.plan.forEach(v=>DAY_PLAN.push(v));
+    DAY_MIG.length=0;    daily.mig.forEach(v=>DAY_MIG.push(v));
+    DAY_CUM_PLAN.length=0; daily.plan_cum_pct.forEach(v=>DAY_CUM_PLAN.push(v));
+    DAY_CUM_ACT_RAW.length=0; daily.act_cum_pct.forEach(v=>DAY_CUM_ACT_RAW.push(v));
+    if(locations){ LOC_DATA.length=0; locations.forEach(l=>LOC_DATA.push(l)); }
+    window.TODAY_WK=today_wk;
+
+    const _e=id=>document.getElementById(id);
+    const thM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    const fd=new Date(ins.finish_date+'T00:00:00');
+    const finTH=fd.getDate()+' '+thM[fd.getMonth()]+' '+((fd.getFullYear()+543)%100);
+    const migPct=(meta.mig/meta.total*100).toFixed(1);
+    const actLast=weekly.act_cum_pct.filter(v=>v!=null).pop()||0;
+    const planLast=weekly.plan_cum_pct[today_wk]||0;
+    const gap=Math.round((actLast-planLast)*10)/10;
+
+    if(_e('tb-done')) _e('tb-done').textContent=meta.mig+'/'+meta.total;
+    if(_e('tb-pct'))  _e('tb-pct').textContent=migPct+'%';
+    if(_e('tb-wk'))   _e('tb-wk').textContent='W.'+(today_wk+1);
+    if(last_install_date&&_e('last-install-lbl')){
+      const ld=new Date(last_install_date+'T00:00:00');
+      _e('last-install-lbl').textContent=ld.getDate()+' '+thM[ld.getMonth()]+' '+((ld.getFullYear()+543)%100);
+    }
+    if(_e('ins-need-more'))    _e('ins-need-more').textContent=Number(ins.need_more).toFixed(1);
+    if(_e('ins-rate-pct-tag')) _e('ins-rate-pct-tag').textContent='↑'+ins.pct_more+'% จากอัตราปัจจุบัน';
+    if(_e('ins-rate-now'))     _e('ins-rate-now').textContent=Number(ins.daily_rate).toFixed(2);
+    if(_e('ins-rate-req'))     _e('ins-rate-req').textContent=ins.req_rate;
+    if(_e('ins-rate-pct'))     _e('ins-rate-pct').textContent='+'+ins.pct_more+'%';
+    if(_e('ins-forecast'))     _e('ins-forecast').innerHTML=
+      '⚠ ถ้าไม่เพิ่มอัตรา: คาดว่าจะเสร็จ <strong>'+finTH+'</strong> — '
+      +'ช้ากว่าเป้าหมาย (3 เม.ย.) <strong style="color:var(--danger)">'+ins.days_late+' วัน</strong> | '
+      +'ยังเหลือ <strong>'+meta.remaining+' เครื่อง</strong> ใน <strong>'+ins.days_left+' วัน</strong>';
+    if(_e('gauge-pct'))  _e('gauge-pct').textContent=ins.gauge_pct+'%';
+    if(_e('kpi-act'))    _e('kpi-act').textContent=actLast.toFixed(2);
+    if(_e('kpi-plan'))   _e('kpi-plan').textContent=planLast.toFixed(2);
+    if(_e('kpi-diff'))   _e('kpi-diff').textContent=(gap>=0?'+':'')+gap;
+    if(_e('kpi-late'))   _e('kpi-late').textContent=ins.days_late;
+    if(_e('pill-mig'))   _e('pill-mig').textContent=meta.mig;
+    if(_e('pill-cfg'))   _e('pill-cfg').textContent=meta.cfg;
+    if(_e('pill-rem'))   _e('pill-rem').textContent=meta.remaining;
+    if(_e('pill-rate'))  _e('pill-rate').textContent=Number(ins.daily_rate).toFixed(2);
+
+    buildGauge(); buildBurndown(); buildCumWeekly();
+    buildWeeklyBar(); buildCumCfg(); buildWeeklyTable();
+    buildDailyBar(); buildDailyCum();
+    buildHeatmap(); buildLocTable(); buildPlanTab();
+    if(device_summary) buildDeviceSummary(device_summary);
+    if(categories&&locations) buildCatLocTable(locations,categories);
+
+    const sl=_e('sync-ts');
+    if(sl) sl.textContent=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    console.log('HQ: mig='+meta.mig+'/'+meta.total+' rate='+ins.daily_rate+' W.'+(today_wk+1));
+  }catch(e){
+    console.error('HQ loadData error:',e.message);
+  }finally{
+    hideLoading();
+  }
+}
+
+// manualRefresh
 async function manualRefresh(){
   const btns=document.querySelectorAll('[onclick*="manualRefresh"]');
   btns.forEach(b=>{b._o=b.textContent;b.textContent='⏳ โหลด...';b.disabled=true;});
   try{ await fetch(API+'/api/cache/refresh',{method:'POST'}); }catch(e){}
   await loadData();
-  const now=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  const ts=document.getElementById('sync-ts'); if(ts) ts.textContent=now;
   btns.forEach(b=>{b.textContent=b._o||'↺ รีเฟรช';b.disabled=false;});
 }
 
-// ── Export PDF ────────────────────────────────────────────────────────────────
-async function exportPDF(){
-  const btn=document.getElementById('pdf-btn');
-  if(btn){btn.textContent='⏳...';btn.disabled=true;}
-  const pw=window.open('','_blank','width=1280,height=900');
-  if(!pw){alert('กรุณาอนุญาต popup');if(btn){btn.textContent='⬇ PDF';btn.disabled=false;}return;}
-  pw.document.write('<html><body style="display:flex;align-items:center;justify-content:center;height:100vh;margin:0;background:#f0f4ff;font-family:sans-serif"><div style="text-align:center"><div style="font-size:36px">🏢</div><div style="color:#4361ee;font-size:16px;margin-top:12px">กำลังเตรียม PDF...</div></div></body></html>');
-  pw.document.close();
-  try{
-    // show all tabs
-    ['overview','weekly','daily','location','plan'].forEach(t=>{const e=document.getElementById('tab-'+t);if(e)e.style.display='block';});
-    if(!_wkBuilt){_wkBuilt=true;buildWeeklyBar();buildCumCfg();buildCumMig();buildTypeBar();}
-    if(!_dayBuilt){_dayBuilt=true;buildDailyBar();buildDailyCum();}
-    buildPlanTab();
-    await new Promise(r=>setTimeout(r,1000));
-    // capture charts
-    const imgs={};
-    if(typeof Chart!=='undefined'){
-      Object.values(Chart.instances||{}).forEach(ch=>{
-        try{const id=ch.canvas?.id;if(!id)return;
-          imgs[id]={url:ch.toBase64Image('image/png',1.0),w:ch.canvas.offsetWidth,h:ch.canvas.offsetHeight};
-        }catch(e){}
-      });
-    }
-    const styles=Array.from(document.styleSheets).map(ss=>{try{return Array.from(ss.cssRules).map(r=>r.cssText).join('\n');}catch(e){return '';}}).join('\n');
-    const ins=document.querySelector('.insights-box').cloneNode(true);
-    const mn=document.querySelector('main').cloneNode(true);
-    ins.querySelectorAll('canvas').forEach(cv=>{const d=imgs[cv.id];if(d){const i=document.createElement('img');i.src=d.url;i.style.cssText=`position:absolute;inset:0;width:90px;height:90px`;cv.parentNode.replaceChild(i,cv);}});
-    mn.querySelectorAll('.tab-body').forEach(t=>t.style.display='block');
-    mn.querySelectorAll('.tabs').forEach(t=>t.style.display='none');
-    mn.querySelectorAll('canvas').forEach(cv=>{const d=imgs[cv.id];if(d){const i=document.createElement('img');i.src=d.url;i.style.cssText=`display:block;width:${d.w}px;height:${d.h}px;max-width:100%`;cv.parentNode.replaceChild(i,cv);}else cv.style.display='none';});
-    ['tab-weekly','tab-daily','tab-location','tab-plan'].forEach((id,i)=>{const el=mn.querySelector(`#${id}`);if(el)el.style.pageBreakBefore='always';});
-    // type-bar card ขึ้นหน้าใหม่
-    const tbCard=mn.querySelector('#type-bar-card');
-    if(tbCard){tbCard.style.pageBreakBefore='always';tbCard.style.breakBefore='page';tbCard.style.pageBreakInside='avoid';}
-    const date=new Date().toLocaleDateString('th-TH');
-    const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>HQ Migration Progress Dashboard</title>
-<style>@page{size:A4 landscape;margin:8mm 10mm}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;box-sizing:border-box}body{font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;background:#fff;margin:0}
-${styles}
-.topbar,.tabs,[onclick]{display:none!important}.tab-body{display:block!important}.card{break-inside:avoid}canvas{display:none!important}
-.pcard{background:var(--bg);border-radius:8px;padding:10px 12px}.pc-l{font-size:11px;color:var(--text2)}.pc-v{font-size:15px;font-weight:700}.pc-v.red{color:var(--danger)}.pc-v.grn{color:var(--success)}.fpc{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px}.fpc-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.fpc-name{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600}.fpc-pct{font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px}.fpc-big{font-size:24px;font-weight:800}.fpc-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:10px}.fpc-fill{height:100%;border-radius:3px}.fpc-dates{display:flex;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid var(--border)}.fdate{flex:1}.dl{font-size:10px;color:var(--text2)}.dv{font-size:12px;font-weight:600}
-#tab-plan .g3{display:grid!important;grid-template-columns:1fr 1fr 1fr!important;gap:12px!important}
-#tab-plan .g2{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}
-#tab-plan #plan-loc-list .g2{display:grid!important;grid-template-columns:1fr 1fr!important;gap:9px!important}
-.g2{display:grid!important;grid-template-columns:1fr 1fr!important;gap:12px!important}.g3{display:grid!important;grid-template-columns:1fr 1fr 1fr!important;gap:12px!important}.step-row{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:10px!important}.hm-grid{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:8px!important}
-.ph{background:linear-gradient(135deg,#3a56e4,#6c4de4);color:#fff;padding:8px 16px;margin-bottom:10px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700}
-</style></head><body>
-<div class="ph"><span>✈ SDA Migration Progress Dashboard - </span><span style="background:linear-gradient(90deg,#ffd700,#ffaa00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-weight:800;font-size:15px">HQ</span><span style="font-size:11px;font-weight:400">${date}</span></div>
-${ins.outerHTML}${mn.outerHTML}
-\x3cscript\x3ewindow.onload=function(){setTimeout(function(){window.print();},600);};<\/script>
-</body></html>`;
-    pw.document.open();pw.document.write(html);pw.document.close();
-  }catch(e){console.error(e);try{pw.close();}catch(x){}alert('Export ไม่สำเร็จ: '+e.message);}
-  finally{
-    const active=document.querySelector('.tab.on');
-    const name=active?.getAttribute('onclick')?.match(/'(\w+)'/)?.[1]||'overview';
-    ['overview','weekly','daily','location','plan'].forEach(t=>{const e=document.getElementById('tab-'+t);if(e)e.style.display=t===name?'block':'none';});
-    if(btn){btn.textContent='⬇ PDF';btn.disabled=false;}
-  }
-}
-
-
-function buildTypeBar(){
-  const cv=document.getElementById('type-bar-c');
-  if(!cv) return;
-  const ex=Chart.getChart(cv); if(ex) ex.destroy();
-  const sorted=[...HQ_TYPE_DATA].sort((a,b)=>b.plan-a.plan);
-
-  const labelPlugin={
-    id:'hqTypeLabels',
-    afterDraw(chart){
-      const ctx=chart.ctx;
-      chart.data.datasets.forEach((ds,di)=>{
-        const meta=chart.getDatasetMeta(di);
-        if(meta.hidden) return;
-        meta.data.forEach((bar,i)=>{
-          const val=ds.data[i];
-          if(!val||val<1) return;
-          const d=sorted[i];
-          ctx.save();
-          if(di===0){
-            ctx.font='10px Segoe UI'; ctx.fillStyle='#94a3b8';
-          } else {
-            const pct=d.plan>0?Math.round(d.done/d.plan*100):0;
-            ctx.font='bold 10px Segoe UI'; ctx.fillStyle='#4361ee';
-            val && (bar._label=`${val} (${pct}%)`);
-          }
-          ctx.textAlign='left'; ctx.textBaseline='middle';
-          ctx.fillText(di===1?(bar._label||val):val, bar.x+4, bar.y);
-          ctx.restore();
-        });
-      });
-    }
-  };
-
-  new Chart(cv,{
-    type:'bar',
-    plugins:[labelPlugin],
-    data:{
-      labels:sorted.map(d=>d.n),
-      datasets:[
-        {label:'แผน (TOR)',     data:sorted.map(d=>d.plan),backgroundColor:'rgba(148,163,196,.35)',borderColor:'#94a3c4',borderWidth:1,borderRadius:3},
-        {label:'ติดตั้งแล้ว',      data:sorted.map(d=>d.done),backgroundColor:'rgba(67,97,238,.75)',borderColor:'#4361ee',borderWidth:1,borderRadius:3},
-      ]
-    },
-    options:{
-      indexAxis:'y',
-      responsive:true, maintainAspectRatio:false,
-      layout:{padding:{right:80}},
-      plugins:{
-        legend:{position:'bottom',labels:{font:{size:11}}},
-        tooltip:{callbacks:{label:c=>{
-          const d=sorted[c.dataIndex];
-          if(c.datasetIndex===0) return ` แผน: ${d.plan} เครื่อง`;
-          return ` ติดตั้งแล้ว: ${d.done} เครื่อง (${d.plan>0?Math.round(d.done/d.plan*100):0}%)`;
-        }}}
-      },
-      scales:{
-        x:{grid:{color:'#f0f4ff'},ticks:{font:{size:9},maxTicksLimit:8}},
-        y:{grid:{display:false},ticks:{font:{size:8}}}
-      }
-    }
-  });
-}
+window.addEventListener('DOMContentLoaded',async()=>{
+  await loadData();
+});
 
 </script>
 </body>
