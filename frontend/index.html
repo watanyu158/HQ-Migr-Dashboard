@@ -1130,7 +1130,7 @@ ${styles}
 </style></head><body>
 <div class="ph"><span>✈ SDA Migration Progress Dashboard - </span><span style="background:linear-gradient(90deg,#ffd700,#ffaa00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-weight:800;font-size:15px">HQ</span><span style="font-size:11px;font-weight:400">${date}</span></div>
 ${ins.outerHTML}${mn.outerHTML}
-<script>window.onload=function(){setTimeout(function(){window.print();},600);};<\/script>
+\x3cscript\x3ewindow.onload=function(){setTimeout(function(){window.print();},600);};<\/script>
 </body></html>`;
     pw.document.open();pw.document.write(html);pw.document.close();
   }catch(e){console.error(e);try{pw.close();}catch(x){}alert('Export ไม่สำเร็จ: '+e.message);}
