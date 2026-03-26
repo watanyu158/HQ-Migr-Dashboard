@@ -86,20 +86,58 @@ function calcDashboard(wb) {
     actCumD.push(pct(dayRows[9][i]));
   }
 
-  // Overdue + HOLD from HQ sheet
-  let hqOverdue=0, hqHold=0, onTimeQty=0;
+  // Overdue + HOLD + on_time from HQ sheet
+  let hqOverdue=0, hqHold=0, swOnTime=0, swMigTotal=0;
   hqRaw.slice(2).forEach(r => {
     const device = r[3]; const newQty = r[6];
     if (!device || typeof device !== 'string') return;
     if (typeof newQty !== 'number' || !Number.isInteger(newQty) || newQty <= 0) return;
-    const mig  = typeof r[15] === 'number' ? Math.min(Math.round(r[15]), newQty) : 0;
+    const mig    = typeof r[15] === 'number' ? Math.min(Math.round(r[15]), newQty) : 0;
     const remark = r[12] ? String(r[12]).toLowerCase() : '';
     const status = r[11] ? String(r[11]).toLowerCase() : '';
     if (remark.includes('hold') || status.includes('hold')) hqHold += newQty;
     else if (mig < newQty) hqOverdue += (newQty - mig);
-    if (mig >= newQty) onTimeQty += newQty;
+    // on_time: Install Date (col9) <= Scheduled Date (col8)
+    if (mig > 0) {
+      swMigTotal += mig;
+      let instDt = r[9]; let schedDt = r[8];
+      if (typeof instDt  === 'number') instDt  = new Date((instDt  - 25569)*86400000);
+      if (typeof schedDt === 'number') schedDt = new Date((schedDt - 25569)*86400000);
+      if (instDt instanceof Date && schedDt instanceof Date && !isNaN(instDt) && !isNaN(schedDt)) {
+        instDt.setHours(0,0,0,0); schedDt.setHours(0,0,0,0);
+        if (instDt <= schedDt) swOnTime += mig;
+      } else {
+        swOnTime += mig; // no date → count as on_time
+      }
+    }
   });
-  const onTimePct = mig_total > 0 ? Math.round(onTimeQty / mig_total * 100 * 10) / 10 : 0;
+
+  // AP on_time from HQ-WL
+  let apOnTime=0, apMigTotal=0;
+  wlRaw.slice(1).forEach(r => {
+    const room = r[2] ? String(r[2]).toLowerCase() : '';
+    if (room.includes('summary') || room.includes('รวม') || room.includes('total')) return;
+    const mig = (typeof r[16]==='number' && Number.isInteger(r[16]) && r[16]>0) ? r[16] : 0;
+    if (mig <= 0) return;
+    apMigTotal += mig;
+    let instDt = r[8]; let planDt = r[7];
+    if (typeof instDt === 'number') instDt = new Date((instDt - 25569)*86400000);
+    if (typeof planDt === 'number') planDt = new Date((planDt - 25569)*86400000);
+    if (instDt instanceof Date && planDt instanceof Date && !isNaN(instDt) && !isNaN(planDt)) {
+      instDt.setHours(0,0,0,0); planDt.setHours(0,0,0,0);
+      if (instDt <= planDt) apOnTime += mig;
+    } else {
+      apOnTime += mig;
+    }
+  });
+
+  const totalOnTime   = swOnTime + apOnTime;
+  const totalMigForOT = swMigTotal + apMigTotal;
+  const onTimePct     = totalMigForOT > 0 ? Math.round(totalOnTime / totalMigForOT * 1000) / 10 : 0;
+  const onTimeQty     = totalOnTime;
+
+  // remaining from total TOR (Switch+AP+Infra)
+
 
   // Last install date
   let lastInstall = null;
@@ -170,6 +208,8 @@ function calcDashboard(wb) {
     }))
     .sort((a,b) => b.tor - a.tor);
 
+
+
   // AP from HQ-WL — col3=qty, col16=Migration, ข้าม summary rows (col2 มี "summary"/"รวม")
   let apTotal=0, apMig=0;
   const apLocMap = {};
@@ -198,12 +238,16 @@ function calcDashboard(wb) {
     {n:'Infra',  tor:infraCat.tor,  mig:infraCat.mig,   pct:Math.round(infraCat.mig/infraCat.tor*100)||0,   color:'#ff9f43'},
   ];
 
+  const totalTor    = (switchCat.tor||0) + apTotal + (infraCat.tor||0);
+  const totalMigAll = (switchCat.mig||0) + apMig   + (infraCat.mig||0);
+  const remainingAll = totalTor - totalMigAll;
+
   console.log(`✓ Locations: ${locations.length} | ${locations.map(l=>l.n.slice(0,10)+':'+l.mig).join(', ')}`);
 
   return {
     wk, wk_dates, today_wk: todayWk,
     last_install_date: lastInstallDate,
-    meta: {total:TOTAL, mig:mig_total, cfg:cfg_total, remaining, hold:hqHold, overdue:hqOverdue, on_time_qty:onTimeQty, on_time_pct:onTimePct},
+    meta: {total:totalTor, mig:totalMigAll, cfg:cfg_total, remaining:remainingAll, hold:hqHold, overdue:hqOverdue, on_time_qty:onTimeQty, on_time_pct:onTimePct},
     insight: {
       daily_rate:dailyRate, req_rate:reqRate, need_more:needMore,
       pct_more:pctMore, days_late:daysLate, gauge_pct:gaugePct,
