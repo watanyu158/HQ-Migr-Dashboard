@@ -280,7 +280,7 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto;box-sizing:border-box}
     </div>
     <div class="ins-gauge-card">
       <div class="ins-gauge-section">
-        <div class="ins-gauge-wrap"><canvas id="gauge-c"></canvas><div class="ins-gc"><div class="gp" id="gauge-pct">45%</div></div></div>
+        <div class="ins-gauge-wrap"><canvas id="gauge-c"></canvas><div class="ins-gc"><div class="gp" id="gauge-pct">46%</div></div></div>
       </div>
       <div class="ins-kpi-table">
         <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:2px;text-transform:uppercase;letter-spacing:.4px">ประเมินความตรงต่อเวลา</div>
@@ -954,30 +954,123 @@ function showTab(name,el){
 
 // ── Refresh ───────────────────────────────────────────────────────────────────
 
+
+
+
+
+
 function showLoading(){
-  // reset topbar
+  // topbar
   ['tb-done','tb-pct'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.innerHTML='<span style="opacity:.35">–</span>';
   });
-  // reset insight
-  ['ins-act-pct','ins-rate-now','ins-rate-req','gauge-pct',
-   'kpi-act','kpi-plan','kpi-diff','kpi-late',
+  // insight
+  ['ins-act-pct','ins-rate-now','ins-rate-req',
+   'gauge-pct','kpi-act','kpi-plan','kpi-diff','kpi-late',
    'pill-mig','pill-cfg','pill-rem','pill-rate'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.textContent='–';
   });
   const fc=document.getElementById('ins-forecast');
   if(fc) fc.innerHTML='<strong>⏳ กำลังคำนวณ...</strong>';
-  const rpct=document.getElementById('ins-rate-pct');
-  if(rpct) rpct.textContent='...';
-  const ov=document.getElementById('ov-mig');
-  if(ov) ov.textContent='–';
-  const oc=document.getElementById('ov-cfg');
-  if(oc) oc.textContent='–';
+  const rp=document.getElementById('ins-rate-pct');
+  if(rp) rp.textContent='...';
+  const ov1=document.getElementById('ov-mig');
+  if(ov1) ov1.textContent='–';
+  const ov2=document.getElementById('ov-cfg');
+  if(ov2) ov2.textContent='–';
 }
 
 function hideLoading(){}
+
+async function loadData(){
+  showLoading();
+  try{
+    const r=await fetch(`${API}/api/dashboard`);
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const d=await r.json();
+    const {meta,insight:ins,weekly,daily,locations,wk,today_wk}=d;
+
+    // อัพเดท arrays
+    WK_PLAN.length=0;       weekly.plan.forEach(v=>WK_PLAN.push(v));
+    WK_CFG.length=0;        weekly.cfg.forEach(v=>WK_CFG.push(v));
+    WK_MIG.length=0;        weekly.mig.forEach(v=>WK_MIG.push(v));
+    CUM_PLAN_PCT.length=0;  weekly.plan_cum_pct.forEach(v=>CUM_PLAN_PCT.push(v));
+    CUM_ACT_RAW.length=0;   weekly.act_cum_pct.forEach(v=>CUM_ACT_RAW.push(v));
+    BD_PLAN.length=0;       weekly.bd_plan.forEach(v=>BD_PLAN.push(v));
+    BD_ACT.length=0;        weekly.bd_act.forEach(v=>BD_ACT.push(v));
+    DAILY_LABELS.length=0;  daily.labels.forEach(v=>DAILY_LABELS.push(v));
+    DAILY_PLAN.length=0;    daily.plan.forEach(v=>DAILY_PLAN.push(v));
+    DAILY_ACT.length=0;     daily.mig.forEach(v=>DAILY_ACT.push(v));
+    CUM_PLAN_D.length=0;    daily.plan_cum_pct.forEach(v=>CUM_PLAN_D.push(v));
+    CUM_ACT_D_RAW.length=0; daily.act_cum_pct.forEach(v=>CUM_ACT_D_RAW.push(v));
+    window.TODAY_WK=today_wk;
+
+    // carry-forward CUM_ACT
+    let _l=null;
+    if(typeof CUM_ACT!=='undefined'){ CUM_ACT.length=0; }
+    CUM_ACT_RAW.forEach((v,i)=>{
+      if(v!=null) _l=v;
+      if(typeof CUM_ACT!=='undefined') CUM_ACT.push(i<=TODAY_WK?_l:null);
+    });
+
+    const _e=id=>document.getElementById(id);
+    const thM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    const fd=new Date(ins.finish_date+'T00:00:00');
+    const finTH=`${fd.getDate()} ${thM[fd.getMonth()]} ${(fd.getFullYear()+543)%100}`;
+    const migPct=(meta.mig/meta.total*100).toFixed(1);
+    const actLast=weekly.act_cum_pct.filter(v=>v!=null).pop()||0;
+    const planLast=weekly.plan_cum_pct[today_wk]||0;
+    const gap=Math.round((actLast-planLast)*10)/10;
+
+    // topbar
+    if(_e('tb-done')) _e('tb-done').textContent=`${meta.mig}/${meta.total}`;
+    if(_e('tb-pct'))  _e('tb-pct').textContent=migPct+'%';
+    if(_e('tb-wk'))   _e('tb-wk').textContent=`W.${today_wk+1}`;
+    // overview
+    if(_e('ov-mig'))   _e('ov-mig').textContent=meta.mig;
+    if(_e('ov-cfg'))   _e('ov-cfg').textContent=meta.cfg;
+    if(_e('ov-mig-b')) _e('ov-mig-b').style.width=(meta.mig/meta.total*100).toFixed(1)+'%';
+    if(_e('ov-cfg-b')) _e('ov-cfg-b').style.width=(meta.cfg/meta.total*100).toFixed(1)+'%';
+    // insight
+    if(_e('ins-act-pct')) _e('ins-act-pct').textContent=migPct+'%';
+    if(_e('ins-gap-tag')) _e('ins-gap-tag').textContent=(gap>=0?'+':'')+gap+'%';
+    if(_e('ins-rate-now')) _e('ins-rate-now').textContent=Number(ins.daily_rate).toFixed(2);
+    if(_e('ins-rate-req')) _e('ins-rate-req').textContent=ins.req_rate;
+    if(_e('ins-rate-pct')) _e('ins-rate-pct').textContent='+'+(ins.pct_more||0)+'%';
+    if(_e('ins-forecast')) _e('ins-forecast').innerHTML=
+      `<strong>⚠ ถ้าไม่เพิ่มอัตรา:</strong> คาดว่าจะเสร็จ <strong>${finTH}</strong> — `+
+      `ช้ากว่าเป้าหมาย (3 เม.ย.) <strong style="color:var(--danger)">${ins.days_late} วัน</strong> | `+
+      `ยังเหลือ <strong>${meta.remaining} เครื่อง</strong> ใน <strong>${ins.days_left} วัน</strong>`;
+    if(_e('gauge-pct'))  _e('gauge-pct').textContent=ins.gauge_pct+'%';
+    if(_e('kpi-act'))    _e('kpi-act').textContent=actLast.toFixed(2);
+    if(_e('kpi-plan'))   _e('kpi-plan').textContent=planLast.toFixed(2);
+    if(_e('kpi-diff'))   _e('kpi-diff').textContent=(gap>=0?'+':'')+gap;
+    if(_e('kpi-late'))   _e('kpi-late').textContent=ins.days_late;
+    if(_e('pill-mig'))   _e('pill-mig').textContent=meta.mig;
+    if(_e('pill-cfg'))   _e('pill-cfg').textContent=meta.cfg;
+    if(_e('pill-rem'))   _e('pill-rem').textContent=meta.remaining;
+    if(_e('pill-rate'))  _e('pill-rate').textContent=Number(ins.daily_rate).toFixed(2);
+
+    // rebuild charts
+    ['buildGauge','buildBurndown','buildLocTable','buildPlanTab','buildTypeBar'].forEach(fn=>{
+      if(typeof window[fn]==='function') window[fn]();
+    });
+
+    const sl=_e('sync-ts')||_e('last-sync-lbl');
+    if(sl) sl.textContent=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    console.log(`✓ HQ: mig=${meta.mig}/${meta.total} rate=${ins.daily_rate} req=${ins.req_rate}`);
+  } catch(e){
+    console.error('HQ loadData error:', e.message);
+  } finally {
+    hideLoading();
+  }
+}
+
+window.addEventListener('DOMContentLoaded', async()=>{
+  await loadData();
+});
 
 async function manualRefresh(){
   const btns=document.querySelectorAll('[onclick*="manualRefresh"]');
@@ -1122,110 +1215,10 @@ buildCumWeekly();
 buildHeatmap();
 buildLocTable()
 
-async function loadData(){
-  showLoading();
-  try{
-    const r=await fetch(`${API}/api/dashboard`);
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    const d=await r.json();
-    const {meta, insight:ins, weekly, daily, locations, wk, today_wk}=d;
-
-    // อัพเดท arrays
-    WK_PLAN.length=0;       weekly.plan.forEach(v=>WK_PLAN.push(v));
-    WK_CFG.length=0;        weekly.cfg.forEach(v=>WK_CFG.push(v));
-    WK_MIG.length=0;        weekly.mig.forEach(v=>WK_MIG.push(v));
-    CUM_PLAN_PCT.length=0;  weekly.plan_cum_pct.forEach(v=>CUM_PLAN_PCT.push(v));
-    CUM_ACT_RAW.length=0;   weekly.act_cum_pct.forEach(v=>CUM_ACT_RAW.push(v));
-    BD_PLAN.length=0;       weekly.bd_plan.forEach(v=>BD_PLAN.push(v));
-    BD_ACT.length=0;        weekly.bd_act.forEach(v=>BD_ACT.push(v));
-    DAILY_LABELS.length=0;  daily.labels.forEach(v=>DAILY_LABELS.push(v));
-    DAILY_PLAN.length=0;    daily.plan.forEach(v=>DAILY_PLAN.push(v));
-    DAILY_ACT.length=0;     daily.mig.forEach(v=>DAILY_ACT.push(v));
-    CUM_PLAN_D.length=0;    daily.plan_cum_pct.forEach(v=>CUM_PLAN_D.push(v));
-    CUM_ACT_D_RAW.length=0; daily.act_cum_pct.forEach(v=>CUM_ACT_D_RAW.push(v));
-    window.TODAY_WK = today_wk;
-
-    // carry-forward
-    let _l=null;
-    if(typeof CUM_ACT!=='undefined'){ CUM_ACT.length=0; }
-    CUM_ACT_RAW.forEach((v,i)=>{
-      if(v!=null) _l=v;
-      if(typeof CUM_ACT!=='undefined') CUM_ACT.push(i<=TODAY_WK?_l:null);
-    });
-
-    // ── อัพเดท UI ──
-    const _e=id=>document.getElementById(id);
-    const thM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-    const fd=new Date(ins.finish_date+'T00:00:00');
-    const finTH=`${fd.getDate()} ${thM[fd.getMonth()]} ${(fd.getFullYear()+543)%100}`;
-    const migPct=(meta.mig/meta.total*100).toFixed(1);
-    const cfgPct=(meta.cfg/meta.total*100).toFixed(1);
-    const actCumLast=weekly.act_cum_pct.filter(v=>v!=null).pop()||0;
-    const planCumLast=weekly.plan_cum_pct[today_wk]||0;
-    const gap=(actCumLast-planCumLast).toFixed(1);
-
-    // topbar
-    if(_e('tb-done')) _e('tb-done').textContent=`${meta.mig}/${meta.total}`;
-    if(_e('tb-pct'))  _e('tb-pct').textContent=migPct+'%';
-    if(_e('tb-wk'))   _e('tb-wk').textContent=`W.${today_wk+1}`;
-
-    // overview cards
-    if(_e('ov-mig'))   _e('ov-mig').textContent=meta.mig;
-    if(_e('ov-cfg'))   _e('ov-cfg').textContent=meta.cfg;
-    if(_e('ov-mig-b')) _e('ov-mig-b').style.width=migPct+'%';
-    if(_e('ov-cfg-b')) _e('ov-cfg-b').style.width=cfgPct+'%';
-
-    // insight
-    if(_e('ins-act-pct')) _e('ins-act-pct').textContent=migPct+'%';
-    if(_e('ins-gap-tag')) _e('ins-gap-tag').textContent=(parseFloat(gap)>=0?'+':'')+gap+'%';
-    if(_e('ins-rate-now')) _e('ins-rate-now').textContent=Number(ins.daily_rate).toFixed(2);
-    if(_e('ins-rate-req')) _e('ins-rate-req').textContent=ins.req_rate;
-    if(_e('ins-rate-pct')) _e('ins-rate-pct').textContent='+'+(ins.pct_more||0)+'%';
-    if(_e('ins-forecast')) _e('ins-forecast').innerHTML=
-      `<strong>⚠ ถ้าไม่เพิ่มอัตรา:</strong> คาดว่าจะเสร็จ <strong>${finTH}</strong> — `+
-      `ช้ากว่าเป้าหมาย (3 เม.ย.) <strong style="color:var(--danger)">${ins.days_late} วัน</strong> | `+
-      `ยังเหลือ <strong>${meta.remaining} เครื่อง</strong> ใน <strong>${ins.days_left} วัน</strong>`;
-
-    // gauge + KPI
-    if(_e('gauge-pct'))  _e('gauge-pct').textContent=ins.gauge_pct+'%';
-    if(_e('kpi-act'))    _e('kpi-act').textContent=actCumLast.toFixed(2);
-    if(_e('kpi-plan'))   _e('kpi-plan').textContent=planCumLast.toFixed(2);
-    if(_e('kpi-diff'))   _e('kpi-diff').textContent=gap;
-    if(_e('kpi-late'))   _e('kpi-late').textContent=ins.days_late;
-
-    // pills
-    if(_e('pill-mig'))  _e('pill-mig').textContent=meta.mig;
-    if(_e('pill-cfg'))  _e('pill-cfg').textContent=meta.cfg;
-    if(_e('pill-rem'))  _e('pill-rem').textContent=meta.remaining;
-    if(_e('pill-rate')) _e('pill-rate').textContent=Number(ins.daily_rate).toFixed(2);
-
-    // rebuild charts
-    if(typeof buildGauge==='function')          buildGauge();
-    if(typeof buildBurndown==='function')        buildBurndown();
-    if(typeof buildProgressCharts==='function')  buildProgressCharts();
-    if(typeof buildLocList==='function')         buildLocList();
-    if(typeof buildLocTable==='function')        buildLocTable();
-    if(typeof buildPlanTab==='function')         buildPlanTab();
-    if(typeof buildTypeBar==='function')         buildTypeBar();
-
-    // sync time
-    const sl=_e('sync-ts')||_e('last-sync-lbl');
-    if(sl) sl.textContent=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-
-    console.log(`✓ HQ: mig=${meta.mig}/${meta.total} rate=${ins.daily_rate} req=${ins.req_rate}`);
-  } catch(e){
-    console.error('HQ loadData error:', e.message);
-  } finally {
-    hideLoading();
-  }
-}
+async 
 
 
-window.addEventListener('DOMContentLoaded', async()=>{
-  await loadData();
-  const el=document.getElementById('last-sync-lbl');
-  if(el) el.textContent=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-});
+
 
 
 </script>
