@@ -86,6 +86,21 @@ function calcDashboard(wb) {
     actCumD.push(pct(dayRows[9][i]));
   }
 
+  // Overdue + HOLD from HQ sheet
+  let hqOverdue=0, hqHold=0, onTimeQty=0;
+  hqRaw.slice(2).forEach(r => {
+    const device = r[3]; const newQty = r[6];
+    if (!device || typeof device !== 'string') return;
+    if (typeof newQty !== 'number' || !Number.isInteger(newQty) || newQty <= 0) return;
+    const mig  = typeof r[15] === 'number' ? Math.min(Math.round(r[15]), newQty) : 0;
+    const remark = r[12] ? String(r[12]).toLowerCase() : '';
+    const status = r[11] ? String(r[11]).toLowerCase() : '';
+    if (remark.includes('hold') || status.includes('hold')) hqHold += newQty;
+    else if (mig < newQty) hqOverdue += (newQty - mig);
+    if (mig >= newQty) onTimeQty += newQty;
+  });
+  const onTimePct = mig_total > 0 ? Math.round(onTimeQty / mig_total * 100 * 10) / 10 : 0;
+
   // Last install date
   let lastInstall = null;
   hqRaw.slice(2).forEach(r => {
@@ -155,13 +170,16 @@ function calcDashboard(wb) {
     }))
     .sort((a,b) => b.tor - a.tor);
 
-  // AP from HQ-WL — col3=qty, col16=Migration(integer only)
+  // AP from HQ-WL — col3=qty, col16=Migration, ข้าม summary rows (col2 มี "summary"/"รวม")
   let apTotal=0, apMig=0;
   const apLocMap = {};
   let curLocWL = null;
   wlRaw.slice(1).forEach(r => {
     if (r[0]) curLocWL = String(r[0]).trim();
     if (!curLocWL) return;
+    // ข้าม summary rows
+    const room = r[2] ? String(r[2]).toLowerCase() : '';
+    if (room.includes('summary') || room.includes('รวม') || room.includes('total')) return;
     const qty = (typeof r[3]==='number' && r[3]>0) ? r[3] : 0;
     const mig = (typeof r[16]==='number' && Number.isInteger(r[16]) && r[16]>0) ? r[16] : 0;
     apTotal += qty;
@@ -185,7 +203,7 @@ function calcDashboard(wb) {
   return {
     wk, wk_dates, today_wk: todayWk,
     last_install_date: lastInstallDate,
-    meta: {total:TOTAL, mig:mig_total, cfg:cfg_total, remaining, hold:0},
+    meta: {total:TOTAL, mig:mig_total, cfg:cfg_total, remaining, hold:hqHold, overdue:hqOverdue, on_time_qty:onTimeQty, on_time_pct:onTimePct},
     insight: {
       daily_rate:dailyRate, req_rate:reqRate, need_more:needMore,
       pct_more:pctMore, days_late:daysLate, gauge_pct:gaugePct,
