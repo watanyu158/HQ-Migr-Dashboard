@@ -212,14 +212,14 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
       </div>
       <div class="ins-rate-row">
         <span class="ins-rate-lbl">อัตราปัจจุบัน</span>
-        <span class="ins-rate-val">2.78</span>
+        <span class="ins-rate-val" id="ins-rate-now">2.7</span>
         <span class="ins-rate-unit">เครื่อง/วัน</span>
         <span class="ins-rate-arrow">→</span>
         <span class="ins-rate-lbl">ต้องเพิ่มเป็น</span>
-        <span class="ins-rate-target">5.2</span>
-        <span class="ins-rate-unit">เครื่อง/วัน (+84%)</span>
+        <span class="ins-rate-target" id="ins-rate-req">6</span>
+        <span class="ins-rate-unit">เครื่อง/วัน (<span id="ins-rate-pct">+122%</span>)</span>
       </div>
-      <div class="ins-forecast">
+      <div class="ins-forecast" id="ins-forecast">
         <strong>⚠ ถ้าไม่เพิ่มอัตรา:</strong> คาดว่าจะเสร็จ <strong>12 เม.ย. 2569</strong> —
         ช้ากว่าเป้าหมาย (3 เม.ย.) <strong style="color:var(--danger)">9 วัน</strong> |
         ยังเหลือ <strong>52 เครื่อง</strong> ใน <strong>10 วัน</strong>
@@ -227,13 +227,13 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
     </div>
     <div class="ins-gauge-card">
       <div class="ins-gauge-section">
-        <div class="ins-gauge-wrap"><canvas id="gauge-c"></canvas><div class="ins-gc"><div class="gp" id="gauge-pct">73%</div></div></div>
+        <div class="ins-gauge-wrap"><canvas id="gauge-c"></canvas><div class="ins-gc"><div class="gp" id="gauge-pct">45%</div></div></div>
       </div>
       <div class="ins-kpi-table">
         <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:2px;text-transform:uppercase;letter-spacing:.4px">ประเมินความตรงต่อเวลา</div>
         <div class="ins-kpi-row">
           <span class="ins-kpi-lbl">สะสมจริง</span>
-          <span class="ins-kpi-val" id="kpi-act" style="color:var(--warning)">73.06</span>
+          <span class="ins-kpi-val" id="kpi-act" style="color:var(--warning)">0</span>
           <span class="ins-kpi-unit">%</span>
         </div>
         <div class="ins-kpi-row">
@@ -248,7 +248,7 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
         </div>
         <div class="ins-kpi-row">
           <span class="ins-kpi-lbl" style="font-size:11px">ล่าช้า</span>
-          <span class="ins-kpi-val" style="color:var(--danger);font-size:13px">9</span>
+          <span class="ins-kpi-val" id="kpi-late" style="color:var(--danger);font-size:13px">11</span>
           <span class="ins-kpi-unit" style="color:var(--danger)">วัน</span>
         </div>
       </div>
@@ -259,7 +259,7 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
     <div class="ins-pill warning"><div class="ins-pill ip-v" id="pill-mig">142</div><div class="ip-l">Migration แล้ว</div></div>
     <div class="ins-pill success"><div class="ins-pill ip-v" id="pill-cfg">147</div><div class="ip-l">Config แล้ว</div></div>
     <div class="ins-pill danger"><div class="ins-pill ip-v" id="pill-rem">51</div><div class="ip-l">คงเหลือ</div></div>
-    <div class="ins-pill"><div class="ins-pill ip-v" id="pill-rate">2.82</div><div class="ip-l">เครื่อง/วัน</div></div>
+    <div class="ins-pill"><div class="ins-pill ip-v" id="pill-rate">2.7</div><div class="ip-l">เครื่อง/วัน</div></div>
   </div>
 </div>
 
@@ -902,18 +902,26 @@ function showTab(name,el){
 // ── Refresh ───────────────────────────────────────────────────────────────────
 
 function showLoading(){
-  const _stxt=document.getElementById('tb-status-txt');
-  if(_stxt) _stxt.textContent='⏳';
-  ['tb-mig','tb-cfg','tb-pct','ov-mig','ov-cfg','gauge-pct-lbl',
-   'pill-rem','pill-hold','pill-days'].forEach(id=>{
+  // reset topbar
+  ['tb-done','tb-pct'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.innerHTML='<span style="opacity:.35">–</span>';
   });
-  document.querySelectorAll('.ins-warn').forEach(w=>w.textContent='⏳ กำลังคำนวณ...');
-  document.querySelectorAll('.ins-big em').forEach(em=>em.textContent='–');
-  document.querySelectorAll('.ins-rate-val').forEach(el=>el.textContent='–');
-  document.querySelectorAll('.ins-kpi-val').forEach(el=>el.textContent='–');
-  document.querySelectorAll('.ip-val').forEach(el=>el.textContent='–');
+  // reset insight
+  ['ins-act-pct','ins-rate-now','ins-rate-req','gauge-pct',
+   'kpi-act','kpi-plan','kpi-diff','kpi-late',
+   'pill-mig','pill-cfg','pill-rem','pill-rate'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.textContent='–';
+  });
+  const fc=document.getElementById('ins-forecast');
+  if(fc) fc.innerHTML='<strong>⏳ กำลังคำนวณ...</strong>';
+  const rpct=document.getElementById('ins-rate-pct');
+  if(rpct) rpct.textContent='...';
+  const ov=document.getElementById('ov-mig');
+  if(ov) ov.textContent='–';
+  const oc=document.getElementById('ov-cfg');
+  if(oc) oc.textContent='–';
 }
 
 function hideLoading(){}
@@ -1067,7 +1075,7 @@ async function loadData(){
     const r=await fetch(`${API}/api/dashboard`);
     if(!r.ok) throw new Error('HTTP '+r.status);
     const d=await r.json();
-    const {meta,insight:ins,weekly,daily,locations,wk,today_wk}=d;
+    const {meta, insight:ins, weekly, daily, locations, wk, today_wk}=d;
 
     // อัพเดท arrays
     WK_PLAN.length=0;       weekly.plan.forEach(v=>WK_PLAN.push(v));
@@ -1082,71 +1090,76 @@ async function loadData(){
     DAILY_ACT.length=0;     daily.mig.forEach(v=>DAILY_ACT.push(v));
     CUM_PLAN_D.length=0;    daily.plan_cum_pct.forEach(v=>CUM_PLAN_D.push(v));
     CUM_ACT_D_RAW.length=0; daily.act_cum_pct.forEach(v=>CUM_ACT_D_RAW.push(v));
-    window.TODAY_WK=today_wk;
+    window.TODAY_WK = today_wk;
 
-    // carry-forward CUM_ACT
-    let _l=null; const CUM_ACT=[];
-    CUM_ACT_RAW.forEach((v,i)=>{ if(v!=null)_l=v; CUM_ACT.push(i<=TODAY_WK?_l:null); });
-    // อัพเดท global ACT_ALL ถ้ามี
-    if(typeof ACT_ALL!=='undefined'){ ACT_ALL.length=0; CUM_ACT.forEach(v=>ACT_ALL.push(v)); }
+    // carry-forward
+    let _l=null;
+    if(typeof CUM_ACT!=='undefined'){ CUM_ACT.length=0; }
+    CUM_ACT_RAW.forEach((v,i)=>{
+      if(v!=null) _l=v;
+      if(typeof CUM_ACT!=='undefined') CUM_ACT.push(i<=TODAY_WK?_l:null);
+    });
 
+    // ── อัพเดท UI ──
     const _e=id=>document.getElementById(id);
     const thM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
     const fd=new Date(ins.finish_date+'T00:00:00');
     const finTH=`${fd.getDate()} ${thM[fd.getMonth()]} ${(fd.getFullYear()+543)%100}`;
+    const migPct=(meta.mig/meta.total*100).toFixed(1);
+    const cfgPct=(meta.cfg/meta.total*100).toFixed(1);
+    const actCumLast=weekly.act_cum_pct.filter(v=>v!=null).pop()||0;
+    const planCumLast=weekly.plan_cum_pct[today_wk]||0;
+    const gap=(actCumLast-planCumLast).toFixed(1);
 
-    // topbar + overview
-    if(_e('tb-mig'))   _e('tb-mig').textContent  =`${meta.mig}/${meta.total}`;
-    if(_e('tb-cfg'))   _e('tb-cfg').textContent  =`${meta.cfg}/${meta.total}`;
-    if(_e('tb-pct'))   _e('tb-pct').textContent  =(meta.mig/meta.total*100).toFixed(1)+'%';
-    if(_e('tb-status-txt')){
-      _e('tb-status-txt').textContent=ins.days_late>0?'ช้ากว่าแผน':'ตรงแผน';
-    }
-    if(_e('ov-mig'))   _e('ov-mig').textContent  =meta.mig;
-    if(_e('ov-cfg'))   _e('ov-cfg').textContent  =meta.cfg;
-    if(_e('ov-mig-b')) _e('ov-mig-b').style.width=(meta.mig/meta.total*100).toFixed(1)+'%';
-    if(_e('ov-cfg-b')) _e('ov-cfg-b').style.width=(meta.cfg/meta.total*100).toFixed(1)+'%';
+    // topbar
+    if(_e('tb-done')) _e('tb-done').textContent=`${meta.mig}/${meta.total}`;
+    if(_e('tb-pct'))  _e('tb-pct').textContent=migPct+'%';
+    if(_e('tb-wk'))   _e('tb-wk').textContent=`W.${today_wk+1}`;
 
-    // pills
-    if(_e('pill-rem'))  _e('pill-rem').textContent =meta.remaining;
-    if(_e('pill-hold')) _e('pill-hold').textContent=meta.hold||0;
-    if(_e('pill-days')) _e('pill-days').textContent=ins.days_left;
-    if(_e('gauge-pct-lbl')) _e('gauge-pct-lbl').textContent=ins.gauge_pct+'%';
+    // overview cards
+    if(_e('ov-mig'))   _e('ov-mig').textContent=meta.mig;
+    if(_e('ov-cfg'))   _e('ov-cfg').textContent=meta.cfg;
+    if(_e('ov-mig-b')) _e('ov-mig-b').style.width=migPct+'%';
+    if(_e('ov-cfg-b')) _e('ov-cfg-b').style.width=cfgPct+'%';
 
     // insight
-    document.querySelectorAll('.ins-big em').forEach(em=>em.textContent=Number(ins.need_more).toFixed(1));
-    document.querySelectorAll('.ins-pct-tag').forEach(t=>t.textContent='↑'+ins.pct_more+'% จากอัตราปัจจุบัน');
-    const rv=document.querySelectorAll('.ins-rate-val');
-    if(rv[0]) rv[0].textContent=Number(ins.daily_rate).toFixed(2);
-    if(rv[1]) rv[1].textContent=ins.req_rate;
-    document.querySelectorAll('.ins-warn').forEach(w=>{
-      w.textContent=ins.days_late>0
-        ?`⚠ ถ้าไม่เพิ่ม → เสร็จ ${finTH} — ช้ากว่าเป้า ${ins.days_late} วัน`
-        :`✅ ถ้าคงอัตรานี้ → เสร็จ ${finTH} — ก่อนกำหนด`;
-    });
-    const kv=document.querySelectorAll('.ins-kpi-val');
-    if(kv[0]) kv[0].textContent=Number(ins.daily_rate).toFixed(2);
-    if(kv[1]) kv[1].textContent=ins.req_rate;
-    if(kv[2]) kv[2].textContent='+'+Number(ins.need_more).toFixed(1);
-    document.querySelectorAll('.ip-val').forEach(el=>{
-      const lbl=el.nextElementSibling?.textContent||'';
-      if(lbl==='คาดเสร็จ') el.textContent=finTH;
-      if(lbl==='วันเหลือ') el.textContent=ins.days_left;
-    });
-    document.querySelectorAll('.ip-sub').forEach(el=>{
-      if(el.closest('.p-date')) el.textContent=ins.days_late>0?'ช้า '+ins.days_late+' วัน':'ก่อนกำหนด';
-    });
+    if(_e('ins-act-pct')) _e('ins-act-pct').textContent=migPct+'%';
+    if(_e('ins-gap-tag')) _e('ins-gap-tag').textContent=(parseFloat(gap)>=0?'+':'')+gap+'%';
+    if(_e('ins-rate-now')) _e('ins-rate-now').textContent=Number(ins.daily_rate).toFixed(2);
+    if(_e('ins-rate-req')) _e('ins-rate-req').textContent=ins.req_rate;
+    if(_e('ins-rate-pct')) _e('ins-rate-pct').textContent='+'+(ins.pct_more||0)+'%';
+    if(_e('ins-forecast')) _e('ins-forecast').innerHTML=
+      `<strong>⚠ ถ้าไม่เพิ่มอัตรา:</strong> คาดว่าจะเสร็จ <strong>${finTH}</strong> — `+
+      `ช้ากว่าเป้าหมาย (3 เม.ย.) <strong style="color:var(--danger)">${ins.days_late} วัน</strong> | `+
+      `ยังเหลือ <strong>${meta.remaining} เครื่อง</strong> ใน <strong>${ins.days_left} วัน</strong>`;
+
+    // gauge + KPI
+    if(_e('gauge-pct'))  _e('gauge-pct').textContent=ins.gauge_pct+'%';
+    if(_e('kpi-act'))    _e('kpi-act').textContent=actCumLast.toFixed(2);
+    if(_e('kpi-plan'))   _e('kpi-plan').textContent=planCumLast.toFixed(2);
+    if(_e('kpi-diff'))   _e('kpi-diff').textContent=gap;
+    if(_e('kpi-late'))   _e('kpi-late').textContent=ins.days_late;
+
+    // pills
+    if(_e('pill-mig'))  _e('pill-mig').textContent=meta.mig;
+    if(_e('pill-cfg'))  _e('pill-cfg').textContent=meta.cfg;
+    if(_e('pill-rem'))  _e('pill-rem').textContent=meta.remaining;
+    if(_e('pill-rate')) _e('pill-rate').textContent=Number(ins.daily_rate).toFixed(2);
 
     // rebuild charts
-    if(typeof buildGauge==='function') buildGauge();
-    if(typeof buildBurndown==='function') buildBurndown();
-    if(typeof buildProgressCharts==='function') buildProgressCharts();
-    if(typeof buildLocList==='function') buildLocList();
-    if(typeof buildLocTable==='function') buildLocTable();
-    if(typeof buildPlanTab==='function') buildPlanTab();
-    if(typeof buildTypeBar==='function') buildTypeBar();
+    if(typeof buildGauge==='function')          buildGauge();
+    if(typeof buildBurndown==='function')        buildBurndown();
+    if(typeof buildProgressCharts==='function')  buildProgressCharts();
+    if(typeof buildLocList==='function')         buildLocList();
+    if(typeof buildLocTable==='function')        buildLocTable();
+    if(typeof buildPlanTab==='function')         buildPlanTab();
+    if(typeof buildTypeBar==='function')         buildTypeBar();
 
-    console.log(`✓ HQ Dynamic: mig=${meta.mig}/${meta.total} rate=${ins.daily_rate} req=${ins.req_rate}`);
+    // sync time
+    const sl=_e('sync-ts')||_e('last-sync-lbl');
+    if(sl) sl.textContent=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+
+    console.log(`✓ HQ: mig=${meta.mig}/${meta.total} rate=${ins.daily_rate} req=${ins.req_rate}`);
   } catch(e){
     console.error('HQ loadData error:', e.message);
   } finally {
