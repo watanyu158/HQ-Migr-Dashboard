@@ -388,24 +388,25 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto;box-sizing:border-box}
 </div>
 
 
-<!-- ══ Category Summary ══ -->
-<div class="g2" style="margin-bottom:14px">
-  <!-- Chart: Switch vs Infra -->
-  <div class="card">
-    <div class="ch">
-      <div class="chi" style="background:var(--primary-l);color:var(--primary)">📊</div>
-      ความคืบหน้าแยก Category
-    </div>
-    <div style="height:180px"><canvas id="cat-bar-c"></canvas></div>
+<!-- ══ Device Summary: Switch / AP / Infra ══ -->
+<div class="card" style="margin-bottom:14px" id="device-summary-card">
+  <div class="ch">
+    <div class="chi" style="background:var(--primary-l);color:var(--primary)">📡</div>
+    สรุปความคืบหน้า Migration — Switch / AP / Infra
   </div>
-  <!-- Category summary table -->
-  <div class="card">
-    <div class="ch">
-      <div class="chi" style="background:var(--success-l);color:var(--success)">📋</div>
-      สรุป Category × สถานที่
-    </div>
-    <div id="cat-loc-table" style="margin-top:4px"></div>
+  <!-- 3 big stat cards -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px" id="dev-stat-row">
+    <!-- filled by JS -->
   </div>
+  <!-- bar chart -->
+  <div style="height:200px"><canvas id="dev-bar-c"></canvas></div>
+</div>
+<div class="card" style="margin-bottom:14px">
+  <div class="ch">
+    <div class="chi" style="background:var(--success-l);color:var(--success)">📋</div>
+    รายละเอียดแยกสถานที่ — Switch / AP / Infra
+  </div>
+  <div id="cat-loc-table" style="margin-top:4px"></div>
 </div>
 
 <!-- ══ Tab: Weekly ══ -->
@@ -1008,6 +1009,8 @@ function showLoading(){
   if(hg) hg.innerHTML='<div style="padding:20px;color:var(--text2);font-size:12px;opacity:.5">⏳ กำลังโหลด...</div>';
   const clt=document.getElementById('cat-loc-table');
   if(clt) clt.innerHTML='<div style="padding:20px;color:var(--text2);font-size:12px;opacity:.5">⏳ กำลังโหลด...</div>';
+  const dsr=document.getElementById('dev-stat-row');
+  if(dsr) dsr.innerHTML='<div style="padding:20px;color:var(--text2);font-size:12px;opacity:.5;grid-column:span 3">⏳ กำลังโหลด...</div>';
   const fc=document.getElementById('ins-forecast');
   if(fc)fc.innerHTML='<strong>⏳ กำลังคำนวณ...</strong>';
 }
@@ -1123,54 +1126,77 @@ window.addEventListener('DOMContentLoaded',async()=>{
 });
 
 // ── Category Bar Chart ───────────────────────────────────────────────────────
-function buildCategoryChart(categories){
-  const cv=document.getElementById('cat-bar-c');
-  if(!cv||!categories||!categories.length) return;
+
+
+// ── Category × Location Table ─────────────────────────────────────────────────
+
+
+
+// ── Device Summary: Switch / AP / Infra ────────────────────────────────────
+function buildDeviceSummary(ds){
+  if(!ds||!ds.length) return;
+  const colors = {'Switch':'#4361ee','AP':'#2bc48a','Infra':'#ff9f43'};
+  const bgL   = {'Switch':'#eef1ff','AP':'#e8faf3','Infra':'#fff5e6'};
+
+  // stat cards
+  const row=document.getElementById('dev-stat-row');
+  if(row){
+    row.innerHTML=ds.map(d=>{
+      const col=colors[d.n]||'#64748b';
+      const bg=bgL[d.n]||'#f8faff';
+      const rem=d.tor-d.mig;
+      return `<div style="background:${bg};border-radius:10px;padding:14px 16px;border:1px solid ${col}33">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+          <span style="font-size:13px;font-weight:700;color:${col}">${d.n}</span>
+          <span style="font-size:18px;font-weight:800;color:${col}">${d.pct}%</span>
+        </div>
+        <div style="font-size:22px;font-weight:700;color:var(--text);margin-bottom:4px">
+          ${d.mig}<span style="font-size:13px;font-weight:400;color:var(--text2)">/${d.tor}</span>
+        </div>
+        <div style="height:6px;background:rgba(0,0,0,.08);border-radius:3px;overflow:hidden;margin-bottom:6px">
+          <div style="height:100%;width:${d.pct}%;background:${col};border-radius:3px;transition:width .8s ease"></div>
+        </div>
+        <div style="font-size:11px;color:var(--text2)">เหลือ <strong>${rem}</strong> เครื่อง</div>
+      </div>`;
+    }).join('');
+  }
+
+  // bar chart
+  const cv=document.getElementById('dev-bar-c');
+  if(!cv) return;
   const ex=Chart.getChart(cv); if(ex) ex.destroy();
-
-  const labels = categories.map(c=>c.n);
-  const torVals = categories.map(c=>c.tor);
-  const migVals = categories.map(c=>c.mig);
-  const cfgVals = categories.map(c=>c.cfg);
-
-  const colors = {'Switch':'#4361ee','Infra':'#ff9f43','ไม่ระบุ':'#94a3b8'};
-  const getColor = (n,a) => {
-    const base=colors[n]||'#64748b';
-    return base+(a?'cc':'40');
-  };
-
   new Chart(cv,{
     type:'bar',
     data:{
-      labels,
+      labels: ds.map(d=>d.n),
       datasets:[
-        {label:'Migration แล้ว', data:migVals,
-         backgroundColor:labels.map(n=>getColor(n,true)),
-         borderColor:labels.map(n=>getColor(n,true).slice(0,7)),
-         borderWidth:1.5, borderRadius:6},
-        {label:'คงเหลือ', data:torVals.map((t,i)=>t-migVals[i]),
-         backgroundColor:labels.map(n=>getColor(n,false)),
-         borderColor:labels.map(n=>getColor(n,false).slice(0,7)),
-         borderWidth:1, borderRadius:6},
+        {label:'Migration แล้ว', data:ds.map(d=>d.mig),
+         backgroundColor:ds.map(d=>(colors[d.n]||'#64748b')+'cc'),
+         borderColor:ds.map(d=>colors[d.n]||'#64748b'),
+         borderWidth:1.5, borderRadius:8},
+        {label:'คงเหลือ', data:ds.map(d=>d.tor-d.mig),
+         backgroundColor:ds.map(d=>(colors[d.n]||'#94a3b8')+'30'),
+         borderColor:ds.map(d=>(colors[d.n]||'#94a3b8')+'60'),
+         borderWidth:1, borderRadius:8},
       ]
     },
     options:{
       responsive:true, maintainAspectRatio:false,
       plugins:{
-        legend:{position:'bottom',labels:{font:{size:10},boxWidth:10}},
+        legend:{position:'bottom',labels:{font:{size:11},boxWidth:12,padding:16}},
         tooltip:{
           callbacks:{
             label:ctx=>{
-              const c=categories[ctx.dataIndex];
-              if(ctx.datasetIndex===0) return ` Migration: ${c.mig}/${c.tor} (${c.pct_mig}%)`;
-              return ` คงเหลือ: ${c.tor-c.mig}`;
+              const d=ds[ctx.dataIndex];
+              if(ctx.datasetIndex===0) return ` Done: ${d.mig}/${d.tor} (${d.pct}%)`;
+              return ` คงเหลือ: ${d.tor-d.mig} เครื่อง`;
             }
           }
         }
       },
       scales:{
-        x:{stacked:true, ticks:{font:{size:11}}, grid:{display:false}},
-        y:{stacked:true, ticks:{font:{size:10}}, grid:{color:'#f0f4ff'}}
+        x:{stacked:true,grid:{display:false},ticks:{font:{size:12}}},
+        y:{stacked:true,grid:{color:'#f0f4ff'},ticks:{font:{size:10}}}
       }
     }
   });
@@ -1180,52 +1206,38 @@ function buildCategoryChart(categories){
 function buildCatLocTable(locations, categories){
   const el=document.getElementById('cat-loc-table');
   if(!el||!locations||!categories) return;
+  const catNames=['Switch','AP','Infra'];
+  const colColors={'Switch':'var(--primary)','AP':'var(--success)','Infra':'var(--warning)'};
 
-  const catNames = categories.map(c=>c.n);
-  const catColors = {'Switch':'var(--primary)','Infra':'var(--warning)','ไม่ระบุ':'var(--text2)'};
-
-  let html = `<table style="width:100%;border-collapse:collapse;font-size:11px">
-    <thead>
-      <tr style="border-bottom:2px solid var(--border)">
-        <th style="text-align:left;padding:5px 8px;color:var(--text2)">สถานที่</th>
-        ${catNames.map(n=>`<th style="text-align:center;padding:5px 8px;color:${catColors[n]||'var(--text2)'}">${n}</th>`).join('')}
-        <th style="text-align:center;padding:5px 8px;color:var(--text2)">รวม</th>
-      </tr>
-    </thead>
-    <tbody>`;
+  let html=`<table style="width:100%;border-collapse:collapse;font-size:11px">
+    <thead><tr style="border-bottom:2px solid var(--border)">
+      <th style="text-align:left;padding:5px 8px;color:var(--text2)">สถานที่</th>
+      ${catNames.map(n=>`<th style="text-align:center;padding:5px 8px;color:${colColors[n]}">${n}</th>`).join('')}
+      <th style="text-align:center;padding:5px 8px;color:var(--text2)">รวม Switch+Infra</th>
+    </tr></thead><tbody>`;
 
   locations.filter(l=>l.tor>0).forEach(l=>{
-    const rowMig = catNames.reduce((s,cat)=>{
-      const v=l.cats&&l.cats[cat]; return s+(v?v.mig:0);
-    },0);
-    const rowTor = catNames.reduce((s,cat)=>{
-      const v=l.cats&&l.cats[cat]; return s+(v?v.tor:0);
-    },0);
-    const pct = rowTor>0?Math.round(rowMig/rowTor*100):0;
-    const barColor = pct>=100?'var(--success)':pct>=70?'#38bdf8':pct>=30?'var(--warning)':pct>0?'var(--danger)':'var(--border)';
-
-    html += `<tr style="border-bottom:1px solid var(--border)">
-      <td style="padding:5px 8px;font-weight:500">${l.n}</td>
-      ${catNames.map(cat=>{
-        const v=l.cats&&l.cats[cat];
-        if(!v||!v.tor) return `<td style="text-align:center;padding:5px 8px;color:var(--text3)">–</td>`;
-        const cp=Math.round(v.mig/v.tor*100);
-        return `<td style="text-align:center;padding:5px 8px">
-          <span style="font-weight:600">${v.mig}/${v.tor}</span>
-          <span style="color:var(--text2);font-size:10px"> (${cp}%)</span>
-        </td>`;
-      }).join('')}
+    const sw=l.cats&&l.cats['Switch']||{tor:0,mig:0};
+    const inf=l.cats&&l.cats['Infra']||{tor:0,mig:0};
+    // AP loc จาก api ไม่มีตรงๆ — แสดง Switch+Infra เท่านั้น
+    const tot=sw.tor+inf.tor; const tmig=sw.mig+inf.mig;
+    const pct=tot>0?Math.round(tmig/tot*100):0;
+    const bc=pct>=100?'var(--success)':pct>=70?'#38bdf8':pct>=30?'var(--warning)':pct>0?'var(--danger)':'var(--border)';
+    const cell=v=>v.tor?`<td style="text-align:center;padding:5px 8px"><b>${v.mig}/${v.tor}</b><br><span style="color:var(--text2);font-size:10px">${Math.round(v.mig/v.tor*100)}%</span></td>`
+                       :`<td style="text-align:center;padding:5px 8px;color:var(--text3)">–</td>`;
+    html+=`<tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:5px 8px;font-weight:500;font-size:11px">${l.n}</td>
+      ${cell(sw)}<td style="text-align:center;padding:5px 8px;color:var(--text3)">–</td>${cell(inf)}
       <td style="text-align:center;padding:5px 8px">
-        <span style="font-weight:700">${rowMig}/${rowTor}</span><br>
-        <div style="height:3px;background:var(--border);border-radius:2px;margin-top:2px">
-          <div style="height:100%;width:${pct}%;background:${barColor};border-radius:2px"></div>
+        <b>${tmig}/${tot}</b>
+        <div style="height:4px;background:var(--border);border-radius:2px;margin-top:3px">
+          <div style="height:100%;width:${pct}%;background:${bc};border-radius:2px"></div>
         </div>
       </td>
     </tr>`;
   });
-
-  html += `</tbody></table>`;
-  el.innerHTML = html;
+  html+=`</tbody></table>`;
+  el.innerHTML=html;
 }
 
 async function manualRefresh(){

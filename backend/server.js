@@ -20,10 +20,12 @@ function calcDashboard(wb) {
   const wsWk  = wb.Sheets['HQ-กราฟรายสัปดาห์'];
   const wsDay = wb.Sheets['HQ-กราฟรายวัน'];
   const wsHQ  = wb.Sheets['HQ'];
+  const wsWL  = wb.Sheets['HQ-WL'];
 
   const wkRows  = XLSX.utils.sheet_to_json(wsWk,  {header:1, defval:null});
   const dayRows = XLSX.utils.sheet_to_json(wsDay, {header:1, defval:null});
   const hqRaw   = XLSX.utils.sheet_to_json(wsHQ,  {header:1, defval:null});
+  const wlRaw   = wsWL ? XLSX.utils.sheet_to_json(wsWL, {header:1, defval:null}) : [];
 
   const N_WK = 9;
   const num = v => typeof v === 'number' ? v : null;
@@ -153,6 +155,31 @@ function calcDashboard(wb) {
     }))
     .sort((a,b) => b.tor - a.tor);
 
+  // AP from HQ-WL — col3=qty, col16=Migration(integer only)
+  let apTotal=0, apMig=0;
+  const apLocMap = {};
+  let curLocWL = null;
+  wlRaw.slice(1).forEach(r => {
+    if (r[0]) curLocWL = String(r[0]).trim();
+    if (!curLocWL) return;
+    const qty = (typeof r[3]==='number' && r[3]>0) ? r[3] : 0;
+    const mig = (typeof r[16]==='number' && Number.isInteger(r[16]) && r[16]>0) ? r[16] : 0;
+    apTotal += qty;
+    apMig   += mig;
+    if (!apLocMap[curLocWL]) apLocMap[curLocWL] = {qty:0, mig:0};
+    apLocMap[curLocWL].qty += qty;
+    apLocMap[curLocWL].mig += mig;
+  });
+
+  // device_summary: Switch, AP, Infra
+  const switchCat = categories.find(c=>c.n==='Switch') || {tor:0,mig:0};
+  const infraCat  = categories.find(c=>c.n==='Infra')  || {tor:0,mig:0};
+  const device_summary = [
+    {n:'Switch', tor:switchCat.tor, mig:switchCat.mig, pct:Math.round(switchCat.mig/switchCat.tor*100)||0, color:'#4361ee'},
+    {n:'AP',     tor:apTotal,       mig:apMig,          pct:apTotal>0?Math.round(apMig/apTotal*100):0,      color:'#2bc48a'},
+    {n:'Infra',  tor:infraCat.tor,  mig:infraCat.mig,   pct:Math.round(infraCat.mig/infraCat.tor*100)||0,   color:'#ff9f43'},
+  ];
+
   console.log(`✓ Locations: ${locations.length} | ${locations.map(l=>l.n.slice(0,10)+':'+l.mig).join(', ')}`);
 
   return {
@@ -167,7 +194,8 @@ function calcDashboard(wb) {
     weekly: {plan:plan_wk, cfg:cfg_wk, mig:mig_wk, bd_plan, bd_act, plan_cum_pct, act_cum_pct},
     daily:  {labels:dayLabels, plan:planDay, mig:migDay, plan_cum_pct:planCumD, act_cum_pct:actCumD},
     locations,
-    categories
+    categories,
+    device_summary
   };
 }
 
