@@ -285,11 +285,7 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
     <div class="ch"><div class="chi" style="background:var(--info-l);color:var(--info)">🗺️</div>Location Heatmap — สรุปตามสถานที่</div>
     <div class="hm-grid" id="hm-grid"></div>
   </div>
-  <!-- Category x Location table -->
-  <div class="card" style="margin-bottom:14px">
-    <div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">📋</div>รายละเอียดแยกสถานที่ — Switch / AP / Infra</div>
-    <div id="cat-loc-table" style="margin-top:4px">⏳ กำลังโหลด...</div>
-  </div>
+
 </div>
 
 <div class="tab-body" id="tab-weekly">
@@ -343,8 +339,8 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
 
 <div class="tab-body" id="tab-location">
   <div class="card" style="margin-bottom:14px">
-    <div class="ch"><div class="chi" style="background:var(--info-l);color:var(--info)">📍</div>สรุปตามสถานที่</div>
-    <div id="loc-table" style="overflow-x:auto;margin-top:4px"></div>
+    <div class="ch"><div class="chi" style="background:var(--info-l);color:var(--info)">📍</div>รายละเอียดแยกตามสถานที่</div>
+    <div id="cat-loc-table" style="margin-top:4px">⏳ กำลังโหลด...</div>
   </div>
 </div>
 
@@ -499,28 +495,48 @@ function buildHeatmap(){
 }
 
 function buildCatLocTable(locations,categories){
-  const el=document.getElementById('cat-loc-table');if(!el||!locations||!categories)return;
+  const el=document.getElementById('cat-loc-table');
+  if(!el||!locations||!categories) return;
   const catNames=['Switch','AP','Infra'];
   const colColors={'Switch':'var(--primary)','AP':'var(--success)','Infra':'var(--warning)'};
-  let html='<table style="width:100%;border-collapse:collapse;font-size:11px"><thead><tr style="border-bottom:2px solid var(--border)">'
-    +'<th style="text-align:left;padding:5px 8px;color:var(--text2)">สถานที่</th>'
-    +catNames.map(n=>'<th style="text-align:center;padding:5px 8px;color:'+colColors[n]+'">'+n+'</th>').join('')
-    +'<th style="text-align:center;padding:5px 8px;color:var(--text2)">รวม Switch+Infra</th>'
+
+  let html='<table style="width:100%;border-collapse:collapse;font-size:11px">'
+    +'<thead><tr style="border-bottom:2px solid var(--border)">'
+    +'<th style="text-align:left;padding:6px 10px;color:var(--text2)">สถานที่</th>'
+    +catNames.map(n=>'<th style="text-align:center;padding:6px 10px;color:'+colColors[n]+'">'+n+'</th>').join('')
+    +'<th style="text-align:center;padding:6px 10px;color:var(--text2)">% ความก้าวหน้า</th>'
     +'</tr></thead><tbody>';
+
   locations.filter(l=>l.tor>0).forEach(l=>{
-    const sw=l.cats&&l.cats['Switch']||{tor:0,mig:0};
-    const inf=l.cats&&l.cats['Infra']||{tor:0,mig:0};
-    const tot=sw.tor+inf.tor,tmig=sw.mig+inf.mig;
+    const sw =l.cats&&l.cats['Switch']||{tor:0,mig:0};
+    const inf=l.cats&&l.cats['Infra'] ||{tor:0,mig:0};
+    // AP — ยังไม่มี loc mapping ใน API → แสดง –
+    const tot=sw.tor+inf.tor;
+    const tmig=sw.mig+inf.mig;
     const pct=tot>0?Math.round(tmig/tot*100):0;
     const bc=pct>=100?'var(--success)':pct>=70?'#38bdf8':pct>=30?'var(--warning)':pct>0?'var(--danger)':'var(--border)';
-    const cell=v=>v.tor?'<td style="text-align:center;padding:5px 8px"><b>'+v.mig+'/'+v.tor+'</b><br><span style="color:var(--text2);font-size:10px">'+Math.round(v.mig/v.tor*100)+'%</span></td>'
-      :'<td style="text-align:center;padding:5px 8px;color:var(--text3)">–</td>';
-    html+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 8px;font-weight:500">'+l.n+'</td>'
-      +cell(sw)+'<td style="text-align:center;padding:5px 8px;color:var(--text3)">–</td>'+cell(inf)
-      +'<td style="text-align:center;padding:5px 8px"><b>'+tmig+'/'+tot+'</b>'
-      +'<div style="height:4px;background:var(--border);border-radius:2px;margin-top:3px"><div style="height:100%;width:'+pct+'%;background:'+bc+';border-radius:2px"></div></div></td></tr>';
+    const cell=v=>v.tor
+      ?'<td style="text-align:center;padding:6px 10px"><b>'+v.mig+'/'+v.tor+'</b>'
+       +'<span style="color:var(--text2);font-size:10px"> ('+Math.round(v.mig/v.tor*100)+'%)</span></td>'
+      :'<td style="text-align:center;padding:6px 10px;color:var(--text3)">–</td>';
+    html+='<tr style="border-bottom:1px solid var(--border)">'
+      +'<td style="padding:6px 10px;font-weight:500">'+l.n+'</td>'
+      +cell(sw)
+      +'<td style="text-align:center;padding:6px 10px;color:var(--text3)">–</td>'
+      +cell(inf)
+      +'<td style="padding:6px 10px;min-width:120px">'
+        +'<div style="display:flex;align-items:center;gap:6px">'
+        +'<div style="flex:1;height:6px;background:var(--border);border-radius:99px;overflow:hidden">'
+        +'<div style="height:100%;width:'+pct+'%;background:'+bc+';border-radius:99px;transition:width .8s"></div>'
+        +'</div>'
+        +'<span style="font-size:11px;font-weight:600;color:'+bc+';min-width:32px;text-align:right">'+pct+'%</span>'
+        +'</div>'
+      +'</td>'
+      +'</tr>';
   });
-  el.innerHTML=html+'</tbody></table>';
+
+  html+='</tbody></table>';
+  el.innerHTML=html;
 }
 
 function buildWeeklyBar(){
