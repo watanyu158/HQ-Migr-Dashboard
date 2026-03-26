@@ -236,7 +236,7 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto;box-sizing:border-box}
     <div class="tb-logo" style="font-size:20px;background:rgba(255,255,255,.15)">✈</div>
     <div>
       <div class="tb-title" style="font-size:15px;letter-spacing:.3px">SDA Migration Progress Dashboard - <span style="background:linear-gradient(90deg,#ffd700,#ffaa00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800">HQ</span></div>
-      <div class="tb-sub">รายงานสรุปการติดตั้งอุปกรณ์ SDA | ซิงค์ล่าสุด <span id="sync-ts">--</span></div>
+      <div class="tb-sub">รายงานสรุปการติดตั้งอุปกรณ์ SDA | ข้อมูลล่าสุด: <span id="last-install-lbl">23 มี.ค. 69</span> | ซิงค์ <span id="sync-ts">--</span></div>
     </div>
   </div>
   <div class="tb-stats">
@@ -259,7 +259,7 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto;box-sizing:border-box}
       <div class="ins-alert-head">
         <div class="ins-icon">🚀</div>
         <div>
-          <div class="ins-big">Migration สะสม <em id="ins-act-pct">73.6%</em> — ช้ากว่าแผน <span class="ins-pct-tag" id="ins-gap-tag">-18.6%</span></div>
+          <div class="ins-big">ต้องเพิ่ม <em id="ins-need-more">3.27</em> อุปกรณ์/วัน<br><span class="ins-pct-tag" id="ins-rate-pct-tag">↑120% จากอัตราปัจจุบัน</span></div>
           <div style="font-size:12px;color:var(--text2);margin-top:3px">W.8 (23/3-29/3) | เป้าหมาย 193 เครื่อง | เสร็จแล้ว 142 เครื่อง</div>
         </div>
       </div>
@@ -337,29 +337,29 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto;box-sizing:border-box}
       <div class="shdr-stat"><div class="v">193</div><div class="l">อุปกรณ์ตามแผน</div></div>
       <div class="shdr-stat"><div class="v" id="ov-mig">142</div><div class="l">Migration แล้ว</div></div>
       <div class="shdr-stat"><div class="v" id="ov-cfg">147</div><div class="l">Config แล้ว</div></div>
-      <div class="shdr-stat"><div class="v">73.6%</div><div class="l">% ความคืบหน้า</div></div>
+      <div class="shdr-stat"><div class="v" id="ov-pct">73.6%</div><div class="l">% ความคืบหน้า</div></div>
     </div>
   </div>
 
   <!-- 3-step progress -->
   <div class="step-row">
     <div class="step s-cfg">
-      <div class="step-top"><span class="step-icon">⚙️</span><span class="step-pct" style="background:var(--primary-l);color:var(--primary)">76.2%</span></div>
-      <div><span class="step-num" style="color:var(--primary)">147</span><span class="step-denom">/193</span></div>
+      <div class="step-top"><span class="step-icon">⚙️</span><span class="step-pct" id="step-cfg-pct" style="background:var(--primary-l);color:var(--primary)">76.2%</span></div>
+      <div><span class="step-num" id="step-cfg-num" style="color:var(--primary)">147</span><span class="step-denom">/193</span></div>
       <div class="step-lbl">Configuration</div>
-      <div class="step-bar"><div class="step-fill" style="width:76.2%;background:var(--primary)"></div></div>
+      <div class="step-bar"><div class="step-fill" id="step-cfg-bar" style="width:76.2%;background:var(--primary)"></div></div>
     </div>
     <div class="step s-inst">
-      <div class="step-top"><span class="step-icon">🔧</span><span class="step-pct" style="background:var(--primary-l);color:var(--primary)">76.2%</span></div>
-      <div><span class="step-num" style="color:var(--primary)">147</span><span class="step-denom">/193</span></div>
+      <div class="step-top"><span class="step-icon">🔧</span><span class="step-pct" id="step-inst-pct" style="background:var(--primary-l);color:var(--primary)">76.2%</span></div>
+      <div><span class="step-num" id="step-inst-num" style="color:var(--primary)">147</span><span class="step-denom">/193</span></div>
       <div class="step-lbl">Installation</div>
-      <div class="step-bar"><div class="step-fill" style="width:76.2%;background:var(--success)"></div></div>
+      <div class="step-bar"><div class="step-fill" id="step-inst-bar" style="width:76.2%;background:var(--success)"></div></div>
     </div>
     <div class="step s-mig">
-      <div class="step-top"><span class="step-icon">🚀</span><span class="step-pct" style="background:var(--warning-l);color:var(--warning)">73.6%</span></div>
-      <div><span class="step-num" style="color:var(--warning)">142</span><span class="step-denom">/193</span></div>
+      <div class="step-top"><span class="step-icon">🚀</span><span class="step-pct" id="step-mig-pct" style="background:var(--warning-l);color:var(--warning)">73.6%</span></div>
+      <div><span class="step-num" id="step-mig-num" style="color:var(--warning)">142</span><span class="step-denom">/193</span></div>
       <div class="step-lbl">Migration</div>
-      <div class="step-bar"><div class="step-fill" style="width:73.6%;background:var(--warning)"></div></div>
+      <div class="step-bar"><div class="step-fill" id="step-mig-bar" style="width:73.6%;background:var(--warning)"></div></div>
     </div>
   </div>
 
@@ -513,7 +513,7 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto;box-sizing:border-box}
   <div class="card" style="margin-bottom:14px">
     <div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">⚡</div>ข้อมูลการติดตั้งจริง</div>
     <div class="g3" style="margin-bottom:11px">
-      <div class="pcard"><div class="pc-l">Migration ที่ทำแล้ว</div><div class="pc-v" style="font-size:20px">142/193 เครื่อง</div></div>
+      <div class="pcard"><div class="pc-l">Migration ที่ทำแล้ว</div><div class="pc-v" id="pc-mig" style="font-size:20px">142/193 เครื่อง</div></div>
       <div class="pcard"><div class="pc-l">เฉลี่ยที่ทำได้/วัน</div><div class="pc-v" style="font-size:20px">2.82/วัน</div></div>
       <div class="pcard"><div class="pc-l">คาดว่าจะเสร็จ</div><div class="pc-v red" style="font-size:20px">12 เม.ย. 69 <span style="font-size:12px">(ช้า 9 วัน)</span></div></div>
     </div>
@@ -577,7 +577,7 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto;box-sizing:border-box}
   <div class="card" style="margin-bottom:14px">
     <div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">⚡</div>ข้อมูลการติดตั้งจริง</div>
     <div class="g3" style="margin-bottom:11px">
-      <div class="pcard"><div class="pc-l">Migration ที่ทำแล้ว</div><div class="pc-v" style="font-size:20px">142/193 เครื่อง</div></div>
+      <div class="pcard"><div class="pc-l">Migration ที่ทำแล้ว</div><div class="pc-v" id="pc-mig" style="font-size:20px">142/193 เครื่อง</div></div>
       <div class="pcard"><div class="pc-l">เฉลี่ยที่ทำได้/วัน</div><div class="pc-v" style="font-size:20px">2.82/วัน</div></div>
       <div class="pcard"><div class="pc-l">คาดว่าจะเสร็จ</div><div class="pc-v red" style="font-size:20px">12 เม.ย. 69 <span style="font-size:12px">(ช้า 9 วัน)</span></div></div>
     </div>
@@ -961,27 +961,29 @@ function showTab(name,el){
 
 
 
+
+
+
+
+
+
+
+
+
 function showLoading(){
-  // topbar
-  ['tb-done','tb-pct'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.innerHTML='<span style="opacity:.35">–</span>';
-  });
-  // insight
-  ['ins-act-pct','ins-rate-now','ins-rate-req',
-   'gauge-pct','kpi-act','kpi-plan','kpi-diff','kpi-late',
-   'pill-mig','pill-cfg','pill-rem','pill-rate'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.textContent='–';
+  const ids=[
+    'tb-done','tb-pct','tb-wk',
+    'ov-mig','ov-cfg','ov-pct',
+    'step-cfg-pct','step-cfg-num','step-inst-pct','step-inst-num','step-mig-pct','step-mig-num',
+    'gauge-pct','kpi-act','kpi-plan','kpi-diff','kpi-late',
+    'pill-mig','pill-cfg','pill-rem','pill-rate','pc-mig',
+    'ins-need-more','ins-rate-pct-tag','ins-rate-now','ins-rate-req','ins-rate-pct'];
+  ids.forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML='<span style="opacity:.35">–</span>';});
+  ['step-cfg-bar','step-inst-bar','step-mig-bar','ov-mig-b','ov-cfg-b'].forEach(id=>{
+    const e=document.getElementById(id);if(e)e.style.width='0%';
   });
   const fc=document.getElementById('ins-forecast');
-  if(fc) fc.innerHTML='<strong>⏳ กำลังคำนวณ...</strong>';
-  const rp=document.getElementById('ins-rate-pct');
-  if(rp) rp.textContent='...';
-  const ov1=document.getElementById('ov-mig');
-  if(ov1) ov1.textContent='–';
-  const ov2=document.getElementById('ov-cfg');
-  if(ov2) ov2.textContent='–';
+  if(fc)fc.innerHTML='<strong>⏳ กำลังคำนวณ...</strong>';
 }
 
 function hideLoading(){}
@@ -990,11 +992,10 @@ async function loadData(){
   showLoading();
   try{
     const r=await fetch(`${API}/api/dashboard`);
-    if(!r.ok) throw new Error('HTTP '+r.status);
+    if(!r.ok)throw new Error('HTTP '+r.status);
     const d=await r.json();
-    const {meta,insight:ins,weekly,daily,locations,wk,today_wk}=d;
+    const {meta,insight:ins,weekly,daily,locations,wk,today_wk,last_install_date}=d;
 
-    // อัพเดท arrays
     WK_PLAN.length=0;       weekly.plan.forEach(v=>WK_PLAN.push(v));
     WK_CFG.length=0;        weekly.cfg.forEach(v=>WK_CFG.push(v));
     WK_MIG.length=0;        weekly.mig.forEach(v=>WK_MIG.push(v));
@@ -1009,71 +1010,85 @@ async function loadData(){
     CUM_ACT_D_RAW.length=0; daily.act_cum_pct.forEach(v=>CUM_ACT_D_RAW.push(v));
     window.TODAY_WK=today_wk;
 
-    // carry-forward CUM_ACT
-    let _l=null;
-    if(typeof CUM_ACT!=='undefined'){ CUM_ACT.length=0; }
-    CUM_ACT_RAW.forEach((v,i)=>{
-      if(v!=null) _l=v;
-      if(typeof CUM_ACT!=='undefined') CUM_ACT.push(i<=TODAY_WK?_l:null);
-    });
-
     const _e=id=>document.getElementById(id);
     const thM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
     const fd=new Date(ins.finish_date+'T00:00:00');
-    const finTH=`${fd.getDate()} ${thM[fd.getMonth()]} ${(fd.getFullYear()+543)%100}`;
+    const finTH=fd.getDate()+' '+thM[fd.getMonth()]+' '+((fd.getFullYear()+543)%100);
     const migPct=(meta.mig/meta.total*100).toFixed(1);
-    const actLast=weekly.act_cum_pct.filter(v=>v!=null).pop()||0;
-    const planLast=weekly.plan_cum_pct[today_wk]||0;
-    const gap=Math.round((actLast-planLast)*10)/10;
+    const cfgPct=(meta.cfg/meta.total*100).toFixed(1);
 
     // topbar
-    if(_e('tb-done')) _e('tb-done').textContent=`${meta.mig}/${meta.total}`;
+    if(_e('tb-done')) _e('tb-done').textContent=meta.mig+'/'+meta.total;
     if(_e('tb-pct'))  _e('tb-pct').textContent=migPct+'%';
-    if(_e('tb-wk'))   _e('tb-wk').textContent=`W.${today_wk+1}`;
+    if(_e('tb-wk'))   _e('tb-wk').textContent='W.'+(today_wk+1);
+
+    // last install date
+    if(last_install_date && _e('last-install-lbl')){
+      const ld=new Date(last_install_date+'T00:00:00');
+      _e('last-install-lbl').textContent=ld.getDate()+' '+thM[ld.getMonth()]+' '+((ld.getFullYear()+543)%100);
+    }
+
+    // step cards
+    if(_e('step-cfg-pct'))  _e('step-cfg-pct').textContent=cfgPct+'%';
+    if(_e('step-cfg-num'))  _e('step-cfg-num').textContent=meta.cfg;
+    if(_e('step-cfg-bar'))  _e('step-cfg-bar').style.width=cfgPct+'%';
+    if(_e('step-inst-pct')) _e('step-inst-pct').textContent=cfgPct+'%';
+    if(_e('step-inst-num')) _e('step-inst-num').textContent=meta.cfg;
+    if(_e('step-inst-bar')) _e('step-inst-bar').style.width=cfgPct+'%';
+    if(_e('step-mig-pct'))  _e('step-mig-pct').textContent=migPct+'%';
+    if(_e('step-mig-num'))  _e('step-mig-num').textContent=meta.mig;
+    if(_e('step-mig-bar'))  _e('step-mig-bar').style.width=migPct+'%';
+
     // overview
     if(_e('ov-mig'))   _e('ov-mig').textContent=meta.mig;
     if(_e('ov-cfg'))   _e('ov-cfg').textContent=meta.cfg;
-    if(_e('ov-mig-b')) _e('ov-mig-b').style.width=(meta.mig/meta.total*100).toFixed(1)+'%';
-    if(_e('ov-cfg-b')) _e('ov-cfg-b').style.width=(meta.cfg/meta.total*100).toFixed(1)+'%';
+    if(_e('ov-pct'))   _e('ov-pct').textContent=migPct+'%';
+    if(_e('ov-mig-b')) _e('ov-mig-b').style.width=migPct+'%';
+    if(_e('ov-cfg-b')) _e('ov-cfg-b').style.width=cfgPct+'%';
+    if(_e('pc-mig'))   _e('pc-mig').textContent=meta.mig+'/'+meta.total+' เครื่อง';
+
     // insight
-    if(_e('ins-act-pct')) _e('ins-act-pct').textContent=migPct+'%';
-    if(_e('ins-gap-tag')) _e('ins-gap-tag').textContent=(gap>=0?'+':'')+gap+'%';
-    if(_e('ins-rate-now')) _e('ins-rate-now').textContent=Number(ins.daily_rate).toFixed(2);
-    if(_e('ins-rate-req')) _e('ins-rate-req').textContent=ins.req_rate;
-    if(_e('ins-rate-pct')) _e('ins-rate-pct').textContent='+'+(ins.pct_more||0)+'%';
-    if(_e('ins-forecast')) _e('ins-forecast').innerHTML=
-      `<strong>⚠ ถ้าไม่เพิ่มอัตรา:</strong> คาดว่าจะเสร็จ <strong>${finTH}</strong> — `+
-      `ช้ากว่าเป้าหมาย (3 เม.ย.) <strong style="color:var(--danger)">${ins.days_late} วัน</strong> | `+
-      `ยังเหลือ <strong>${meta.remaining} เครื่อง</strong> ใน <strong>${ins.days_left} วัน</strong>`;
+    if(_e('ins-need-more'))    _e('ins-need-more').textContent=Number(ins.need_more).toFixed(1);
+    if(_e('ins-rate-pct-tag')) _e('ins-rate-pct-tag').textContent='↑'+ins.pct_more+'% จากอัตราปัจจุบัน';
+    if(_e('ins-rate-now'))     _e('ins-rate-now').textContent=Number(ins.daily_rate).toFixed(2);
+    if(_e('ins-rate-req'))     _e('ins-rate-req').textContent=ins.req_rate;
+    if(_e('ins-rate-pct'))     _e('ins-rate-pct').textContent='+'+ins.pct_more+'%';
+    if(_e('ins-forecast'))     _e('ins-forecast').innerHTML=
+      '<strong>⚠ ถ้าไม่เพิ่มอัตรา:</strong> คาดว่าจะเสร็จ <strong>'+finTH+'</strong> — '+
+      'ช้ากว่าเป้าหมาย (3 เม.ย.) <strong style="color:var(--danger)">'+ins.days_late+' วัน</strong> | '+
+      'ยังเหลือ <strong>'+meta.remaining+' เครื่อง</strong> ใน <strong>'+ins.days_left+' วัน</strong>';
     if(_e('gauge-pct'))  _e('gauge-pct').textContent=ins.gauge_pct+'%';
-    if(_e('kpi-act'))    _e('kpi-act').textContent=actLast.toFixed(2);
-    if(_e('kpi-plan'))   _e('kpi-plan').textContent=planLast.toFixed(2);
-    if(_e('kpi-diff'))   _e('kpi-diff').textContent=(gap>=0?'+':'')+gap;
-    if(_e('kpi-late'))   _e('kpi-late').textContent=ins.days_late;
-    if(_e('pill-mig'))   _e('pill-mig').textContent=meta.mig;
-    if(_e('pill-cfg'))   _e('pill-cfg').textContent=meta.cfg;
-    if(_e('pill-rem'))   _e('pill-rem').textContent=meta.remaining;
-    if(_e('pill-rate'))  _e('pill-rate').textContent=Number(ins.daily_rate).toFixed(2);
+    const actLast=weekly.act_cum_pct.filter(v=>v!=null).pop()||0;
+    const planLast=weekly.plan_cum_pct[today_wk]||0;
+    const gap=Math.round((actLast-planLast)*10)/10;
+    if(_e('kpi-act'))  _e('kpi-act').textContent=actLast.toFixed(2);
+    if(_e('kpi-plan')) _e('kpi-plan').textContent=planLast.toFixed(2);
+    if(_e('kpi-diff')) _e('kpi-diff').textContent=(gap>=0?'+':'')+gap;
+    if(_e('kpi-late')) _e('kpi-late').textContent=ins.days_late;
+    if(_e('pill-mig'))  _e('pill-mig').textContent=meta.mig;
+    if(_e('pill-cfg'))  _e('pill-cfg').textContent=meta.cfg;
+    if(_e('pill-rem'))  _e('pill-rem').textContent=meta.remaining;
+    if(_e('pill-rate')) _e('pill-rate').textContent=Number(ins.daily_rate).toFixed(2);
 
     // rebuild charts
-    ['buildGauge','buildBurndown','buildLocTable','buildPlanTab','buildTypeBar'].forEach(fn=>{
-      if(typeof window[fn]==='function') window[fn]();
+    ['buildGauge','buildBurndown','buildHeatmap','buildLocTable','buildPlanTab','buildTypeBar',
+     'buildCumWeekly','buildWeeklyBar','buildCumCfg','buildCumMig','buildDailyBar','buildDailyCum'].forEach(fn=>{
+      if(typeof window[fn]==='function')window[fn]();
     });
 
-    const sl=_e('sync-ts')||_e('last-sync-lbl');
-    if(sl) sl.textContent=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-    console.log(`✓ HQ: mig=${meta.mig}/${meta.total} rate=${ins.daily_rate} req=${ins.req_rate}`);
-  } catch(e){
-    console.error('HQ loadData error:', e.message);
-  } finally {
+    const sl=_e('sync-ts');
+    if(sl)sl.textContent=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    console.log('HQ: mig='+meta.mig+'/'+meta.total+' rate='+ins.daily_rate+' W.'+(today_wk+1));
+  }catch(e){
+    console.error('HQ loadData error:',e.message);
+  }finally{
     hideLoading();
   }
 }
 
-window.addEventListener('DOMContentLoaded', async()=>{
+window.addEventListener('DOMContentLoaded',async()=>{
   await loadData();
 });
-
 async function manualRefresh(){
   const btns=document.querySelectorAll('[onclick*="manualRefresh"]');
   btns.forEach(b=>{b._o=b.textContent;b.textContent='⏳ โหลด...';b.disabled=true;});

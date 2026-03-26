@@ -103,8 +103,22 @@ function calcDashboard(wb) {
     .map(([n, v]) => ({ n, tor: v.tor, mig: v.mig, pct: Math.round(v.mig / v.tor * 100) }))
     .sort((a, b) => b.pct - a.pct || b.tor - a.tor);
 
+  // Last install date
+  let lastInstall = null;
+  hqRows.forEach(r => {
+    const d = r['Install Date'] || r['Complete Date'];
+    if (!d) return;
+    let dt = d instanceof Date ? d : (typeof d === 'number' ? new Date((d-25569)*86400000) : null);
+    if (!dt || isNaN(dt)) return;
+    dt.setHours(0,0,0,0);
+    const today = new Date(); today.setHours(0,0,0,0);
+    if (dt <= today && (!lastInstall || dt > lastInstall)) lastInstall = dt;
+  });
+  const lastInstallDate = lastInstall ? lastInstall.toISOString().slice(0,10) : null;
+
   return {
     wk, wk_dates, today_wk: todayWk,
+    last_install_date: lastInstallDate,
     meta: { total: TOTAL, mig: mig_total, cfg: cfg_total, remaining, hold: 0 },
     insight: {
       daily_rate: dailyRate, req_rate: reqRate, need_more: needMore,
