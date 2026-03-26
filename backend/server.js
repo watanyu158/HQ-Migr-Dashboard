@@ -95,33 +95,63 @@ function calcDashboard(wb) {
   });
   const lastInstallDate = lastInstall ? lastInstall.toISOString().slice(0,10) : null;
 
-  // Locations — col index: 0=สถานที่, 3=อุปกรณ์, 5=TOR, 13=Cfg, 14=Inst, 15=Mig
-  const locMap = {};
+  // Locations + Categories — col: 0=สถานที่,3=อุปกรณ์,6=NewQty,13=Cfg,14=Inst,15=Mig,18=Category
+  const locMap = {}, catMap = {}, locCatMap = {};
   let curLoc = null;
   hqRaw.slice(2).forEach(r => {
     if (r[0]) curLoc = String(r[0]).trim();
     if (!curLoc || curLoc === 'เพิ่มเติม') return;
     const device = r[3];
-    const tor    = r[5];
+    const newQty = r[6];  // จำนวน ใหม่ — รวม = 193
     if (!device || typeof device !== 'string') return;
-    if (typeof tor !== 'number' || !Number.isInteger(tor) || tor <= 0) return;
-    const mig  = typeof r[15] === 'number' ? Math.round(r[15]) : 0;
-    const cfg  = typeof r[13] === 'number' ? Math.round(r[13]) : 0;
-    const inst = typeof r[14] === 'number' ? Math.round(r[14]) : 0;
+    if (typeof newQty !== 'number' || !Number.isInteger(newQty) || newQty <= 0) return;
+
+    const rawMig  = typeof r[15] === 'number' ? Math.round(r[15]) : 0;
+    const rawCfg  = typeof r[13] === 'number' ? Math.round(r[13]) : 0;
+    const rawInst = typeof r[14] === 'number' ? Math.round(r[14]) : 0;
+    const mig  = Math.min(rawMig,  newQty);
+    const cfg  = Math.min(rawCfg,  newQty);
+    const inst = Math.min(rawInst, newQty);
+    const cat  = r[18] ? String(r[18]).trim() : 'ไม่ระบุ';
+
+    // Location map
     if (!locMap[curLoc]) locMap[curLoc] = {tor:0, cfg:0, inst:0, mig:0};
-    locMap[curLoc].tor  += tor;
+    locMap[curLoc].tor  += newQty;
     locMap[curLoc].cfg  += cfg;
     locMap[curLoc].inst += inst;
     locMap[curLoc].mig  += mig;
+
+    // Category map
+    if (!catMap[cat]) catMap[cat] = {tor:0, cfg:0, inst:0, mig:0};
+    catMap[cat].tor  += newQty;
+    catMap[cat].cfg  += cfg;
+    catMap[cat].inst += inst;
+    catMap[cat].mig  += mig;
+
+    // Location x Category map
+    const lk = curLoc;
+    if (!locCatMap[lk]) locCatMap[lk] = {};
+    if (!locCatMap[lk][cat]) locCatMap[lk][cat] = {tor:0, mig:0};
+    locCatMap[lk][cat].tor += newQty;
+    locCatMap[lk][cat].mig += mig;
   });
 
   const locations = Object.entries(locMap)
     .filter(([,v]) => v.tor > 0)
     .map(([n,v]) => ({
       n, tor:v.tor, cfg:v.cfg, inst:v.inst, mig:v.mig,
-      pct: Math.round(v.mig / v.tor * 100)
+      pct: Math.round(v.mig / v.tor * 100),
+      cats: locCatMap[n] || {}
     }))
     .sort((a,b) => b.pct - a.pct || b.tor - a.tor);
+
+  const categories = Object.entries(catMap)
+    .map(([n,v]) => ({
+      n, tor:v.tor, cfg:v.cfg, inst:v.inst, mig:v.mig,
+      pct_mig: Math.round(v.mig / v.tor * 100),
+      pct_cfg: Math.round(v.cfg / v.tor * 100)
+    }))
+    .sort((a,b) => b.tor - a.tor);
 
   console.log(`✓ Locations: ${locations.length} | ${locations.map(l=>l.n.slice(0,10)+':'+l.mig).join(', ')}`);
 
@@ -136,7 +166,8 @@ function calcDashboard(wb) {
     },
     weekly: {plan:plan_wk, cfg:cfg_wk, mig:mig_wk, bd_plan, bd_act, plan_cum_pct, act_cum_pct},
     daily:  {labels:dayLabels, plan:planDay, mig:migDay, plan_cum_pct:planCumD, act_cum_pct:actCumD},
-    locations
+    locations,
+    categories
   };
 }
 
