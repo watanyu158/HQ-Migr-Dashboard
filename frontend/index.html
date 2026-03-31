@@ -237,120 +237,118 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
 </div>
 
 <div class="tab-body" id="tab-overview" style="display:block">
-  <!-- 4 scard -->
   <div class="g4" style="margin-bottom:14px">
     <div class="scard all"><div class="sl" style="color:var(--primary)">🏗 Migration ทั้งหมด</div><div class="sn" id="ov-all">–/–</div><div class="ss" id="ov-all-sub">กำลังโหลด...</div><div class="sbar"><div class="sf" id="ov-all-b" style="width:0%;background:var(--primary)"></div></div><div class="sbadge" id="ov-all-badge" style="background:var(--primary-l);color:var(--primary)">–%</div></div>
+  <div class="g2" style="margin-bottom:14px">
+    <div class="card"><div class="ch"><div class="chi" style="background:var(--primary-l);color:var(--primary)">📊</div>Migration แยกประเภทอุปกรณ์</div><div style="height:200px"><canvas id="dev-bar-c"></canvas></div></div>
+    <div class="card" style="display:flex;flex-direction:column;justify-content:space-between;gap:14px">
+      <div class="ch" style="margin-bottom:0"><div class="chi" style="background:var(--success-l);color:var(--success)">⏱</div>ความตรงต่อเวลา</div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;justify-content:center">
+        <div style="position:relative;width:150px;height:150px;flex-shrink:0">
+          <canvas id="donut-c" width="150" height="150"></canvas>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <div style="font-size:24px;font-weight:700;color:var(--success)" id="donut-ontime-pct">91.6%</div>
+            <div style="font-size:11px;color:var(--text2)">ตรงเวลา</div>
+            <div style="font-size:10px;color:var(--text2)" id="donut-ontime-sub">252/275</div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;border-top:1px solid var(--border);padding-top:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="display:flex;align-items:center;gap:7px"><span style="width:12px;height:12px;border-radius:3px;background:var(--success);display:inline-block"></span>ตรงเวลา</span><span style="font-weight:600" id="donut-ontime-cnt">252</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="display:flex;align-items:center;gap:7px"><span style="width:12px;height:12px;border-radius:3px;background:var(--danger);display:inline-block"></span>ช้ากว่าแผน</span><span style="font-weight:600" id="donut-late-cnt">23</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="display:flex;align-items:center;gap:7px"><span style="width:12px;height:12px;border-radius:3px;background:#e2e8f0;display:inline-block"></span>รอดำเนินการ</span><span style="font-weight:600" id="donut-pending-cnt">85</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="g2" style="margin-bottom:14px">
+    <div class="card"><div class="ch"><div class="chi" style="background:var(--danger-l);color:var(--danger)">📉</div>Burndown Chart</div><div style="height:200px"><canvas id="burndown-c"></canvas></div></div>
+    <div class="card"><div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">📈</div>% สะสม — แผน vs จริง</div><div style="height:200px"><canvas id="cum-weekly-c"></canvas></div></div>
+  </div>
+  <div class="card" style="margin-bottom:14px"><div class="ch"><div class="chi" style="background:var(--info-l);color:var(--info)">🗺️</div>Location Heatmap — สรุปตามสถานที่</div><div class="hm-grid" id="hm-grid"></div></div>
+  <div class="card" style="margin-bottom:14px"><div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">📋</div>รายละเอียดแยกสถานที่ — Switch / AP / Infra</div><div id="cat-loc-table" style="margin-top:4px">⏳ กำลังโหลด...</div></div>
+
     <div class="scard sw"><div class="sl" style="color:#4361ee">🔀 Switch</div><div class="sn" id="ov-sw">–/–</div><div class="ss" id="ov-sw-sub">กำลังโหลด...</div><div class="sbar"><div class="sf" id="ov-sw-b" style="width:0%;background:#4361ee"></div></div><div class="sbadge" id="ov-sw-badge" style="background:var(--primary-l);color:#4361ee">–%</div></div>
     <div class="scard ap"><div class="sl" style="color:#065f46">📶 AP</div><div class="sn" id="ov-ap">–/–</div><div class="ss" id="ov-ap-sub">กำลังโหลด...</div><div class="sbar"><div class="sf" id="ov-ap-b" style="width:0%;background:#2bc48a"></div></div><div class="sbadge" id="ov-ap-badge" style="background:var(--success-l);color:#065f46">–%</div></div>
     <div class="scard inf"><div class="sl" style="color:#92400e">⚡ Infra</div><div class="sn" id="ov-inf">–/–</div><div class="ss" id="ov-inf-sub">กำลังโหลด...</div><div class="sbar"><div class="sf" id="ov-inf-b" style="width:0%;background:#ff9f43"></div></div><div class="sbadge" id="ov-inf-badge" style="background:var(--warning-l);color:#92400e">–%</div></div>
   </div>
-  <!-- Device bar + Donut -->
   <div class="g2" style="margin-bottom:14px">
-    <div class="card">
-      <div class="ch"><div class="chi" style="background:var(--primary-l);color:var(--primary)">📊</div>Migration แยกประเภทอุปกรณ์</div>
-      <div style="height:200px"><canvas id="dev-bar-c"></canvas></div>
-    </div>
-    <div class="card" style="display:flex;flex-direction:column;gap:10px">
+    <div class="card"><div class="ch"><div class="chi" style="background:var(--primary-l);color:var(--primary)">📊</div>Migration แยกประเภทอุปกรณ์</div><div style="height:200px"><canvas id="dev-bar-c"></canvas></div></div>
+    <div class="card" style="display:flex;flex-direction:column;justify-content:space-between;gap:14px">
       <div class="ch" style="margin-bottom:0"><div class="chi" style="background:var(--success-l);color:var(--success)">⏱</div>ความตรงต่อเวลา</div>
-      <div style="display:flex;align-items:center;gap:16px;flex:1">
-        <div style="position:relative;width:130px;height:130px;flex-shrink:0">
-          <canvas id="donut-c" width="130" height="130"></canvas>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;justify-content:center">
+        <div style="position:relative;width:150px;height:150px;flex-shrink:0">
+          <canvas id="donut-c" width="150" height="150"></canvas>
           <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
-            <div style="font-size:20px;font-weight:700;color:var(--success)" id="donut-ontime-pct">–%</div>
-            <div style="font-size:10px;color:var(--text2)">ตรงเวลา</div>
-            <div style="font-size:10px;color:var(--text2)" id="donut-ontime-sub">–/–</div>
+            <div style="font-size:24px;font-weight:700;color:var(--success)" id="donut-ontime-pct">91.6%</div>
+            <div style="font-size:11px;color:var(--text2)">ตรงเวลา</div>
+            <div style="font-size:10px;color:var(--text2)" id="donut-ontime-sub">252/275</div>
           </div>
         </div>
-        <div style="flex:1;display:flex;flex-direction:column;gap:8px;font-size:12px">
-          <div style="display:flex;justify-content:space-between"><span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:2px;background:var(--success);display:inline-block"></span>ตรงเวลา</span><span style="font-weight:600" id="donut-ontime-cnt">–</span></div>
-          <div style="display:flex;justify-content:space-between"><span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:2px;background:var(--danger);display:inline-block"></span>ช้ากว่าแผน</span><span style="font-weight:600" id="donut-late-cnt">–</span></div>
-          <div style="display:flex;justify-content:space-between"><span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:2px;background:#e2e8f0;display:inline-block"></span>รอดำเนินการ</span><span style="font-weight:600" id="donut-pending-cnt">–</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;border-top:1px solid var(--border);padding-top:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="display:flex;align-items:center;gap:7px"><span style="width:12px;height:12px;border-radius:3px;background:var(--success);display:inline-block"></span>ตรงเวลา</span>
+          <span style="font-weight:600" id="donut-ontime-cnt">252</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="display:flex;align-items:center;gap:7px"><span style="width:12px;height:12px;border-radius:3px;background:var(--danger);display:inline-block"></span>ช้ากว่าแผน</span>
+          <span style="font-weight:600" id="donut-late-cnt">23</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="display:flex;align-items:center;gap:7px"><span style="width:12px;height:12px;border-radius:3px;background:#e2e8f0;display:inline-block"></span>รอดำเนินการ</span>
+          <span style="font-weight:600" id="donut-pending-cnt">85</span>
         </div>
       </div>
     </div>
   </div>
-  <!-- Burndown + Cumulative -->
   <div class="g2" style="margin-bottom:14px">
-    <div class="card">
-      <div class="ch"><div class="chi" style="background:var(--danger-l);color:var(--danger)">📉</div>Burndown Chart</div>
-      <div style="height:200px"><canvas id="burndown-c"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">📈</div>% สะสม — แผน vs จริง</div>
-      <div style="height:200px"><canvas id="cum-weekly-c"></canvas></div>
-    </div>
+    <div class="card"><div class="ch"><div class="chi" style="background:var(--danger-l);color:var(--danger)">📉</div>Burndown Chart</div><div style="height:200px"><canvas id="burndown-c"></canvas></div></div>
+    <div class="card"><div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">📈</div>% สะสม — แผน vs จริง</div><div style="height:200px"><canvas id="cum-weekly-c"></canvas></div></div>
   </div>
-  <!-- Heatmap -->
-  <div class="card" style="margin-bottom:14px">
-    <div class="ch"><div class="chi" style="background:var(--info-l);color:var(--info)">🗺️</div>Location Heatmap — สรุปตามสถานที่</div>
-    <div class="hm-grid" id="hm-grid"></div>
-  </div>
-
 </div>
 
+
+
 <div class="tab-body" id="tab-weekly">
-  <!-- ความก้าวหน้ารวม -->
+  <!-- Overall cumulative progress — เหมือน SVB -->
   <div class="card" style="margin-bottom:14px">
     <div class="ch">
       <div class="chi" style="background:var(--primary-l);color:var(--primary)">📈</div>
       ความก้าวหน้ารวม — แผน vs จริง (%)
       <div style="display:flex;gap:10px;margin-left:auto;font-size:11px;font-weight:400">
         <span id="prog-plan-lbl" style="color:var(--text3)">แผน: –%</span>
-        <span id="prog-act-lbl" style="color:var(--primary);font-weight:600">จริง: –%</span>
+        <span id="prog-act-lbl"  style="color:var(--primary);font-weight:600">จริง: –%</span>
       </div>
     </div>
-    <div style="height:260px"><canvas id="prog-all-c"></canvas></div>
+    <div style="height:280px"><canvas id="prog-all-c"></canvas></div>
     <div style="display:flex;gap:16px;margin-top:8px;font-size:11px;color:var(--text2)">
-      <span><span style="display:inline-block;width:20px;border-top:2px dashed #4361ee;margin-right:4px;vertical-align:middle"></span>แผน (%)</span>
-      <span><span style="display:inline-block;width:20px;border-top:2px solid #4361ee;margin-right:4px;vertical-align:middle"></span>จริง (%)</span>
+      <span><span style="display:inline-block;width:24px;height:2px;background:var(--primary);margin-right:4px;vertical-align:middle;border-top:2px dashed var(--primary)"></span>แผน (%)</span>
+      <span><span style="display:inline-block;width:24px;height:2px;background:var(--success);margin-right:4px;vertical-align:middle"></span>จริง (%)</span>
       <span style="color:var(--danger)">| วันนี้</span>
     </div>
   </div>
-  <!-- Weekly bar + Cumulative -->
   <div class="g2" style="margin-bottom:14px">
-    <div class="card">
-      <div class="ch"><div class="chi" style="background:var(--primary-l);color:var(--primary)">📊</div>ผลงานรายสัปดาห์</div>
-      <div style="height:220px"><canvas id="weekly-bar-c"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="ch"><div class="chi" style="background:var(--warning-l);color:var(--warning)">📈</div>% สะสมรายสัปดาห์</div>
-      <div style="height:220px"><canvas id="cum-cfg-c"></canvas></div>
-    </div>
+    <div class="card"><div class="ch"><div class="chi" style="background:var(--primary-l);color:var(--primary)">📊</div>ผลงานรายสัปดาห์</div><div style="height:220px"><canvas id="weekly-bar-c"></canvas></div></div>
+    <div class="card"><div class="ch"><div class="chi" style="background:var(--warning-l);color:var(--warning)">📈</div>% สะสมรายสัปดาห์</div><div style="height:220px"><canvas id="cum-cfg-c"></canvas></div></div>
   </div>
-  <!-- Weekly table -->
-  <div class="card" style="margin-bottom:14px">
-    <div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">📋</div>ตารางสรุปรายสัปดาห์</div>
-    <div id="weekly-table" style="overflow-x:auto;margin-top:4px"></div>
-  </div>
+  <div class="card" style="margin-bottom:14px"><div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">📋</div>ตารางสรุปรายสัปดาห์</div><div id="weekly-table" style="overflow-x:auto;margin-top:4px
 </div>
+</div>
+</div>
+</main>
 
 <div class="tab-body" id="tab-daily">
   <div class="g2" style="margin-bottom:14px">
-    <div class="card">
-      <div class="ch"><div class="chi" style="background:var(--primary-l);color:var(--primary)">📊</div>ผลงานรายวัน</div>
-      <div style="height:260px"><canvas id="daily-bar-c"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">📈</div>% สะสมรายวัน</div>
-      <div style="height:260px"><canvas id="daily-cum-c"></canvas></div>
-    </div>
+    <div class="card"><div class="ch"><div class="chi" style="background:var(--primary-l);color:var(--primary)">📊</div>ผลงานรายวัน</div><div style="height:220px"><canvas id="daily-bar-c"></canvas></div></div>
+    <div class="card"><div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">📈</div>% สะสมรายวัน</div><div style="height:220px"><canvas id="daily-cum-c"></canvas></div></div>
   </div>
 </div>
-
 <div class="tab-body" id="tab-location">
-  <div class="card" style="margin-bottom:14px">
-    <div class="ch"><div class="chi" style="background:var(--info-l);color:var(--info)">📍</div>รายละเอียดแยกตามสถานที่</div>
-    <div id="cat-loc-table" style="margin-top:4px">⏳ กำลังโหลด...</div>
-  </div>
+  <div class="card" style="margin-bottom:14px"><div class="ch"><div class="chi" style="background:var(--info-l);color:var(--info)">📍</div>สรุปตามสถานที่</div><div id="loc-table" style="overflow-x:auto;margin-top:4px"></div></div>
 </div>
-
 <div class="tab-body" id="tab-plan">
-  <div class="card" style="margin-bottom:14px">
-    <div class="ch"><div class="chi" style="background:var(--warning-l);color:var(--warning)">📅</div>แผนงาน vs ความคืบหน้า</div>
-    <div style="height:340px"><canvas id="plan-c"></canvas></div>
-  </div>
+  <div class="card" style="margin-bottom:14px"><div class="ch"><div class="chi" style="background:var(--warning-l);color:var(--warning)">📅</div>แผนงาน vs ความคืบหน้า</div><div style="height:300px"><canvas id="plan-c"></canvas></div></div>
 </div>
-
 </main>
 
 <script>
@@ -495,48 +493,28 @@ function buildHeatmap(){
 }
 
 function buildCatLocTable(locations,categories){
-  const el=document.getElementById('cat-loc-table');
-  if(!el||!locations||!categories) return;
+  const el=document.getElementById('cat-loc-table');if(!el||!locations||!categories)return;
   const catNames=['Switch','AP','Infra'];
   const colColors={'Switch':'var(--primary)','AP':'var(--success)','Infra':'var(--warning)'};
-
-  let html='<table style="width:100%;border-collapse:collapse;font-size:11px">'
-    +'<thead><tr style="border-bottom:2px solid var(--border)">'
-    +'<th style="text-align:left;padding:6px 10px;color:var(--text2)">สถานที่</th>'
-    +catNames.map(n=>'<th style="text-align:center;padding:6px 10px;color:'+colColors[n]+'">'+n+'</th>').join('')
-    +'<th style="text-align:center;padding:6px 10px;color:var(--text2)">% ความก้าวหน้า</th>'
+  let html='<table style="width:100%;border-collapse:collapse;font-size:11px"><thead><tr style="border-bottom:2px solid var(--border)">'
+    +'<th style="text-align:left;padding:5px 8px;color:var(--text2)">สถานที่</th>'
+    +catNames.map(n=>'<th style="text-align:center;padding:5px 8px;color:'+colColors[n]+'">'+n+'</th>').join('')
+    +'<th style="text-align:center;padding:5px 8px;color:var(--text2)">รวม Switch+Infra</th>'
     +'</tr></thead><tbody>';
-
   locations.filter(l=>l.tor>0).forEach(l=>{
-    const sw =l.cats&&l.cats['Switch']||{tor:0,mig:0};
-    const inf=l.cats&&l.cats['Infra'] ||{tor:0,mig:0};
-    // AP — ยังไม่มี loc mapping ใน API → แสดง –
-    const tot=sw.tor+inf.tor;
-    const tmig=sw.mig+inf.mig;
+    const sw=l.cats&&l.cats['Switch']||{tor:0,mig:0};
+    const inf=l.cats&&l.cats['Infra']||{tor:0,mig:0};
+    const tot=sw.tor+inf.tor,tmig=sw.mig+inf.mig;
     const pct=tot>0?Math.round(tmig/tot*100):0;
     const bc=pct>=100?'var(--success)':pct>=70?'#38bdf8':pct>=30?'var(--warning)':pct>0?'var(--danger)':'var(--border)';
-    const cell=v=>v.tor
-      ?'<td style="text-align:center;padding:6px 10px"><b>'+v.mig+'/'+v.tor+'</b>'
-       +'<span style="color:var(--text2);font-size:10px"> ('+Math.round(v.mig/v.tor*100)+'%)</span></td>'
-      :'<td style="text-align:center;padding:6px 10px;color:var(--text3)">–</td>';
-    html+='<tr style="border-bottom:1px solid var(--border)">'
-      +'<td style="padding:6px 10px;font-weight:500">'+l.n+'</td>'
-      +cell(sw)
-      +'<td style="text-align:center;padding:6px 10px;color:var(--text3)">–</td>'
-      +cell(inf)
-      +'<td style="padding:6px 10px;min-width:120px">'
-        +'<div style="display:flex;align-items:center;gap:6px">'
-        +'<div style="flex:1;height:6px;background:var(--border);border-radius:99px;overflow:hidden">'
-        +'<div style="height:100%;width:'+pct+'%;background:'+bc+';border-radius:99px;transition:width .8s"></div>'
-        +'</div>'
-        +'<span style="font-size:11px;font-weight:600;color:'+bc+';min-width:32px;text-align:right">'+pct+'%</span>'
-        +'</div>'
-      +'</td>'
-      +'</tr>';
+    const cell=v=>v.tor?'<td style="text-align:center;padding:5px 8px"><b>'+v.mig+'/'+v.tor+'</b><br><span style="color:var(--text2);font-size:10px">'+Math.round(v.mig/v.tor*100)+'%</span></td>'
+      :'<td style="text-align:center;padding:5px 8px;color:var(--text3)">–</td>';
+    html+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 8px;font-weight:500">'+l.n+'</td>'
+      +cell(sw)+'<td style="text-align:center;padding:5px 8px;color:var(--text3)">–</td>'+cell(inf)
+      +'<td style="text-align:center;padding:5px 8px"><b>'+tmig+'/'+tot+'</b>'
+      +'<div style="height:4px;background:var(--border);border-radius:2px;margin-top:3px"><div style="height:100%;width:'+pct+'%;background:'+bc+';border-radius:2px"></div></div></td></tr>';
   });
-
-  html+='</tbody></table>';
-  el.innerHTML=html;
+  el.innerHTML=html+'</tbody></table>';
 }
 
 function buildWeeklyBar(){
