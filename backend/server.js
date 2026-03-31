@@ -8,7 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const LOCAL_EXCEL = path.join(__dirname, 'SAT_Progress.xlsx');
+const LOCAL_EXCEL = path.join(__dirname, 'SAT Progress.xlsx');
 const TOTAL = 193;
 const PROJ_START = new Date('2026-02-03');
 const PROJ_END   = new Date('2026-04-03');
@@ -264,7 +264,7 @@ function calcDashboard(wb) {
 async function getDashboard(force=false) {
   const now = Date.now();
   if (!force && cachedData && (now - cacheTime) < CACHE_TTL) return cachedData;
-  if (!fs.existsSync(LOCAL_EXCEL)) throw new Error('SAT_Progress.xlsx not found');
+  if (!fs.existsSync(LOCAL_EXCEL)) throw new Error('SAT Progress.xlsx not found');
   console.log('Reading Excel...');
   const wb = XLSX.readFile(LOCAL_EXCEL);
   cachedData = calcDashboard(wb);
