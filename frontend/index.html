@@ -159,18 +159,18 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
         <div class="ins-kpi-title">ประสิทธิภาพ</div>
         <div class="ins-kpi-row">
           <span class="ins-kpi-lbl">ทำได้จริง</span>
-          <span class="ins-kpi-val" id="kpi-act" style="color:var(--warning)">2.73</span>
-          <span class="ins-kpi-unit">/วัน</span>
+          <span class="ins-kpi-val" id="kpi-act" style="color:var(--warning)">73.58</span>
+          <span class="ins-kpi-unit">%</span>
         </div>
         <div class="ins-kpi-row">
           <span class="ins-kpi-lbl">เป้าหมาย</span>
-          <span class="ins-kpi-val" id="kpi-plan" style="color:var(--primary)">6</span>
-          <span class="ins-kpi-unit">/วัน</span>
+          <span class="ins-kpi-val" id="kpi-plan" style="color:var(--primary)">91.71</span>
+          <span class="ins-kpi-unit">%</span>
         </div>
         <div class="ins-kpi-row ins-kpi-gap">
           <span class="ins-kpi-lbl">ส่วนต่าง</span>
-          <span class="ins-kpi-val" id="kpi-diff" style="color:var(--danger)">+3.27</span>
-          <span class="ins-kpi-unit" style="color:var(--danger)">/วัน</span>
+          <span class="ins-kpi-val" id="kpi-diff" style="color:var(--danger)">-18.1</span>
+          <span class="ins-kpi-unit" style="color:var(--danger)">%</span>
         </div>
       </div>
     </div>
@@ -230,7 +230,7 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
 <main>
 <div class="tabs">
   <div class="tab on" onclick="showTab('overview',this)">📊 ภาพรวม</div>
-  <div class="tab"    onclick="showTab('weekly',this)">📈 ความก้าวหน้า</div>
+  <div class="tab"    onclick="showTab('weekly',this)">📈 รายสัปดาห์</div>
   <div class="tab"    onclick="showTab('daily',this)">📆 รายวัน</div>
   <div class="tab"    onclick="showTab('location',this)">📍 สถานที่</div>
   <div class="tab"    onclick="showTab('plan',this)">📅 แผนงาน</div>
@@ -239,34 +239,6 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
 <div class="tab-body" id="tab-overview" style="display:block">
   <div class="g4" style="margin-bottom:14px">
     <div class="scard all"><div class="sl" style="color:var(--primary)">🏗 Migration ทั้งหมด</div><div class="sn" id="ov-all">–/–</div><div class="ss" id="ov-all-sub">กำลังโหลด...</div><div class="sbar"><div class="sf" id="ov-all-b" style="width:0%;background:var(--primary)"></div></div><div class="sbadge" id="ov-all-badge" style="background:var(--primary-l);color:var(--primary)">–%</div></div>
-  <div class="g2" style="margin-bottom:14px">
-    <div class="card"><div class="ch"><div class="chi" style="background:var(--primary-l);color:var(--primary)">📊</div>Migration แยกประเภทอุปกรณ์</div><div style="height:200px"><canvas id="dev-bar-c"></canvas></div></div>
-    <div class="card" style="display:flex;flex-direction:column;justify-content:space-between;gap:14px">
-      <div class="ch" style="margin-bottom:0"><div class="chi" style="background:var(--success-l);color:var(--success)">⏱</div>ความตรงต่อเวลา</div>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;justify-content:center">
-        <div style="position:relative;width:150px;height:150px;flex-shrink:0">
-          <canvas id="donut-c" width="150" height="150"></canvas>
-          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
-            <div style="font-size:24px;font-weight:700;color:var(--success)" id="donut-ontime-pct">91.6%</div>
-            <div style="font-size:11px;color:var(--text2)">ตรงเวลา</div>
-            <div style="font-size:10px;color:var(--text2)" id="donut-ontime-sub">252/275</div>
-          </div>
-        </div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;border-top:1px solid var(--border);padding-top:12px">
-        <div style="display:flex;justify-content:space-between;align-items:center"><span style="display:flex;align-items:center;gap:7px"><span style="width:12px;height:12px;border-radius:3px;background:var(--success);display:inline-block"></span>ตรงเวลา</span><span style="font-weight:600" id="donut-ontime-cnt">252</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:center"><span style="display:flex;align-items:center;gap:7px"><span style="width:12px;height:12px;border-radius:3px;background:var(--danger);display:inline-block"></span>ช้ากว่าแผน</span><span style="font-weight:600" id="donut-late-cnt">23</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:center"><span style="display:flex;align-items:center;gap:7px"><span style="width:12px;height:12px;border-radius:3px;background:#e2e8f0;display:inline-block"></span>รอดำเนินการ</span><span style="font-weight:600" id="donut-pending-cnt">85</span></div>
-      </div>
-    </div>
-  </div>
-  <div class="g2" style="margin-bottom:14px">
-    <div class="card"><div class="ch"><div class="chi" style="background:var(--danger-l);color:var(--danger)">📉</div>Burndown Chart</div><div style="height:200px"><canvas id="burndown-c"></canvas></div></div>
-    <div class="card"><div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">📈</div>% สะสม — แผน vs จริง</div><div style="height:200px"><canvas id="cum-weekly-c"></canvas></div></div>
-  </div>
-  <div class="card" style="margin-bottom:14px"><div class="ch"><div class="chi" style="background:var(--info-l);color:var(--info)">🗺️</div>Location Heatmap — สรุปตามสถานที่</div><div class="hm-grid" id="hm-grid"></div></div>
-  <div class="card" style="margin-bottom:14px"><div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">📋</div>รายละเอียดแยกสถานที่ — Switch / AP / Infra</div><div id="cat-loc-table" style="margin-top:4px">⏳ กำลังโหลด...</div></div>
-
     <div class="scard sw"><div class="sl" style="color:#4361ee">🔀 Switch</div><div class="sn" id="ov-sw">–/–</div><div class="ss" id="ov-sw-sub">กำลังโหลด...</div><div class="sbar"><div class="sf" id="ov-sw-b" style="width:0%;background:#4361ee"></div></div><div class="sbadge" id="ov-sw-badge" style="background:var(--primary-l);color:#4361ee">–%</div></div>
     <div class="scard ap"><div class="sl" style="color:#065f46">📶 AP</div><div class="sn" id="ov-ap">–/–</div><div class="ss" id="ov-ap-sub">กำลังโหลด...</div><div class="sbar"><div class="sf" id="ov-ap-b" style="width:0%;background:#2bc48a"></div></div><div class="sbadge" id="ov-ap-badge" style="background:var(--success-l);color:#065f46">–%</div></div>
     <div class="scard inf"><div class="sl" style="color:#92400e">⚡ Infra</div><div class="sn" id="ov-inf">–/–</div><div class="ss" id="ov-inf-sub">กำลังโหลด...</div><div class="sbar"><div class="sf" id="ov-inf-b" style="width:0%;background:#ff9f43"></div></div><div class="sbadge" id="ov-inf-badge" style="background:var(--warning-l);color:#92400e">–%</div></div>
@@ -310,32 +282,12 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
 
 
 <div class="tab-body" id="tab-weekly">
-  <!-- Overall cumulative progress — เหมือน SVB -->
-  <div class="card" style="margin-bottom:14px">
-    <div class="ch">
-      <div class="chi" style="background:var(--primary-l);color:var(--primary)">📈</div>
-      ความก้าวหน้ารวม — แผน vs จริง (%)
-      <div style="display:flex;gap:10px;margin-left:auto;font-size:11px;font-weight:400">
-        <span id="prog-plan-lbl" style="color:var(--text3)">แผน: –%</span>
-        <span id="prog-act-lbl"  style="color:var(--primary);font-weight:600">จริง: –%</span>
-      </div>
-    </div>
-    <div style="height:280px"><canvas id="prog-all-c"></canvas></div>
-    <div style="display:flex;gap:16px;margin-top:8px;font-size:11px;color:var(--text2)">
-      <span><span style="display:inline-block;width:24px;height:2px;background:var(--primary);margin-right:4px;vertical-align:middle;border-top:2px dashed var(--primary)"></span>แผน (%)</span>
-      <span><span style="display:inline-block;width:24px;height:2px;background:var(--success);margin-right:4px;vertical-align:middle"></span>จริง (%)</span>
-      <span style="color:var(--danger)">| วันนี้</span>
-    </div>
-  </div>
   <div class="g2" style="margin-bottom:14px">
     <div class="card"><div class="ch"><div class="chi" style="background:var(--primary-l);color:var(--primary)">📊</div>ผลงานรายสัปดาห์</div><div style="height:220px"><canvas id="weekly-bar-c"></canvas></div></div>
     <div class="card"><div class="ch"><div class="chi" style="background:var(--warning-l);color:var(--warning)">📈</div>% สะสมรายสัปดาห์</div><div style="height:220px"><canvas id="cum-cfg-c"></canvas></div></div>
   </div>
-  <div class="card" style="margin-bottom:14px"><div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">📋</div>ตารางสรุปรายสัปดาห์</div><div id="weekly-table" style="overflow-x:auto;margin-top:4px
+  <div class="card" style="margin-bottom:14px"><div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">📋</div>ตารางสรุปรายสัปดาห์</div><div id="weekly-table" style="overflow-x:auto;margin-top:4px"></div></div>
 </div>
-</div>
-</div>
-</main>
 
 <div class="tab-body" id="tab-daily">
   <div class="g2" style="margin-bottom:14px">
@@ -343,33 +295,46 @@ main{padding:14px 20px;max-width:1400px;margin:0 auto}
     <div class="card"><div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">📈</div>% สะสมรายวัน</div><div style="height:220px"><canvas id="daily-cum-c"></canvas></div></div>
   </div>
 </div>
+
 <div class="tab-body" id="tab-location">
   <div class="card" style="margin-bottom:14px"><div class="ch"><div class="chi" style="background:var(--info-l);color:var(--info)">📍</div>สรุปตามสถานที่</div><div id="loc-table" style="overflow-x:auto;margin-top:4px"></div></div>
 </div>
+
 <div class="tab-body" id="tab-plan">
   <div class="card" style="margin-bottom:14px"><div class="ch"><div class="chi" style="background:var(--warning-l);color:var(--warning)">📅</div>แผนงาน vs ความคืบหน้า</div><div style="height:300px"><canvas id="plan-c"></canvas></div></div>
 </div>
+
 </main>
 
 <script>
 const API = window.location.hostname==='localhost'?'http://localhost:3001':'https://hq-migr-api.onrender.com';
-const N_WK=9;
-let TODAY_WK = Math.max(0,Math.min(8,Math.floor((new Date()-new Date(2026,1,3))/(7*24*60*60*1000))));
-let WK_LABELS=["W.1", "W.2", "W.3", "W.4", "W.5", "W.6", "W.7", "W.8", "W.9"];
-let WK_PLAN=[35, 10, 9, 52, 14, 18, 11, 28, 16];
-let WK_MIG=[22, 10, 9, 52, 14, 18, 11, 6, null];
-let WK_CFG=[27, 10, 9, 52, 14, 18, 11, 6, null];
-let CUM_PLAN=[18.13, 23.32, 27.98, 54.92, 62.18, 71.5, 77.2, 91.71, 100];
-let CUM_ACT_RAW=[11.4, 16.58, 21.24, 48.19, 55.44, 64.77, 70.47, 73.58, null];
-let BD_PLAN=[158, 148, 139, 87, 73, 55, 44, 16, 0];
-let BD_ACT=[171, 161, 152, 100, 86, 68, 57, 51, null];
-let DAY_LABELS=["3/ก.พ.", "4/ก.พ.", "5/ก.พ.", "6/ก.พ.", "7/ก.พ.", "8/ก.พ.", "9/ก.พ.", "10/ก.พ.", "11/ก.พ.", "12/ก.พ.", "13/ก.พ.", "14/ก.พ.", "15/ก.พ.", "16/ก.พ.", "17/ก.พ.", "18/ก.พ.", "19/ก.พ.", "20/ก.พ.", "21/ก.พ.", "22/ก.พ.", "23/ก.พ.", "24/ก.พ.", "25/ก.พ.", "26/ก.พ.", "27/ก.พ.", "28/ก.พ.", "1/มี.ค.", "2/มี.ค.", "3/มี.ค.", "4/มี.ค.", "5/มี.ค.", "6/มี.ค.", "7/มี.ค.", "8/มี.ค.", "9/มี.ค.", "10/มี.ค.", "11/มี.ค.", "12/มี.ค.", "13/มี.ค.", "14/มี.ค.", "15/มี.ค.", "16/มี.ค.", "17/มี.ค.", "18/มี.ค.", "19/มี.ค.", "20/มี.ค.", "21/มี.ค.", "22/มี.ค.", "23/มี.ค.", "24/มี.ค.", "25/มี.ค.", "26/มี.ค.", "27/มี.ค.", "28/มี.ค.", "29/มี.ค.", "30/มี.ค.", "31/มี.ค.", "1/เม.ย.", "2/เม.ย.", "3/เม.ย."];
-let DAY_PLAN=[35, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 5, 0, 4, 0, 0, 15, 0, 20, 0, 17, 0, 0, 14, 0, 0, 0, 0, 0, 0, 10, 0, 8, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 7, 14, 0, 7, 0, 0, 7, 0, 3, 0, 6];
-let DAY_MIG=[22, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 5, 0, 4, 0, 0, 15, 0, 20, 0, 17, 0, 0, 14, 0, 0, 0, 0, 0, 0, 10, 0, 8, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-let DAY_CUM_PLAN=[18.13, 18.13, 18.13, 18.13, 18.13, 18.13, 18.13, 18.13, 23.32, 23.32, 23.32, 23.32, 23.32, 23.32, 23.32, 25.91, 25.91, 27.98, 27.98, 27.98, 35.75, 35.75, 46.11, 46.11, 54.92, 54.92, 54.92, 62.18, 62.18, 62.18, 62.18, 62.18, 62.18, 62.18, 67.36, 67.36, 71.5, 71.5, 71.5, 71.5, 71.5, 77.2, 77.2, 77.2, 77.2, 77.2, 77.2, 77.2, 77.2, 80.83, 88.08, 88.08, 91.71, 91.71, 91.71, 95.34, 95.34, 96.89, 96.89, 100];
-let DAY_CUM_ACT_RAW=[11.4, 11.4, 11.4, 11.4, 11.4, 11.4, 11.4, 11.4, 16.58, 16.58, 16.58, 16.58, 16.58, 16.58, 16.58, 19.17, 19.17, 21.24, 21.24, 21.24, 29.02, 29.02, 39.38, 39.38, 48.19, 48.19, 48.19, 55.44, 55.44, 55.44, 55.44, 55.44, 55.44, 55.44, 60.62, 60.62, 64.77, 64.77, 64.77, 64.77, 64.77, 70.47, 70.47, 70.47, 70.47, 70.47, 70.47, 70.47, 70.47, 72.54, null, null, null, null, null, null, null, null, null, null];
-let LOC_DATA=[{"n": "อาคารสำนักงานใหญ่", "tor": 95, "mig": 95, "pct": 100}, {"n": "อาคารสันทนาการ สนญ.", "tor": 6, "mig": 6, "pct": 100}, {"n": "อาคารสายงานวิศวกรรมศาสตร์และเทคโนโลยีสารสนเทศ (สงวท.)", "tor": 54, "mig": 41, "pct": 76}, {"n": "อาคารสโมสรท่าอากาศยาน - สทย. (สงทภ.)", "tor": 9, "mig": 6, "pct": 67}, {"n": "อาคารจอดรถ", "tor": 12, "mig": 0, "pct": 0}, {"n": "คลังพัสดุ", "tor": 2, "mig": 0, "pct": 0}, {"n": "สถานีไฟฟ้าย่อย 1 อาคารข้างหลัง", "tor": 1, "mig": 0, "pct": 0}, {"n": "สำนักแพทย์", "tor": 2, "mig": 0, "pct": 0}, {"n": "อาคารกองประปา", "tor": 2, "mig": 0, "pct": 0}, {"n": "อาคารกองอาคาร", "tor": 2, "mig": 0, "pct": 0}, {"n": "อาคารบำบัดน้ำเสีย", "tor": 2, "mig": 0, "pct": 0}, {"n": "อาคารผู้โดยสายภายในประเทศ (T2)", "tor": 1, "mig": 0, "pct": 0}, {"n": "อาคารเสริมสร้างพลานามัย", "tor": 3, "mig": 0, "pct": 0}, {"n": "สถานีไฟฟ้าย่อย 1 อาคารข้างหน้า", "tor": 2, "mig": 0, "pct": 0}];
 
+// Today GMT+7
+const _todayGMT7 = new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Bangkok'}));
+const _projStart = new Date(2026,1,3);
+const _projEnd   = new Date(2026,3,3);
+const _projDays  = Math.round((_projEnd-_projStart)/(24*60*60*1000));
+const _elapsed   = Math.max(0,Math.round((_todayGMT7-_projStart)/(24*60*60*1000)));
+let   TODAY_WK   = Math.max(0,Math.min(8,Math.floor(_elapsed/7)));
+
+// Initial data
+const N_WK=9;
+let WK_LABELS = ['W.1', 'W.2', 'W.3', 'W.4', 'W.5', 'W.6', 'W.7', 'W.8', 'W.9'];
+let WK_PLAN   = [35, 10, 9, 52, 14, 18, 11, 28, 16];
+let WK_MIG    = [22, 10, 9, 52, 14, 18, 11, 6, null];
+let WK_CFG    = [27, 10, 9, 52, 14, 18, 11, 6, null];
+let CUM_PLAN  = [18.13, 23.32, 27.98, 54.92, 62.18, 71.5, 77.2, 91.71, 100];
+let CUM_ACT_RAW = [11.4, 16.58, 21.24, 48.19, 55.44, 64.77, 70.47, 73.58, null];
+let BD_PLAN   = [158, 148, 139, 87, 73, 55, 44, 16, 0];
+let BD_ACT    = [171, 161, 152, 100, 86, 68, 57, 51, null];
+let DAY_LABELS = ['3/ก.พ.', '4/ก.พ.', '5/ก.พ.', '6/ก.พ.', '7/ก.พ.', '8/ก.พ.', '9/ก.พ.', '10/ก.พ.', '11/ก.พ.', '12/ก.พ.', '13/ก.พ.', '14/ก.พ.', '15/ก.พ.', '16/ก.พ.', '17/ก.พ.', '18/ก.พ.', '19/ก.พ.', '20/ก.พ.', '21/ก.พ.', '22/ก.พ.', '23/ก.พ.', '24/ก.พ.', '25/ก.พ.', '26/ก.พ.', '27/ก.พ.', '28/ก.พ.', '1/มี.ค.', '2/มี.ค.', '3/มี.ค.', '4/มี.ค.', '5/มี.ค.', '6/มี.ค.', '7/มี.ค.', '8/มี.ค.', '9/มี.ค.', '10/มี.ค.', '11/มี.ค.', '12/มี.ค.', '13/มี.ค.', '14/มี.ค.', '15/มี.ค.', '16/มี.ค.', '17/มี.ค.', '18/มี.ค.', '19/มี.ค.', '20/มี.ค.', '21/มี.ค.', '22/มี.ค.', '23/มี.ค.', '24/มี.ค.', '25/มี.ค.', '26/มี.ค.', '27/มี.ค.', '28/มี.ค.', '29/มี.ค.', '30/มี.ค.', '31/มี.ค.', '1/เม.ย.', '2/เม.ย.', '3/เม.ย.'];
+let DAY_PLAN  = [35, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 5, 0, 4, 0, 0, 15, 0, 20, 0, 17, 0, 0, 14, 0, 0, 0, 0, 0, 0, 10, 0, 8, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 7, 14, 0, 7, 0, 0, 7, 0, 3, 0, 6];
+let DAY_MIG   = [22, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 5, 0, 4, 0, 0, 15, 0, 20, 0, 17, 0, 0, 14, 0, 0, 0, 0, 0, 0, 10, 0, 8, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+let DAY_CUM_PLAN = [18.13, 18.13, 18.13, 18.13, 18.13, 18.13, 18.13, 18.13, 23.32, 23.32, 23.32, 23.32, 23.32, 23.32, 23.32, 25.91, 25.91, 27.98, 27.98, 27.98, 35.75, 35.75, 46.11, 46.11, 54.92, 54.92, 54.92, 62.18, 62.18, 62.18, 62.18, 62.18, 62.18, 62.18, 67.36, 67.36, 71.5, 71.5, 71.5, 71.5, 71.5, 77.2, 77.2, 77.2, 77.2, 77.2, 77.2, 77.2, 77.2, 80.83, 88.08, 88.08, 91.71, 91.71, 91.71, 95.34, 95.34, 96.89, 96.89, 100];
+let DAY_CUM_ACT_RAW = [11.4, 11.4, 11.4, 11.4, 11.4, 11.4, 11.4, 11.4, 16.58, 16.58, 16.58, 16.58, 16.58, 16.58, 16.58, 19.17, 19.17, 21.24, 21.24, 21.24, 29.02, 29.02, 39.38, 39.38, 48.19, 48.19, 48.19, 55.44, 55.44, 55.44, 55.44, 55.44, 55.44, 55.44, 60.62, 60.62, 64.77, 64.77, 64.77, 64.77, 64.77, 70.47, 70.47, 70.47, 70.47, 70.47, 70.47, 70.47, 70.47, 72.54, null, null, null, null, null, null, null, null, null, null];
+let LOC_DATA  = [{"n": "อาคารสำนักงานใหญ่", "tor": 95, "mig": 95, "pct": 100}, {"n": "อาคารสันทนาการ สนญ.", "tor": 6, "mig": 6, "pct": 100}, {"n": "อาคารสายงานวิศวกรรมศาสตร์และเทคโนโลยีสารสนเทศ (สงวท.)", "tor": 54, "mig": 41, "pct": 76}, {"n": "อาคารสโมสรท่าอากาศยาน - สทย. (สงทภ.)", "tor": 9, "mig": 6, "pct": 67}, {"n": "อาคารจอดรถ", "tor": 12, "mig": 0, "pct": 0}, {"n": "คลังพัสดุ", "tor": 2, "mig": 0, "pct": 0}, {"n": "สถานีไฟฟ้าย่อย 1 อาคารข้างหลัง", "tor": 1, "mig": 0, "pct": 0}, {"n": "สำนักแพทย์", "tor": 2, "mig": 0, "pct": 0}, {"n": "อาคารกองประปา", "tor": 2, "mig": 0, "pct": 0}, {"n": "อาคารกองอาคาร", "tor": 2, "mig": 0, "pct": 0}, {"n": "อาคารบำบัดน้ำเสีย", "tor": 2, "mig": 0, "pct": 0}, {"n": "อาคารผู้โดยสายภายในประเทศ (T2)", "tor": 1, "mig": 0, "pct": 0}, {"n": "อาคารเสริมสร้างพลานามัย", "tor": 3, "mig": 0, "pct": 0}, {"n": "สถานีไฟฟ้าย่อย 1 อาคารข้างหน้า", "tor": 2, "mig": 0, "pct": 0}];
+
+// showTab
 function showTab(id,el){
   document.querySelectorAll('.tab-body').forEach(t=>t.style.display='none');
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
@@ -378,109 +343,141 @@ function showTab(id,el){
   if(el) el.classList.add('on');
 }
 
+// showLoading
 function showLoading(){
   ['tb-done','tb-pct','tb-wk',
    'ov-all','ov-all-badge','ov-sw','ov-sw-badge','ov-ap','ov-ap-badge','ov-inf','ov-inf-badge',
    'ins-need-more','ins-rate-now','ins-rate-req','ins-rate-pct','ins-rate-pct-tag',
-   'gauge-pct','kpi-act','kpi-plan','kpi-diff',
-   'pill-rem','pill-days','pill-over','pill-hold','pill-finish','pill-late','pill-ontime','pill-ontime-sub'
-  ].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML='<span style="opacity:.35">–</span>';});
-  ['ov-all-b','ov-sw-b','ov-ap-b','ov-inf-b'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.width='0%';});
-  const fc=document.getElementById('ins-forecast');if(fc)fc.innerHTML='⏳ กำลังคำนวณ...';
-  const hg=document.getElementById('hm-grid');if(hg)hg.innerHTML='<div style="padding:16px;opacity:.4">⏳</div>';
+   'gauge-pct','kpi-act','kpi-plan','kpi-diff','kpi-late',
+   'pill-rem','pill-days','pill-over','pill-hold','pill-finish','pill-late','pill-ontime','pill-ontime-sub'].forEach(id=>{
+    const e=document.getElementById(id);
+    if(e) e.innerHTML='<span style="opacity:.35">–</span>';
+  });
+  ['ov-all-b','ov-sw-b','ov-ap-b','ov-inf-b'].forEach(id=>{
+    const e=document.getElementById(id); if(e) e.style.width='0%';
+  });
+  const fc=document.getElementById('ins-forecast');
+  if(fc) fc.innerHTML='<strong>⏳ กำลังคำนวณ...</strong>';
+  const hg=document.getElementById('hm-grid');
+  if(hg) hg.innerHTML='<div style="padding:20px;color:var(--text2);font-size:12px;opacity:.5">⏳ กำลังโหลด...</div>';
+  const clt=document.getElementById('cat-loc-table');
+  if(clt) clt.innerHTML='<div style="padding:20px;color:var(--text2);font-size:12px;opacity:.5">⏳ กำลังโหลด...</div>';
 }
 function hideLoading(){}
 
+// buildGauge
 function buildGauge(){
-  const cv=document.getElementById('gauge-c');if(!cv)return;
-  const ex=Chart.getChart(cv);if(ex)ex.destroy();
-  const actL=CUM_ACT_RAW.filter(v=>v!=null).pop()||0;
-  const planL=CUM_PLAN[TODAY_WK]||0;
-  const pct=planL>0?Math.round(actL/planL*100):0;
-  const g=Math.min(150,pct);
-  const col=g>=90?'#2bc48a':g>=60?'#4361ee':'#ff9f43';
-  new Chart(cv,{type:'doughnut',data:{datasets:[{data:[g,Math.max(0,150-g)],backgroundColor:[col,'#f0f4ff'],borderWidth:0,circumference:270,rotation:225}]},options:{cutout:'75%',responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false},tooltip:{enabled:false}}}});
+  const cv=document.getElementById('gauge-c');
+  if(!cv) return;
+  const ex=Chart.getChart(cv); if(ex) ex.destroy();
+  const actLast=CUM_ACT_RAW.filter(v=>v!=null).pop()||0;
+  const planLast=CUM_PLAN[TODAY_WK]||0;
+  const pct=planLast>0?Math.round(actLast/planLast*100):0;
+  const gPct=Math.min(150,pct);
+  const col=gPct>=90?'#2bc48a':gPct>=60?'#4361ee':'#ff9f43';
+  new Chart(cv,{type:'doughnut',data:{datasets:[
+    {data:[gPct,Math.max(0,150-gPct)],backgroundColor:[col,'#f0f4ff'],borderWidth:0,circumference:270,rotation:225}
+  ]},options:{cutout:'75%',plugins:{legend:{display:false},tooltip:{enabled:false}}}});
 }
 
-function buildDonut(onQ,lateQ,pendQ){
-  const cv=document.getElementById('donut-c');if(!cv)return;
-  const ex=Chart.getChart(cv);if(ex)ex.destroy();
-  new Chart(cv,{type:'doughnut',data:{datasets:[{data:[onQ,Math.max(0,lateQ),pendQ],backgroundColor:['#2bc48a','#ff6b6b','#e2e8f0'],borderWidth:3,borderColor:'#fff'}]},options:{responsive:false,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{display:false}}}});
-}
-
+// buildBurndown
 function buildBurndown(){
-  const cv=document.getElementById('burndown-c');if(!cv)return;
-  const ex=Chart.getChart(cv);if(ex)ex.destroy();
-  new Chart(cv,{type:'line',data:{labels:WK_LABELS,datasets:[
-    {label:'แผน',data:BD_PLAN,borderColor:'#4361ee',borderWidth:2,borderDash:[5,3],backgroundColor:'rgba(67,97,238,.08)',fill:true,tension:.3,pointRadius:3},
-    {label:'จริง',data:BD_ACT,borderColor:'#2bc48a',borderWidth:2,backgroundColor:'rgba(43,196,138,.1)',fill:true,tension:.3,pointRadius:4,pointBackgroundColor:'#2bc48a',spanGaps:true},
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10}}},scales:{x:{grid:{color:'#f0f4ff'},ticks:{font:{size:9}}},y:{grid:{color:'#f0f4ff'},ticks:{font:{size:9}}}}}});
+  const cv=document.getElementById('burndown-c');
+  if(!cv) return;
+  const ex=Chart.getChart(cv); if(ex) ex.destroy();
+  new Chart(cv,{type:'line',
+    data:{labels:WK_LABELS,datasets:[
+      {label:'แผน',data:BD_PLAN,borderColor:'#4361ee',borderWidth:2,borderDash:[5,3],
+        backgroundColor:'rgba(67,97,238,.08)',fill:true,tension:.3,pointRadius:3},
+      {label:'จริง',data:BD_ACT,borderColor:'#2bc48a',borderWidth:2,
+        backgroundColor:'rgba(43,196,138,.1)',fill:true,tension:.3,
+        pointRadius:4,pointBackgroundColor:'#2bc48a',spanGaps:true},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10,padding:10}}},
+      scales:{
+        x:{grid:{color:'#f0f4ff'},ticks:{font:{size:9}}},
+        y:{grid:{color:'#f0f4ff'},ticks:{font:{size:9}}}
+      }
+    }
+  });
 }
 
+// buildCumWeekly
 function buildCumWeekly(){
-  const cv=document.getElementById('cum-weekly-c');if(!cv)return;
-  const ex=Chart.getChart(cv);if(ex)ex.destroy();
+  const cv=document.getElementById('cum-weekly-c');
+  if(!cv) return;
+  const ex=Chart.getChart(cv); if(ex) ex.destroy();
   let last=null;
   const actLine=CUM_ACT_RAW.map((v,i)=>{if(v!=null)last=v;return i<=TODAY_WK?last:null;});
-  new Chart(cv,{type:'line',data:{labels:WK_LABELS,datasets:[
-    {label:'แผน %',data:CUM_PLAN,borderColor:'#4361ee',borderWidth:2,borderDash:[5,3],tension:.3,pointRadius:3,fill:false},
-    {label:'จริง %',data:actLine,borderColor:'#2bc48a',borderWidth:2.5,tension:.3,pointRadius:4,pointBackgroundColor:'#2bc48a',fill:false,spanGaps:true},
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10}}},scales:{x:{grid:{color:'#f0f4ff'},ticks:{font:{size:9}}},y:{min:0,max:100,grid:{color:'#f0f4ff'},ticks:{callback:v=>v+'%',font:{size:9}}}}}});
+  new Chart(cv,{type:'line',
+    data:{labels:WK_LABELS,datasets:[
+      {label:'แผน %',data:CUM_PLAN,borderColor:'#4361ee',borderWidth:2,borderDash:[5,3],
+        tension:.3,pointRadius:3,fill:false},
+      {label:'จริง %',data:actLine,borderColor:'#2bc48a',borderWidth:2.5,
+        tension:.3,pointRadius:4,pointBackgroundColor:'#2bc48a',fill:false,spanGaps:true},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10}}},
+      scales:{
+        x:{grid:{color:'#f0f4ff'},ticks:{font:{size:9}}},
+        y:{min:0,max:100,grid:{color:'#f0f4ff'},ticks:{callback:v=>v+'%',font:{size:9}}}
+      }
+    }
+  });
 }
 
-function buildProgAll(){
-  const cv=document.getElementById('prog-all-c');if(!cv)return;
-  const ex=Chart.getChart(cv);if(ex)ex.destroy();
-  let last=null;
-  const actFull=WK_LABELS.map((_,i)=>{if(i<CUM_ACT_RAW.length&&CUM_ACT_RAW[i]!=null)last=CUM_ACT_RAW[i];return i<=TODAY_WK?last:null;});
-  const tdPlugin={id:'tdHQ',afterDraw(chart){
-    const m=chart.getDatasetMeta(0);if(!m.data[TODAY_WK])return;
-    const {top,bottom}=chart.chartArea;
-    const x0=m.data[TODAY_WK].x,x1=m.data[TODAY_WK+1]?m.data[TODAY_WK+1].x:x0;
-    const x=x0+(x1-x0)*.5,ctx=chart.ctx;ctx.save();
-    ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,bottom);
-    ctx.strokeStyle='rgba(255,107,107,.8)';ctx.lineWidth=2;ctx.setLineDash([5,3]);ctx.stroke();ctx.restore();
-  }};
-  new Chart(cv,{type:'line',plugins:[tdPlugin],data:{labels:WK_LABELS,datasets:[
-    {label:'แผน %',data:CUM_PLAN,borderColor:'rgba(67,97,238,.5)',borderWidth:2,borderDash:[6,3],tension:.3,pointRadius:3,fill:false},
-    {label:'จริง %',data:actFull,borderColor:'#4361ee',borderWidth:2.5,tension:.3,pointRadius:4,pointBackgroundColor:'#4361ee',fill:false,spanGaps:true},
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(30,45,77,.92)',titleColor:'#fff',bodyColor:'rgba(255,255,255,.8)',padding:8,cornerRadius:8,callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y?.toFixed(1)||'–'}%`}}},scales:{x:{grid:{color:'#f0f4ff'},ticks:{font:{size:10}}},y:{min:0,max:100,grid:{color:'#f0f4ff'},ticks:{callback:v=>v+'%',font:{size:10}}}}}});
-  const actL=CUM_ACT_RAW.filter(v=>v!=null).pop()||0;
-  const planN=CUM_PLAN[TODAY_WK]||0;
-  const _e=id=>document.getElementById(id);
-  if(_e('prog-plan-lbl'))_e('prog-plan-lbl').textContent='แผน: '+planN.toFixed(1)+'%';
-  if(_e('prog-act-lbl')) _e('prog-act-lbl').textContent='จริง: '+actL.toFixed(1)+'%';
-}
-
+// buildDeviceSummary
 function buildDeviceSummary(ds){
-  if(!ds||!ds.length)return;
+  if(!ds||!ds.length) return;
   const colMap={'Switch':'#4361ee','AP':'#2bc48a','Infra':'#ff9f43'};
   const map={'Switch':'sw','AP':'ap','Infra':'inf'};
-  const totTor=ds.reduce((s,d)=>s+d.tor,0),totMig=ds.reduce((s,d)=>s+d.mig,0);
-  const totPct=totTor>0?Math.round(totMig/totTor*100):0;
+  const totalTor=ds.reduce((s,d)=>s+d.tor,0);
+  const totalMig=ds.reduce((s,d)=>s+d.mig,0);
+  const totalPct=totalTor>0?Math.round(totalMig/totalTor*100):0;
   const _e=id=>document.getElementById(id);
-  if(_e('ov-all'))       _e('ov-all').textContent=totMig+'/'+totTor;
-  if(_e('ov-all-sub'))   _e('ov-all-sub').textContent='Migration ทั้งหมด ('+totPct+'%)';
-  if(_e('ov-all-b'))     _e('ov-all-b').style.width=totPct+'%';
-  if(_e('ov-all-badge')) _e('ov-all-badge').textContent=totPct+'%';
+  if(_e('ov-all'))       _e('ov-all').textContent=totalMig+'/'+totalTor;
+  if(_e('ov-all-sub'))   _e('ov-all-sub').textContent='Migration ทั้งหมด ('+totalPct+'%)';
+  if(_e('ov-all-b'))     _e('ov-all-b').style.width=totalPct+'%';
+  if(_e('ov-all-badge')) _e('ov-all-badge').textContent=totalPct+'%';
   ds.forEach(d=>{
-    const k=map[d.n];if(!k)return;
-    if(_e('ov-'+k))          _e('ov-'+k).textContent=d.mig+'/'+d.tor;
-    if(_e('ov-'+k+'-sub'))   _e('ov-'+k+'-sub').textContent=d.n+' Migration ('+d.pct+'%)';
-    if(_e('ov-'+k+'-b'))     _e('ov-'+k+'-b').style.width=d.pct+'%';
-    if(_e('ov-'+k+'-badge')) _e('ov-'+k+'-badge').textContent=d.pct+'%';
+    const k=map[d.n]; if(!k) return;
+    if(_e('ov-'+k))         _e('ov-'+k).textContent=d.mig+'/'+d.tor;
+    if(_e('ov-'+k+'-sub'))  _e('ov-'+k+'-sub').textContent=d.n+' Migration ('+d.pct+'%)';
+    if(_e('ov-'+k+'-b'))    _e('ov-'+k+'-b').style.width=d.pct+'%';
+    if(_e('ov-'+k+'-badge'))_e('ov-'+k+'-badge').textContent=d.pct+'%';
   });
-  const cv=document.getElementById('dev-bar-c');if(!cv)return;
-  const ex=Chart.getChart(cv);if(ex)ex.destroy();
-  new Chart(cv,{type:'bar',data:{labels:ds.map(d=>d.n),datasets:[
-    {label:'Migration แล้ว',data:ds.map(d=>d.mig),backgroundColor:ds.map(d=>(colMap[d.n]||'#64748b')+'cc'),borderColor:ds.map(d=>colMap[d.n]||'#64748b'),borderWidth:1.5,borderRadius:8},
-    {label:'คงเหลือ',data:ds.map(d=>d.tor-d.mig),backgroundColor:ds.map(d=>(colMap[d.n]||'#94a3b8')+'28'),borderColor:ds.map(d=>(colMap[d.n]||'#94a3b8')+'50'),borderWidth:1,borderRadius:8},
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:12,padding:16}},tooltip:{callbacks:{label:ctx=>{const d=ds[ctx.dataIndex];return ctx.datasetIndex===0?' Done: '+d.mig+'/'+d.tor+' ('+d.pct+'%)'
-    :' เหลือ: '+(d.tor-d.mig)+' เครื่อง';}}}},scales:{x:{stacked:true,grid:{display:false},ticks:{font:{size:12}}},y:{stacked:true,grid:{color:'#f0f4ff'},ticks:{font:{size:10}}}}}});
+  const cv=document.getElementById('dev-bar-c');
+  if(!cv) return;
+  const ex=Chart.getChart(cv); if(ex) ex.destroy();
+  new Chart(cv,{type:'bar',
+    data:{labels:ds.map(d=>d.n),datasets:[
+      {label:'Migration แล้ว',data:ds.map(d=>d.mig),
+        backgroundColor:ds.map(d=>(colMap[d.n]||'#64748b')+'cc'),
+        borderColor:ds.map(d=>colMap[d.n]||'#64748b'),borderWidth:1.5,borderRadius:8},
+      {label:'คงเหลือ',data:ds.map(d=>d.tor-d.mig),
+        backgroundColor:ds.map(d=>(colMap[d.n]||'#94a3b8')+'28'),
+        borderColor:ds.map(d=>(colMap[d.n]||'#94a3b8')+'50'),borderWidth:1,borderRadius:8},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:12,padding:16}},
+        tooltip:{callbacks:{label:ctx=>{
+          const d=ds[ctx.dataIndex];
+          return ctx.datasetIndex===0?' Done: '+d.mig+'/'+d.tor+' ('+d.pct+'%)'
+                                     :' เหลือ: '+(d.tor-d.mig)+' เครื่อง';
+        }}}},
+      scales:{
+        x:{stacked:true,grid:{display:false},ticks:{font:{size:12}}},
+        y:{stacked:true,grid:{color:'#f0f4ff'},ticks:{font:{size:10}}}
+      }
+    }
+  });
 }
 
+// buildHeatmap
 function buildHeatmap(){
-  const grid=document.getElementById('hm-grid');if(!grid)return;
+  const grid=document.getElementById('hm-grid');
+  if(!grid) return;
   grid.innerHTML=LOC_DATA.map(l=>{
     const pct=l.tor>0?Math.round(l.mig/l.tor*100):0;
     const bc=pct===100?'var(--success)':pct>=70?'#38bdf8':pct>=30?'var(--warning)':pct>0?'var(--danger)':'var(--border)';
@@ -492,11 +489,14 @@ function buildHeatmap(){
   }).join('');
 }
 
+// buildCatLocTable
 function buildCatLocTable(locations,categories){
-  const el=document.getElementById('cat-loc-table');if(!el||!locations||!categories)return;
+  const el=document.getElementById('cat-loc-table');
+  if(!el||!locations||!categories) return;
   const catNames=['Switch','AP','Infra'];
   const colColors={'Switch':'var(--primary)','AP':'var(--success)','Infra':'var(--warning)'};
-  let html='<table style="width:100%;border-collapse:collapse;font-size:11px"><thead><tr style="border-bottom:2px solid var(--border)">'
+  let html='<table style="width:100%;border-collapse:collapse;font-size:11px">'
+    +'<thead><tr style="border-bottom:2px solid var(--border)">'
     +'<th style="text-align:left;padding:5px 8px;color:var(--text2)">สถานที่</th>'
     +catNames.map(n=>'<th style="text-align:center;padding:5px 8px;color:'+colColors[n]+'">'+n+'</th>').join('')
     +'<th style="text-align:center;padding:5px 8px;color:var(--text2)">รวม Switch+Infra</th>'
@@ -504,43 +504,65 @@ function buildCatLocTable(locations,categories){
   locations.filter(l=>l.tor>0).forEach(l=>{
     const sw=l.cats&&l.cats['Switch']||{tor:0,mig:0};
     const inf=l.cats&&l.cats['Infra']||{tor:0,mig:0};
-    const tot=sw.tor+inf.tor,tmig=sw.mig+inf.mig;
+    const tot=sw.tor+inf.tor; const tmig=sw.mig+inf.mig;
     const pct=tot>0?Math.round(tmig/tot*100):0;
     const bc=pct>=100?'var(--success)':pct>=70?'#38bdf8':pct>=30?'var(--warning)':pct>0?'var(--danger)':'var(--border)';
     const cell=v=>v.tor?'<td style="text-align:center;padding:5px 8px"><b>'+v.mig+'/'+v.tor+'</b><br><span style="color:var(--text2);font-size:10px">'+Math.round(v.mig/v.tor*100)+'%</span></td>'
-      :'<td style="text-align:center;padding:5px 8px;color:var(--text3)">–</td>';
-    html+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 8px;font-weight:500">'+l.n+'</td>'
+                       :'<td style="text-align:center;padding:5px 8px;color:var(--text3)">–</td>';
+    html+='<tr style="border-bottom:1px solid var(--border)">'
+      +'<td style="padding:5px 8px;font-weight:500">'+l.n+'</td>'
       +cell(sw)+'<td style="text-align:center;padding:5px 8px;color:var(--text3)">–</td>'+cell(inf)
       +'<td style="text-align:center;padding:5px 8px"><b>'+tmig+'/'+tot+'</b>'
-      +'<div style="height:4px;background:var(--border);border-radius:2px;margin-top:3px"><div style="height:100%;width:'+pct+'%;background:'+bc+';border-radius:2px"></div></div></td></tr>';
+      +'<div style="height:4px;background:var(--border);border-radius:2px;margin-top:3px">'
+      +'<div style="height:100%;width:'+pct+'%;background:'+bc+';border-radius:2px"></div></div></td></tr>';
   });
-  el.innerHTML=html+'</tbody></table>';
+  html+='</tbody></table>';
+  el.innerHTML=html;
 }
 
+// buildWeeklyBar
 function buildWeeklyBar(){
-  const cv=document.getElementById('weekly-bar-c');if(!cv)return;
-  const ex=Chart.getChart(cv);if(ex)ex.destroy();
-  new Chart(cv,{type:'bar',data:{labels:WK_LABELS,datasets:[
-    {label:'แผน',data:WK_PLAN,backgroundColor:'rgba(67,97,238,.25)',borderColor:'#4361ee',borderWidth:1.5,borderRadius:4},
-    {label:'Migration',data:WK_MIG,backgroundColor:'rgba(43,196,138,.7)',borderColor:'#2bc48a',borderWidth:1.5,borderRadius:4},
-    {label:'Config',data:WK_CFG,backgroundColor:'rgba(255,159,67,.6)',borderColor:'#ff9f43',borderWidth:1.5,borderRadius:4},
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10}}},scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{grid:{color:'#f0f4ff'},ticks:{font:{size:9}}}}}});
+  const cv=document.getElementById('weekly-bar-c');
+  if(!cv) return;
+  const ex=Chart.getChart(cv); if(ex) ex.destroy();
+  new Chart(cv,{type:'bar',
+    data:{labels:WK_LABELS,datasets:[
+      {label:'แผน',data:WK_PLAN,backgroundColor:'rgba(67,97,238,.25)',borderColor:'#4361ee',borderWidth:1.5,borderRadius:4},
+      {label:'Migration',data:WK_MIG,backgroundColor:'rgba(43,196,138,.7)',borderColor:'#2bc48a',borderWidth:1.5,borderRadius:4},
+      {label:'Config',data:WK_CFG,backgroundColor:'rgba(255,159,67,.6)',borderColor:'#ff9f43',borderWidth:1.5,borderRadius:4},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10}}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{grid:{color:'#f0f4ff'},ticks:{font:{size:9}}}}
+    }
+  });
 }
 
+// buildCumCfg (weekly cumulative)
 function buildCumCfg(){
-  const cv=document.getElementById('cum-cfg-c');if(!cv)return;
-  const ex=Chart.getChart(cv);if(ex)ex.destroy();
+  const cv=document.getElementById('cum-cfg-c');
+  if(!cv) return;
+  const ex=Chart.getChart(cv); if(ex) ex.destroy();
   let last=null;
   const actLine=CUM_ACT_RAW.map((v,i)=>{if(v!=null)last=v;return i<=TODAY_WK?last:null;});
-  new Chart(cv,{type:'line',data:{labels:WK_LABELS,datasets:[
-    {label:'แผน %',data:CUM_PLAN,borderColor:'#4361ee',borderWidth:2,borderDash:[5,3],tension:.3,pointRadius:3,fill:false},
-    {label:'จริง %',data:actLine,borderColor:'#2bc48a',borderWidth:2.5,tension:.3,pointRadius:4,pointBackgroundColor:'#2bc48a',fill:false,spanGaps:true},
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10}}},scales:{x:{grid:{color:'#f0f4ff'},ticks:{font:{size:9}}},y:{min:0,max:100,grid:{color:'#f0f4ff'},ticks:{callback:v=>v+'%',font:{size:9}}}}}});
+  new Chart(cv,{type:'line',
+    data:{labels:WK_LABELS,datasets:[
+      {label:'แผน %',data:CUM_PLAN,borderColor:'#4361ee',borderWidth:2,borderDash:[5,3],tension:.3,pointRadius:3,fill:false},
+      {label:'จริง %',data:actLine,borderColor:'#2bc48a',borderWidth:2.5,tension:.3,pointRadius:4,pointBackgroundColor:'#2bc48a',fill:false,spanGaps:true},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10}}},
+      scales:{x:{grid:{color:'#f0f4ff'},ticks:{font:{size:9}}},y:{min:0,max:100,grid:{color:'#f0f4ff'},ticks:{callback:v=>v+'%',font:{size:9}}}}
+    }
+  });
 }
 
+// buildWeeklyTable
 function buildWeeklyTable(){
-  const el=document.getElementById('weekly-table');if(!el)return;
-  let html='<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="border-bottom:2px solid var(--border)">'
+  const el=document.getElementById('weekly-table');
+  if(!el) return;
+  let html='<table style="width:100%;border-collapse:collapse;font-size:12px">'
+    +'<thead><tr style="border-bottom:2px solid var(--border)">'
     +'<th style="text-align:left;padding:6px 8px">สัปดาห์</th>'
     +'<th style="text-align:center;padding:6px 8px;color:var(--primary)">แผน</th>'
     +'<th style="text-align:center;padding:6px 8px;color:var(--success)">Migration</th>'
@@ -548,40 +570,64 @@ function buildWeeklyTable(){
     +'<th style="text-align:center;padding:6px 8px;color:var(--primary)">% สะสม (จริง)</th>'
     +'</tr></thead><tbody>';
   WK_LABELS.forEach((w,i)=>{
-    const plan=WK_PLAN[i]||0,mig=WK_MIG[i],cfg=WK_CFG[i],cum=CUM_ACT_RAW[i];
+    const plan=WK_PLAN[i]||0,mig=WK_MIG[i],cfg=WK_CFG[i];
+    const cum=CUM_ACT_RAW[i];
     const active=i===TODAY_WK?'background:var(--primary-l);font-weight:600':'';
-    html+='<tr style="border-bottom:1px solid var(--border);'+active+'"><td style="padding:6px 8px">'+w+'</td>'
+    html+='<tr style="border-bottom:1px solid var(--border);'+active+'">'
+      +'<td style="padding:6px 8px">'+w+'</td>'
       +'<td style="text-align:center;padding:6px 8px">'+plan+'</td>'
       +'<td style="text-align:center;padding:6px 8px;color:var(--success)">'+(mig!=null?mig:'–')+'</td>'
       +'<td style="text-align:center;padding:6px 8px;color:var(--warning)">'+(cfg!=null?cfg:'–')+'</td>'
-      +'<td style="text-align:center;padding:6px 8px">'+(cum!=null?cum+'%':'–')+'</td></tr>';
+      +'<td style="text-align:center;padding:6px 8px">'+(cum!=null?cum+'%':'–')+'</td>'
+      +'</tr>';
   });
-  el.innerHTML=html+'</tbody></table>';
+  html+='</tbody></table>';
+  el.innerHTML=html;
 }
 
+// buildDailyBar
 function buildDailyBar(){
-  const cv=document.getElementById('daily-bar-c');if(!cv)return;
-  const ex=Chart.getChart(cv);if(ex)ex.destroy();
-  new Chart(cv,{type:'bar',data:{labels:DAY_LABELS,datasets:[
-    {label:'แผน',data:DAY_PLAN,backgroundColor:'rgba(67,97,238,.25)',borderColor:'#4361ee',borderWidth:1,borderRadius:3},
-    {label:'Migration',data:DAY_MIG,backgroundColor:'rgba(43,196,138,.7)',borderColor:'#2bc48a',borderWidth:1,borderRadius:3},
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10}}},scales:{x:{grid:{display:false},ticks:{font:{size:8},maxTicksLimit:15}},y:{grid:{color:'#f0f4ff'},ticks:{font:{size:9}}}}}});
+  const cv=document.getElementById('daily-bar-c');
+  if(!cv) return;
+  const ex=Chart.getChart(cv); if(ex) ex.destroy();
+  const step=Math.max(1,Math.ceil(DAY_LABELS.length/20));
+  new Chart(cv,{type:'bar',
+    data:{labels:DAY_LABELS,datasets:[
+      {label:'แผน',data:DAY_PLAN,backgroundColor:'rgba(67,97,238,.25)',borderColor:'#4361ee',borderWidth:1,borderRadius:3},
+      {label:'Migration',data:DAY_MIG,backgroundColor:'rgba(43,196,138,.7)',borderColor:'#2bc48a',borderWidth:1,borderRadius:3},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10}}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:8},maxTicksLimit:15}},y:{grid:{color:'#f0f4ff'},ticks:{font:{size:9}}}}
+    }
+  });
 }
 
+// buildDailyCum
 function buildDailyCum(){
-  const cv=document.getElementById('daily-cum-c');if(!cv)return;
-  const ex=Chart.getChart(cv);if(ex)ex.destroy();
+  const cv=document.getElementById('daily-cum-c');
+  if(!cv) return;
+  const ex=Chart.getChart(cv); if(ex) ex.destroy();
   let last=null;
   const actLine=DAY_CUM_ACT_RAW.map(v=>{if(v!=null)last=v;return last;});
-  new Chart(cv,{type:'line',data:{labels:DAY_LABELS,datasets:[
-    {label:'แผน %',data:DAY_CUM_PLAN,borderColor:'#4361ee',borderWidth:2,borderDash:[4,3],tension:.2,pointRadius:0,fill:false},
-    {label:'จริง %',data:actLine,borderColor:'#2bc48a',borderWidth:2,tension:.2,pointRadius:0,fill:false,spanGaps:true},
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10}}},scales:{x:{grid:{color:'#f0f4ff'},ticks:{font:{size:8},maxTicksLimit:15}},y:{min:0,max:100,grid:{color:'#f0f4ff'},ticks:{callback:v=>v+'%',font:{size:9}}}}}});
+  new Chart(cv,{type:'line',
+    data:{labels:DAY_LABELS,datasets:[
+      {label:'แผน %',data:DAY_CUM_PLAN,borderColor:'#4361ee',borderWidth:2,borderDash:[4,3],tension:.2,pointRadius:0,fill:false},
+      {label:'จริง %',data:actLine,borderColor:'#2bc48a',borderWidth:2,tension:.2,pointRadius:0,fill:false,spanGaps:true},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10}}},
+      scales:{x:{grid:{color:'#f0f4ff'},ticks:{font:{size:8},maxTicksLimit:15}},y:{min:0,max:100,grid:{color:'#f0f4ff'},ticks:{callback:v=>v+'%',font:{size:9}}}}
+    }
+  });
 }
 
+// buildLocTable
 function buildLocTable(){
-  const el=document.getElementById('loc-table');if(!el)return;
-  let html='<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="border-bottom:2px solid var(--border)">'
+  const el=document.getElementById('loc-table');
+  if(!el) return;
+  let html='<table style="width:100%;border-collapse:collapse;font-size:12px">'
+    +'<thead><tr style="border-bottom:2px solid var(--border)">'
     +'<th style="text-align:left;padding:6px 8px">สถานที่</th>'
     +'<th style="text-align:center;padding:6px 8px;color:var(--warning)">Migration</th>'
     +'<th style="text-align:center;padding:6px 8px;color:var(--text2)">TOR</th>'
@@ -590,28 +636,44 @@ function buildLocTable(){
   LOC_DATA.forEach(l=>{
     const pct=l.tor>0?Math.round(l.mig/l.tor*100):0;
     const col=pct>=100?'var(--success)':pct>=70?'#38bdf8':pct>=30?'var(--warning)':pct>0?'var(--danger)':'var(--text3)';
-    html+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 8px;font-weight:500">'+l.n+'</td>'
+    html+='<tr style="border-bottom:1px solid var(--border)">'
+      +'<td style="padding:6px 8px;font-weight:500">'+l.n+'</td>'
       +'<td style="text-align:center;padding:6px 8px;font-weight:700;color:'+col+'">'+l.mig+'</td>'
       +'<td style="text-align:center;padding:6px 8px;color:var(--text2)">'+l.tor+'</td>'
-      +'<td style="text-align:center;padding:6px 8px"><div style="display:flex;align-items:center;gap:6px;justify-content:center">'
-      +'<div style="width:60px;height:5px;background:var(--border);border-radius:99px;overflow:hidden">'
-      +'<div style="height:100%;width:'+pct+'%;background:'+col+';border-radius:99px"></div></div>'
-      +'<span style="color:'+col+';font-weight:600">'+pct+'%</span></div></td></tr>';
+      +'<td style="text-align:center;padding:6px 8px">'
+        +'<div style="display:flex;align-items:center;gap:6px;justify-content:center">'
+        +'<div style="width:60px;height:5px;background:var(--border);border-radius:99px;overflow:hidden">'
+        +'<div style="height:100%;width:'+pct+'%;background:'+col+';border-radius:99px"></div></div>'
+        +'<span style="color:'+col+';font-weight:600">'+pct+'%</span>'
+        +'</div></td></tr>';
   });
-  el.innerHTML=html+'</tbody></table>';
+  html+='</tbody></table>';
+  el.innerHTML=html;
 }
 
+// buildPlanTab
 function buildPlanTab(){
-  const cv=document.getElementById('plan-c');if(!cv)return;
-  const ex=Chart.getChart(cv);if(ex)ex.destroy();
+  const cv=document.getElementById('plan-c');
+  if(!cv) return;
+  const ex=Chart.getChart(cv); if(ex) ex.destroy();
   let last=null;
   const actLine=CUM_ACT_RAW.map((v,i)=>{if(v!=null)last=v;return i<=TODAY_WK?last:null;});
-  new Chart(cv,{type:'line',data:{labels:WK_LABELS,datasets:[
-    {label:'แผน %',data:CUM_PLAN,borderColor:'#4361ee',borderWidth:2,borderDash:[6,3],tension:.3,pointRadius:4,fill:false},
-    {label:'จริง %',data:actLine,borderColor:'#2bc48a',borderWidth:2.5,tension:.3,pointRadius:5,pointBackgroundColor:'#2bc48a',fill:false,spanGaps:true},
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:12,padding:16}}},scales:{x:{grid:{color:'#f0f4ff'},ticks:{font:{size:10}}},y:{min:0,max:100,grid:{color:'#f0f4ff'},ticks:{callback:v=>v+'%',font:{size:10}}}}}});
+  new Chart(cv,{type:'line',
+    data:{labels:WK_LABELS,datasets:[
+      {label:'แผน %',data:CUM_PLAN,borderColor:'#4361ee',borderWidth:2,borderDash:[6,3],tension:.3,pointRadius:4,fill:false},
+      {label:'จริง %',data:actLine,borderColor:'#2bc48a',borderWidth:2.5,tension:.3,pointRadius:5,pointBackgroundColor:'#2bc48a',fill:false,spanGaps:true},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:12,padding:16}}},
+      scales:{
+        x:{grid:{color:'#f0f4ff'},ticks:{font:{size:10}}},
+        y:{min:0,max:100,grid:{color:'#f0f4ff'},ticks:{callback:v=>v+'%',font:{size:10}}}
+      }
+    }
+  });
 }
 
+// loadData
 async function loadData(){
   showLoading();
   try{
@@ -619,33 +681,35 @@ async function loadData(){
     if(!r.ok) throw new Error('HTTP '+r.status);
     const d=await r.json();
     const {meta,insight:ins,weekly,daily,locations,wk,today_wk,last_install_date,device_summary,categories}=d;
-    WK_LABELS.length=0; wk.forEach(v=>WK_LABELS.push(v));
-    WK_PLAN.length=0;   weekly.plan.forEach(v=>WK_PLAN.push(v));
-    WK_MIG.length=0;    weekly.mig.forEach(v=>WK_MIG.push(v));
-    WK_CFG.length=0;    weekly.cfg.forEach(v=>WK_CFG.push(v));
-    CUM_PLAN.length=0;  weekly.plan_cum_pct.forEach(v=>CUM_PLAN.push(v));
+
+    WK_LABELS.length=0;  wk.forEach(v=>WK_LABELS.push(v));
+    WK_PLAN.length=0;    weekly.plan.forEach(v=>WK_PLAN.push(v));
+    WK_MIG.length=0;     weekly.mig.forEach(v=>WK_MIG.push(v));
+    WK_CFG.length=0;     weekly.cfg.forEach(v=>WK_CFG.push(v));
+    CUM_PLAN.length=0;   weekly.plan_cum_pct.forEach(v=>CUM_PLAN.push(v));
     CUM_ACT_RAW.length=0; weekly.act_cum_pct.forEach(v=>CUM_ACT_RAW.push(v));
-    BD_PLAN.length=0;   weekly.bd_plan.forEach(v=>BD_PLAN.push(v));
-    BD_ACT.length=0;    weekly.bd_act.forEach(v=>BD_ACT.push(v));
+    BD_PLAN.length=0;    weekly.bd_plan.forEach(v=>BD_PLAN.push(v));
+    BD_ACT.length=0;     weekly.bd_act.forEach(v=>BD_ACT.push(v));
     DAY_LABELS.length=0; daily.labels.forEach(v=>DAY_LABELS.push(v));
-    DAY_PLAN.length=0;  daily.plan.forEach(v=>DAY_PLAN.push(v));
-    DAY_MIG.length=0;   daily.mig.forEach(v=>DAY_MIG.push(v));
+    DAY_PLAN.length=0;   daily.plan.forEach(v=>DAY_PLAN.push(v));
+    DAY_MIG.length=0;    daily.mig.forEach(v=>DAY_MIG.push(v));
     DAY_CUM_PLAN.length=0; daily.plan_cum_pct.forEach(v=>DAY_CUM_PLAN.push(v));
     DAY_CUM_ACT_RAW.length=0; daily.act_cum_pct.forEach(v=>DAY_CUM_ACT_RAW.push(v));
-    if(locations){LOC_DATA.length=0; locations.forEach(l=>LOC_DATA.push(l));}
-    TODAY_WK=today_wk;
+    if(locations){ LOC_DATA.length=0; locations.forEach(l=>LOC_DATA.push(l)); }
+    window.TODAY_WK=today_wk;
 
     const _e=id=>document.getElementById(id);
     const thM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
     const fd=new Date(ins.finish_date+'T00:00:00');
     const finTH=fd.getDate()+' '+thM[fd.getMonth()]+' '+((fd.getFullYear()+543)%100);
+    const migPct=(meta.mig/meta.total*100).toFixed(1);
     const actLast=weekly.act_cum_pct.filter(v=>v!=null).pop()||0;
     const planLast=weekly.plan_cum_pct[today_wk]||0;
     const gap=Math.round((actLast-planLast)*10)/10;
 
-    if(_e('tb-done'))  _e('tb-done').textContent=meta.mig+'/'+meta.total;
-    if(_e('tb-pct'))   _e('tb-pct').textContent=(meta.total>0?Math.round(meta.mig/meta.total*100):0)+'%';
-    if(_e('tb-wk'))    _e('tb-wk').textContent='W.'+(today_wk+1);
+    if(_e('tb-done')) _e('tb-done').textContent=meta.mig+'/'+meta.total;
+    if(_e('tb-pct'))  _e('tb-pct').textContent=migPct+'%';
+    if(_e('tb-wk'))   _e('tb-wk').textContent='W.'+(today_wk+1);
     if(last_install_date&&_e('last-install-lbl')){
       const ld=new Date(last_install_date+'T00:00:00');
       _e('last-install-lbl').textContent=ld.getDate()+' '+thM[ld.getMonth()]+' '+((ld.getFullYear()+543)%100);
@@ -660,48 +724,93 @@ async function loadData(){
       +'ช้ากว่าเป้าหมาย (3 เม.ย.) <strong style="color:var(--danger)">'+ins.days_late+' วัน</strong> | '
       +'ยังเหลือ <strong>'+meta.remaining+' เครื่อง</strong> ใน <strong>'+ins.days_left+' วัน</strong>';
     if(_e('gauge-pct'))  _e('gauge-pct').textContent=ins.gauge_pct+'%';
-    if(_e('kpi-act'))    _e('kpi-act').textContent=Number(ins.daily_rate).toFixed(2);
-    if(_e('kpi-plan'))   _e('kpi-plan').textContent=ins.req_rate;
-    if(_e('kpi-diff'))   _e('kpi-diff').textContent='+'+Number(ins.need_more).toFixed(2);
-    if(_e('pill-finish'))      _e('pill-finish').textContent=finTH;
+    if(_e('kpi-act'))    _e('kpi-act').textContent=actLast.toFixed(2);
+    if(_e('kpi-plan'))   _e('kpi-plan').textContent=planLast.toFixed(2);
+    if(_e('kpi-diff'))   _e('kpi-diff').textContent=(gap>=0?'+':'')+gap;
+    if(_e('kpi-late'))   _e('kpi-late').textContent=ins.days_late;
+    // pills — SVB style
+    const fd2=new Date(ins.finish_date+'T00:00:00');
+    const finTH2=fd2.getDate()+' '+thM[fd2.getMonth()]+' '+((fd2.getFullYear()+543)%100);
+    if(_e('pill-finish'))  _e('pill-finish').textContent=finTH2;
+    if(_e('pill-late'))    _e('pill-late').textContent=ins.days_late>0?'ช้า '+ins.days_late+' วัน':'ก่อนกำหนด';
+    if(_e('pill-rem'))     _e('pill-rem').textContent=meta.remaining;
+    if(_e('pill-days'))    _e('pill-days').textContent=ins.days_left;
+    if(_e('pill-over'))    _e('pill-over').textContent=meta.overdue||0;
+    if(_e('pill-hold'))    _e('pill-hold').textContent=meta.hold||0;
+    if(_e('pill-ontime'))  _e('pill-ontime').textContent=(meta.on_time_pct||0)+'%';
+    if(_e('pill-ontime-sub')) _e('pill-ontime-sub').textContent=(meta.on_time_qty||0)+'/'+(meta.mig||0);
+    // pill-finish color based on days_late
     const pf=_e('pill-finish'); if(pf) pf.style.color=ins.days_late>0?'var(--danger)':'var(--success)';
-    if(_e('pill-late'))        _e('pill-late').textContent=ins.days_late>0?'ช้า '+ins.days_late+' วัน':'ก่อนกำหนด';
-    const pl=_e('pill-late');  if(pl) pl.style.color=ins.days_late>0?'var(--danger)':'var(--success)';
-    if(_e('pill-rem'))         _e('pill-rem').textContent=meta.remaining;
-    if(_e('pill-days'))        _e('pill-days').textContent=ins.days_left;
-    if(_e('pill-over'))        _e('pill-over').textContent=meta.overdue||0;
-    if(_e('pill-hold'))        _e('pill-hold').textContent=meta.hold||0;
-    if(_e('pill-ontime'))      _e('pill-ontime').textContent=(meta.on_time_pct||0)+'%';
-    if(_e('pill-ontime-sub'))  _e('pill-ontime-sub').textContent=(meta.on_time_qty||0)+'/'+(meta.mig||0);
+    const plt=_e('pill-late'); if(plt) plt.style.color=ins.days_late>0?'var(--danger)':'var(--success)';
 
-    buildGauge(); buildBurndown(); buildCumWeekly(); buildProgAll();
+    buildGauge(); buildBurndown(); buildCumWeekly();
     buildWeeklyBar(); buildCumCfg(); buildWeeklyTable();
     buildDailyBar(); buildDailyCum();
     buildHeatmap(); buildLocTable(); buildPlanTab();
     if(device_summary) buildDeviceSummary(device_summary);
     if(categories&&locations) buildCatLocTable(locations,categories);
-    const onQ=meta.on_time_qty||0, lateQ=Math.max(0,meta.mig-onQ), pendQ=meta.remaining||0;
-    buildDonut(onQ,lateQ,pendQ);
+    // donut
+    const onTimeQ  = meta.on_time_qty||0;
+    const lateQ    = meta.mig - onTimeQ;
+    const pendingQ = meta.remaining||0;
+    buildDonut(onTimeQ, Math.max(0,lateQ), pendingQ);
     const _e2=id=>document.getElementById(id);
     if(_e2('donut-ontime-pct'))  _e2('donut-ontime-pct').textContent=(meta.on_time_pct||0)+'%';
-    if(_e2('donut-ontime-sub'))  _e2('donut-ontime-sub').textContent=onQ+'/'+meta.mig;
-    if(_e2('donut-ontime-cnt'))  _e2('donut-ontime-cnt').textContent=onQ;
-    if(_e2('donut-late-cnt'))    _e2('donut-late-cnt').textContent=lateQ;
-    if(_e2('donut-pending-cnt')) _e2('donut-pending-cnt').textContent=pendQ;
+    if(_e2('donut-ontime-sub'))  _e2('donut-ontime-sub').textContent=onTimeQ+'/'+meta.mig;
+    if(_e2('donut-ontime-cnt'))  _e2('donut-ontime-cnt').textContent=onTimeQ;
+    if(_e2('donut-late-cnt'))    _e2('donut-late-cnt').textContent=Math.max(0,lateQ);
+    if(_e2('donut-pending-cnt')) _e2('donut-pending-cnt').textContent=pendingQ;
+
     const sl=_e('sync-ts');
     if(sl) sl.textContent=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-    console.log('HQ: '+meta.mig+'/'+meta.total+' W.'+(today_wk+1)+' rate='+ins.daily_rate);
+    console.log('HQ: mig='+meta.mig+'/'+meta.total+' rate='+ins.daily_rate+' W.'+(today_wk+1));
   }catch(e){
-    console.error('HQ error:',e.message);
+    console.error('HQ loadData error:',e.message);
   }finally{
     hideLoading();
   }
 }
 
+// manualRefresh
+
+function buildDonut(onTimeQty, lateQty, pendingQty){
+  const cv=document.getElementById('donut-c');
+  if(!cv) return;
+  const ex=Chart.getChart(cv); if(ex) ex.destroy();
+  new Chart(cv,{type:'doughnut',
+    data:{datasets:[{
+      data:[onTimeQty, Math.max(0,lateQty), pendingQty],
+      backgroundColor:['#2bc48a','#ff6b6b','#e2e8f0'],
+      borderWidth:3, borderColor:'#fff'
+    }]},
+    options:{
+      responsive:false,
+      maintainAspectRatio:false,
+      cutout:'70%',
+      plugins:{legend:{display:false},
+        tooltip:{backgroundColor:'rgba(30,45,77,.92)',titleColor:'#fff',
+          bodyColor:'rgba(255,255,255,.8)',padding:8,cornerRadius:8}}}
+  });
+}
+
 async function manualRefresh(){
   const btns=document.querySelectorAll('[onclick*="manualRefresh"]');
   btns.forEach(b=>{b._o=b.textContent;b.textContent='⏳ โหลด...';b.disabled=true;});
-  try{await fetch(API+'/api/cache/refresh',{method:'POST'});}catch(e){}
+  try{ await fetch(API+'/api/cache/refresh',{method:'POST'}); }catch(e){}
+  await loadData();
+  btns.forEach(b=>{b.textContent=b._o||'↺ รีเฟรช';b.disabled=false;});
+}
+
+window.addEventListener('DOMContentLoaded',async()=>{
+  await loadData();
+});
+
+
+// manualRefresh
+async function manualRefresh(){
+  const btns=document.querySelectorAll('[onclick*="manualRefresh"]');
+  btns.forEach(b=>{b._o=b.textContent;b.textContent='⏳ โหลด...';b.disabled=true;});
+  try{ await fetch(API+'/api/cache/refresh',{method:'POST'}); }catch(e){}
   await loadData();
   btns.forEach(b=>{b.textContent=b._o||'↺ รีเฟรช';b.disabled=false;});
 }
