@@ -3,290 +3,417 @@ const XLSX    = require('xlsx');
 const cors    = require('cors');
 const path    = require('path');
 const fs      = require('fs');
+const https   = require('https');
+const http    = require('http');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const LOCAL_EXCEL = path.join(__dirname, 'SAT Progress.xlsx');
-const TOTAL = 193;
-const PROJ_START = new Date('2026-02-03');
-const PROJ_END   = new Date('2026-04-03');
+// ── Config ────────────────────────────────────────────────────────────────────
+const SHAREPOINT_URL = process.env.SHAREPOINT_URL || '';
+const LOCAL_EXCEL    = path.join(__dirname, 'SDA_Installation_Plan_V2.xlsx');
+const CACHE_PATH     = path.join(__dirname, 'sda_cache.xlsx');
+const CACHE_TTL      = 5 * 60 * 1000; // 5 min
+
+const TOTAL = 1592, TOTAL_SW = 1121, TOTAL_AP = 445, TOTAL_INF = 26;
+const PROJ_START = new Date('2026-02-09');
+const PROJ_END   = new Date('2026-06-23');
+const FABRICS    = ['D1-041','CFZ','T1-015','D1-091','RFF','AMF','PPW'];
+const FAB_COLORS = { 'D1-041':'#4361ee','CFZ':'#2bc48a','T1-015':'#ff9f43',
+                     'D1-091':'#a855f7','RFF':'#22b8cf','AMF':'#f76707','PPW':'#74c0fc' };
+const FAB_PLAN_T = { 'D1-041':710,'CFZ':187,'T1-015':327,'D1-091':147,'RFF':99,'AMF':114,'PPW':8 };
+
+// Week bounds W7–W26 (20 weeks)
+const WK_BOUNDS = [
+  ['2026-02-09','2026-02-15','09 Feb','W7'],  ['2026-02-16','2026-02-22','16 Feb','W8'],
+  ['2026-02-23','2026-03-01','23 Feb','W9'],  ['2026-03-02','2026-03-08','02 Mar','W10'],
+  ['2026-03-09','2026-03-15','09 Mar','W11'], ['2026-03-16','2026-03-22','16 Mar','W12'],
+  ['2026-03-23','2026-03-29','23 Mar','W13'], ['2026-03-30','2026-04-05','30 Mar','W14'],
+  ['2026-04-06','2026-04-12','06 Apr','W15'], ['2026-04-13','2026-04-19','13 Apr','W16'],
+  ['2026-04-20','2026-04-26','20 Apr','W17'], ['2026-04-27','2026-05-03','27 Apr','W18'],
+  ['2026-05-04','2026-05-10','04 May','W19'], ['2026-05-11','2026-05-17','11 May','W20'],
+  ['2026-05-18','2026-05-24','18 May','W21'], ['2026-05-25','2026-05-31','25 May','W22'],
+  ['2026-06-01','2026-06-08','01 Jun','W23'], ['2026-06-09','2026-06-15','09 Jun','W24'],
+  ['2026-06-16','2026-06-22','16 Jun','W25'], ['2026-06-23','2026-06-29','23 Jun','W26'],
+].map(([s,e,label,name]) => ({ s:new Date(s), e:new Date(e), label, name }));
+const N_WK = WK_BOUNDS.length;
 
 let cacheTime = 0, cachedData = null;
-const CACHE_TTL = 5 * 60 * 1000;
 
+// ── File helpers ──────────────────────────────────────────────────────────────
+function downloadFile(url, dest) {
+  return new Promise((resolve, reject) => {
+    const proto = url.startsWith('https') ? https : http;
+    proto.get(url, { headers:{'User-Agent':'Mozilla/5.0'} }, res => {
+      if ([301,302,303,307,308].includes(res.statusCode))
+        return downloadFile(res.headers.location, dest).then(resolve).catch(reject);
+      if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode}`));
+      const f = fs.createWriteStream(dest);
+      res.pipe(f);
+      f.on('finish', () => f.close(resolve));
+      f.on('error', reject);
+    }).on('error', reject);
+  });
+}
+
+async function getWorkbook() {
+  if (SHAREPOINT_URL) {
+    try {
+      console.log('Fetching Excel from SharePoint...');
+      await downloadFile(SHAREPOINT_URL, CACHE_PATH);
+      console.log('SharePoint OK');
+      return XLSX.readFile(CACHE_PATH);
+    } catch(e) {
+      console.warn('SharePoint failed:', e.message);
+    }
+  }
+  // fallback: local file (uploaded to GitHub)
+  if (fs.existsSync(LOCAL_EXCEL)) {
+    console.log('Using local Excel from GitHub');
+    return XLSX.readFile(LOCAL_EXCEL);
+  }
+  throw new Error('No Excel source available');
+}
+
+// ── Week index helper ─────────────────────────────────────────────────────────
+function wkIdx(dt) {
+  if (!dt) return -1;
+  const d = new Date(dt); d.setHours(0,0,0,0);
+  return WK_BOUNDS.findIndex(w => d >= w.s && d <= w.e);
+}
+
+function fmtDate(dt) {
+  const d = new Date(dt);
+  return `${d.getDate()}/${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+
+function cumPct(arr, total) {
+  let c = 0;
+  return arr.map(v => Math.round((c += v) / total * 10000) / 100);
+}
+
+function cumActNull(arr, total, upto) {
+  let c = 0, last = null;
+  return arr.map((v, i) => {
+    if (v > 0) { c += v; last = Math.round(c / total * 10000) / 100; }
+    return i <= upto ? last : null;
+  });
+}
+
+// ── Main calculation ──────────────────────────────────────────────────────────
 function calcDashboard(wb) {
-  const wsWk  = wb.Sheets['HQ-กราฟรายสัปดาห์'];
-  const wsDay = wb.Sheets['HQ-กราฟรายวัน'];
-  const wsHQ  = wb.Sheets['HQ'];
-  const wsWL  = wb.Sheets['HQ-WL'];
+  const wsD  = wb.Sheets['Dashboard'];
+  const wsA  = wb.Sheets['All_Detail'];
+  const dRows = XLSX.utils.sheet_to_json(wsD, { header:1, defval:null });
+  const aRows = XLSX.utils.sheet_to_json(wsA, { defval:null });
 
-  const wkRows  = XLSX.utils.sheet_to_json(wsWk,  {header:1, defval:null});
-  const dayRows = XLSX.utils.sheet_to_json(wsDay, {header:1, defval:null});
-  const hqRaw   = XLSX.utils.sheet_to_json(wsHQ,  {header:1, defval:null});
-  const wlRaw   = wsWL ? XLSX.utils.sheet_to_json(wsWL, {header:1, defval:null}) : [];
+  // Overview
+  // installed = R7[3] Actual Installed
+  const installed = dRows[6][3] || 0;
 
-  const N_WK = 9;
-  const num = v => typeof v === 'number' ? v : null;
-  const pct = v => typeof v === 'number' ? Math.round(v * 10000) / 100 : null;
+  // hold = นับจำนวน rows ที่ Status='Hold' (ไม่ใช่ qty)
+  const hold = aRows.filter(r => r['Status'] === 'Hold').length;
 
-  // Weekly
-  const plan_wk      = wkRows[4].slice(1, N_WK+1).map(v => num(v) || 0);
-  const cfg_wk       = wkRows[5].slice(1, N_WK+1).map(num);
-  const mig_wk       = wkRows[7].slice(1, N_WK+1).map(num);
-  const plan_cum_pct = wkRows[12].slice(1, N_WK+1).map(pct);
-  const act_cum_pct  = wkRows[13].slice(1, N_WK+1).map(pct);
+  // overdue = นับ rows ที่ Days Until Due < 0 และยังไม่เสร็จ (ok < qty)
+  const overdue = aRows.filter(r => {
+    const days = r['Days Until Due'];
+    const qty  = r['Qty'] || 0;
+    const ok   = r['Qty. Success'] || 0;
+    return typeof days === 'number' && days < 0 && ok < qty;
+  }).length;
 
-  const wk = wkRows[3].slice(1, N_WK+1).map(v =>
-    v ? String(v).split('\n')[0].replace(/\r/g,'') : ''
-  );
-  const wk_dates = wkRows[3].slice(1, N_WK+1).map(v => {
-    if (!v) return '';
-    const parts = String(v).split('\n');
-    return parts[1] ? parts[1].replace(/[()]/g,'').replace(/\r/g,'') : '';
-  });
+  const remaining = TOTAL - installed;
 
-  const mig_total = mig_wk.reduce((s,v) => s + (v||0), 0);
-  const cfg_total = cfg_wk.reduce((s,v) => s + (v||0), 0);
-
-  // Burndown
-  let s = 0;
-  const bd_plan = plan_wk.map(v => TOTAL - (s += v));
-  s = 0; let last = null;
-  const bd_act = mig_wk.map((v,i) => {
-    if (v !== null) { s += v; last = TOTAL - s; }
-    return i <= 7 ? last : null;
-  });
-
-  // Insight
+  // TODAY & insight
   const today = new Date(); today.setHours(0,0,0,0);
+  // elapsed: นับรวมวันแรก (proj_start) ด้วย → +1
   const elapsed   = Math.max(1, Math.floor((today - PROJ_START) / 86400000) + 1);
+  // daysLeft: นับรวมวันนี้ด้วย → +1
   const daysLeft  = Math.max(1, Math.floor((PROJ_END - today) / 86400000) + 1);
-  const remaining = TOTAL - mig_total;
-  const dailyRate = Math.round(mig_total / elapsed * 100) / 100;
+  const dailyRate = Math.round(installed / elapsed * 10) / 10;
+  // reqRate ปัดขึ้นเต็มจำนวน
   const reqRate   = Math.ceil(remaining / daysLeft);
-  const needMore  = Math.round((reqRate - dailyRate) * 100) / 100;
+  const needMore  = Math.round((reqRate - dailyRate) * 10) / 10;
   const pctMore   = dailyRate > 0 ? Math.round((reqRate / dailyRate - 1) * 100) : 0;
-  const daysNeeded = dailyRate > 0 ? Math.ceil(remaining / dailyRate) : 9999;
+  const daysNeeded= dailyRate > 0 ? Math.ceil(remaining / dailyRate) : 9999;
   const finishDt  = new Date(today); finishDt.setDate(today.getDate() + daysNeeded);
   const daysLate  = Math.max(0, Math.floor((finishDt - PROJ_END) / 86400000));
   const gaugePct  = reqRate > 0 ? Math.min(150, Math.round(dailyRate / reqRate * 100)) : 100;
-  const todayWk   = Math.max(0, Math.min(N_WK-1, Math.floor((elapsed-1) / 7)));
+  const todayWk   = Math.max(0, Math.min(N_WK - 1, Math.floor((elapsed-1) / 7)));
 
-  // Daily
-  const dayLabels=[], planDay=[], migDay=[], planCumD=[], actCumD=[];
-  for (let i = 1; i < (dayRows[3]||[]).length; i++) {
-    const raw = dayRows[3][i];
-    if (raw === null) continue;
-    dayLabels.push(String(raw).replace(/\r/g,'').replace('\n','/'));
-    planDay.push(typeof dayRows[4][i]==='number' ? dayRows[4][i] : 0);
-    migDay.push(typeof dayRows[5][i]==='number' ? dayRows[5][i] : 0);
-    planCumD.push(pct(dayRows[8][i]) || 0);
-    actCumD.push(pct(dayRows[9][i]));
-  }
+  // Arrays
+  const planWk=new Array(N_WK).fill(0); const actWk =new Array(N_WK).fill(0);
+  const swPlan=new Array(N_WK).fill(0); const swAct =new Array(N_WK).fill(0);
+  const apPlan=new Array(N_WK).fill(0); const apAct =new Array(N_WK).fill(0);
+  const infAct=new Array(N_WK).fill(0);
 
-  // Overdue + HOLD + on_time from HQ sheet
-  let hqOverdue=0, hqHold=0, swOnTime=0, swMigTotal=0;
-  hqRaw.slice(2).forEach(r => {
-    const device = r[3]; const newQty = r[6];
-    if (!device || typeof device !== 'string') return;
-    if (typeof newQty !== 'number' || !Number.isInteger(newQty) || newQty <= 0) return;
-    const mig    = typeof r[15] === 'number' ? Math.min(Math.round(r[15]), newQty) : 0;
-    const remark = r[12] ? String(r[12]).toLowerCase() : '';
-    const status = r[11] ? String(r[11]).toLowerCase() : '';
-    if (remark.includes('hold') || status.includes('hold')) hqHold += newQty;
-    else if (mig < newQty) hqOverdue += (newQty - mig);
-    // on_time: Install Date (col9) <= Scheduled Date (col8)
-    if (mig > 0) {
-      swMigTotal += mig;
-      let instDt = r[9]; let schedDt = r[8];
-      if (typeof instDt  === 'number') instDt  = new Date((instDt  - 25569)*86400000);
-      if (typeof schedDt === 'number') schedDt = new Date((schedDt - 25569)*86400000);
-      if (instDt instanceof Date && schedDt instanceof Date && !isNaN(instDt) && !isNaN(schedDt)) {
-        instDt.setHours(0,0,0,0); schedDt.setHours(0,0,0,0);
-        if (instDt <= schedDt) swOnTime += mig;
+  const fabSwPlan={}, fabApPlan={}, fabSwAct={}, fabApAct={};
+  FABRICS.forEach(f => {
+    fabSwPlan[f]=new Array(N_WK).fill(0); fabApPlan[f]=new Array(N_WK).fill(0);
+    fabSwAct[f] =new Array(N_WK).fill(0); fabApAct[f] =new Array(N_WK).fill(0);
+  });
+
+  const dailyMap = {}; // dk → {sw,ap,inf,plan}
+  const fabDailyAct={}, fabDailyPlan={};
+  FABRICS.forEach(f => { fabDailyAct[f]={}; fabDailyPlan[f]={}; });
+
+  const typeMap = {};
+  const locMap  = {}; // fab → loc → {t,d}
+
+  aRows.forEach(r => {
+    const fab  = r['Fabric'];
+    const cat  = r['Category'];
+    const qty  = r['Qty']           || 0;
+    const ok   = r['Qty. Success']  || 0;
+    const dt   = r['Device Type'];
+    const loc  = r['Location'];
+
+    // Device types (all rows)
+    if (dt) {
+      if (!typeMap[dt]) typeMap[dt] = {plan:0, done:0};
+      typeMap[dt].plan += qty;
+      typeMap[dt].done += ok;
+    }
+
+    if (!FABRICS.includes(fab)) return;
+
+    // Location map
+    if (loc) {
+      if (!locMap[fab]) locMap[fab] = {};
+      if (!locMap[fab][loc]) locMap[fab][loc] = {t:0, d:0};
+      locMap[fab][loc].t += qty;
+      locMap[fab][loc].d += ok;
+    }
+
+    // Scheduled date → plan
+    let schedDt = r['Scheduled Date'];
+    if (typeof schedDt === 'number') schedDt = new Date((schedDt - 25569) * 86400000);
+    if (schedDt && qty > 0) {
+      const wi = wkIdx(schedDt); const dk = fmtDate(schedDt);
+      if (wi >= 0) {
+        planWk[wi] += qty;
+        if (cat === 'Switch') { swPlan[wi]+=qty; fabSwPlan[fab][wi]+=qty; }
+        else if (cat === 'AP') { apPlan[wi]+=qty; fabApPlan[fab][wi]+=qty; }
+      }
+      if (!dailyMap[dk]) dailyMap[dk]={sw:0,ap:0,inf:0,plan:0};
+      dailyMap[dk].plan += qty;
+      fabDailyPlan[fab][dk] = (fabDailyPlan[fab][dk]||0) + qty;
+    }
+
+    // Install date → actual
+    let instDt = r['Install Date'];
+    if (typeof instDt === 'number') instDt = new Date((instDt - 25569) * 86400000);
+    if (instDt && ok > 0) {
+      const wi = wkIdx(instDt); const dk = fmtDate(instDt);
+      if (wi >= 0) {
+        actWk[wi] += ok;
+        if (cat === 'Switch') { swAct[wi]+=ok; fabSwAct[fab][wi]+=ok; }
+        else if (cat === 'AP') { apAct[wi]+=ok; fabApAct[fab][wi]+=ok; }
+        else infAct[wi] += ok;
+      }
+      if (!dailyMap[dk]) dailyMap[dk]={sw:0,ap:0,inf:0,plan:0};
+      if (cat === 'Switch') dailyMap[dk].sw += ok;
+      else if (cat === 'AP') dailyMap[dk].ap += ok;
+      else dailyMap[dk].inf += ok;
+      fabDailyAct[fab][dk] = (fabDailyAct[fab][dk]||0) + ok;
+    }
+  });
+
+  // Cumulative weekly %
+  const PLAN_ALL = cumPct(planWk, TOTAL);
+  const ACT_ALL  = cumActNull(actWk, TOTAL, todayWk);
+  const PLAN_SW  = cumPct(swPlan, TOTAL_SW);
+  const ACT_SW   = cumActNull(swAct, TOTAL_SW, todayWk);
+  const PLAN_AP  = cumPct(apPlan, TOTAL_AP);
+  const ACT_AP   = cumActNull(apAct, TOTAL_AP, todayWk);
+
+  // Burndown
+  let s = 0;
+  const BD_PLAN = planWk.map(v => TOTAL - (s += v));
+  s = 0; let last = null;
+  const BD_ACT = actWk.map((v,i) => {
+    if (v > 0) { s += v; last = TOTAL - s; }
+    return i <= todayWk ? last : null;
+  });
+
+  // FAB_WEEKLY
+  const fabWeekly = {};
+  FABRICS.forEach(f => {
+    const swT = fabSwPlan[f].reduce((a,v)=>a+v, 0);
+    const apT = fabApPlan[f].reduce((a,v)=>a+v, 0);
+    fabWeekly[f] = {
+      sw_plan: cumPct(fabSwPlan[f], swT || 1),
+      sw_act:  cumActNull(fabSwAct[f], swT || 1, todayWk),
+      ap_plan: cumPct(fabApPlan[f], apT || 1),
+      ap_act:  cumActNull(fabApAct[f], apT || 1, todayWk),
+    };
+  });
+
+  // Daily sorted
+  const sortedDates = Object.keys(dailyMap).sort((a,b) => {
+    const [da,ma] = a.split('/').map(Number);
+    const [db,mb] = b.split('/').map(Number);
+    return ma !== mb ? ma - mb : da - db;
+  });
+
+  let cSW=0, cAP=0, cIN=0;
+  const daily = {
+    labels:    sortedDates,
+    sw:        sortedDates.map(d => dailyMap[d].sw),
+    ap:        sortedDates.map(d => dailyMap[d].ap),
+    inf:       sortedDates.map(d => dailyMap[d].inf),
+    plan:      sortedDates.map(d => dailyMap[d].plan),
+    cum_sw:    sortedDates.map(d => (cSW += dailyMap[d].sw)),
+    cum_ap:    sortedDates.map(d => (cAP += dailyMap[d].ap)),
+    cum_inf:   sortedDates.map(d => (cIN += dailyMap[d].inf)),
+  };
+  daily.cum_d = daily.cum_sw.map((v,i) => v + daily.cum_ap[i] + daily.cum_inf[i]);
+
+  // FAB_DAILY
+  const fabDaily = {}, fabDailyPlanOut = {};
+  FABRICS.forEach(f => {
+    fabDaily[f] = sortedDates.map(d => fabDailyAct[f][d] || 0);
+    fabDailyPlanOut[f] = sortedDates.map(d => fabDailyPlan[f][d] || 0);
+  });
+
+  // Fabrics from Dashboard rows 27-33
+  const fabRows = dRows.slice(27, 34);
+  const fabrics = FABRICS.map(fn => {
+    const fr = fabRows.find(r => r[0] === fn) || [];
+    const swT=fr[1]||0, swD=fr[2]||0, apT=fr[4]||0, apD=fr[5]||0, infT=fr[7]||0, infD=fr[8]||0;
+    const tot=swT+apT+infT, done=swD+apD+infD;
+    return {
+      n:fn, t:tot, d:done, p:tot>0?Math.round(done/tot*10000)/100:0,
+      h:fr[3]||0, r:tot-done, c:FAB_COLORS[fn],
+      sw:{t:swT,d:swD}, ap:{t:apT,d:apD}, inf:{t:infT,d:infD},
+      weekly: fabWeekly[fn],
+    };
+  });
+
+  const fabTotals = {};
+  fabrics.forEach(f => { fabTotals[f.n] = {sw:f.sw.d, ap:f.ap.d, inf:f.inf.d}; });
+
+  // Types sorted by plan desc
+  const types = Object.entries(typeMap)
+    .map(([n,d]) => ({n, plan:d.plan, done:d.done}))
+    .sort((a,b) => b.plan - a.plan);
+
+  // Locations
+  const locations = {};
+  Object.entries(locMap).forEach(([fab, locs]) => {
+    locations[fab] = Object.entries(locs)
+      .map(([l,v]) => ({l, t:v.t, d:v.d, p:Math.round(v.d/Math.max(v.t,1)*100)}))
+      .sort((a,b) => b.t - a.t);
+  });
+
+  // on-time = installed ที่ Install Date <= Scheduled Date
+  let onTimeQty = 0, earlyQty = 0, lateQty = 0;
+  aRows.forEach(r => {
+    const ok    = r['Qty. Success'] || 0;
+    let instDt  = r['Install Date'];
+    let schedDt = r['Scheduled Date'];
+    if (typeof instDt  === 'number') instDt  = new Date((instDt  - 25569) * 86400000);
+    if (typeof schedDt === 'number') schedDt = new Date((schedDt - 25569) * 86400000);
+    if (ok > 0 && instDt instanceof Date && schedDt instanceof Date && !isNaN(instDt) && !isNaN(schedDt)) {
+      instDt.setHours(0,0,0,0); schedDt.setHours(0,0,0,0);
+      if (instDt <= schedDt) {
+        onTimeQty += ok;
+        const diff = Math.floor((schedDt - instDt) / 86400000);
+        if (diff > 0) earlyQty += ok; // ติดตั้งก่อน scheduled date
       } else {
-        swOnTime += mig; // no date → count as on_time
+        lateQty += ok;
       }
     }
   });
+  const onTimePct = installed > 0 ? Math.round(onTimeQty / installed * 1000) / 10 : 0;
 
-  // AP on_time from HQ-WL
-  let apOnTime=0, apMigTotal=0;
-  wlRaw.slice(1).forEach(r => {
-    const room = r[2] ? String(r[2]).toLowerCase() : '';
-    if (room.includes('summary') || room.includes('รวม') || room.includes('total')) return;
-    const mig = (typeof r[16]==='number' && Number.isInteger(r[16]) && r[16]>0) ? r[16] : 0;
-    if (mig <= 0) return;
-    apMigTotal += mig;
-    let instDt = r[8]; let planDt = r[7];
-    if (typeof instDt === 'number') instDt = new Date((instDt - 25569)*86400000);
-    if (typeof planDt === 'number') planDt = new Date((planDt - 25569)*86400000);
-    if (instDt instanceof Date && planDt instanceof Date && !isNaN(instDt) && !isNaN(planDt)) {
-      instDt.setHours(0,0,0,0); planDt.setHours(0,0,0,0);
-      if (instDt <= planDt) apOnTime += mig;
-    } else {
-      apOnTime += mig;
+  // hold items list
+  const holdItems = aRows
+    .filter(r => r['Status']==='Hold')
+    .map(r => ({
+      fab:  r['Fabric']||'',
+      loc:  r['Location']||'',
+      dev:  r['Device Type']||'',
+      qty:  r['Qty']||0,
+      done: r['Qty. Success']||0,
+      rem:  r['Qty. Remaining']||0,
+    }));
+
+  // Last install date
+  let lastInstallDate = null;
+  aRows.forEach(r => {
+    let d = r['Install Date'];
+    if (typeof d === 'number') d = new Date((d - 25569) * 86400000);
+    if (d instanceof Date && !isNaN(d)) {
+      const ds = d.toISOString().slice(0,10);
+      if (!lastInstallDate || ds > lastInstallDate) lastInstallDate = ds;
     }
   });
 
-  const totalOnTime   = swOnTime + apOnTime;
-  const totalMigForOT = swMigTotal + apMigTotal;
-  const onTimePct     = totalMigForOT > 0 ? Math.round(totalOnTime / totalMigForOT * 1000) / 10 : 0;
-  const onTimeQty     = totalOnTime;
-
-  // remaining from total TOR (Switch+AP+Infra)
-
-
-  // Last install date
-  let lastInstall = null;
-  hqRaw.slice(2).forEach(r => {
-    const d = r[9];
-    if (typeof d !== 'number') return;
-    const dt = new Date((d - 25569) * 86400000);
-    dt.setHours(0,0,0,0);
-    if (dt <= today && (!lastInstall || dt > lastInstall)) lastInstall = dt;
-  });
-  const lastInstallDate = lastInstall ? lastInstall.toISOString().slice(0,10) : null;
-
-  // Locations + Categories — col: 0=สถานที่,3=อุปกรณ์,6=NewQty,13=Cfg,14=Inst,15=Mig,18=Category
-  const locMap = {}, catMap = {}, locCatMap = {};
-  let curLoc = null;
-  hqRaw.slice(2).forEach(r => {
-    if (r[0]) curLoc = String(r[0]).trim();
-    if (!curLoc || curLoc === 'เพิ่มเติม') return;
-    const device = r[3];
-    const newQty = r[6];  // จำนวน ใหม่ — รวม = 193
-    if (!device || typeof device !== 'string') return;
-    if (typeof newQty !== 'number' || !Number.isInteger(newQty) || newQty <= 0) return;
-
-    const rawMig  = typeof r[15] === 'number' ? Math.round(r[15]) : 0;
-    const rawCfg  = typeof r[13] === 'number' ? Math.round(r[13]) : 0;
-    const rawInst = typeof r[14] === 'number' ? Math.round(r[14]) : 0;
-    const mig  = Math.min(rawMig,  newQty);
-    const cfg  = Math.min(rawCfg,  newQty);
-    const inst = Math.min(rawInst, newQty);
-    const cat  = r[18] ? String(r[18]).trim() : 'ไม่ระบุ';
-
-    // Location map
-    if (!locMap[curLoc]) locMap[curLoc] = {tor:0, cfg:0, inst:0, mig:0};
-    locMap[curLoc].tor  += newQty;
-    locMap[curLoc].cfg  += cfg;
-    locMap[curLoc].inst += inst;
-    locMap[curLoc].mig  += mig;
-
-    // Category map
-    if (!catMap[cat]) catMap[cat] = {tor:0, cfg:0, inst:0, mig:0};
-    catMap[cat].tor  += newQty;
-    catMap[cat].cfg  += cfg;
-    catMap[cat].inst += inst;
-    catMap[cat].mig  += mig;
-
-    // Location x Category map
-    const lk = curLoc;
-    if (!locCatMap[lk]) locCatMap[lk] = {};
-    if (!locCatMap[lk][cat]) locCatMap[lk][cat] = {tor:0, mig:0};
-    locCatMap[lk][cat].tor += newQty;
-    locCatMap[lk][cat].mig += mig;
-  });
-
-  const locations = Object.entries(locMap)
-    .filter(([,v]) => v.tor > 0)
-    .map(([n,v]) => ({
-      n, tor:v.tor, cfg:v.cfg, inst:v.inst, mig:v.mig,
-      pct: Math.round(v.mig / v.tor * 100),
-      cats: locCatMap[n] || {}
-    }))
-    .sort((a,b) => b.pct - a.pct || b.tor - a.tor);
-
-  const categories = Object.entries(catMap)
-    .map(([n,v]) => ({
-      n, tor:v.tor, cfg:v.cfg, inst:v.inst, mig:v.mig,
-      pct_mig: Math.round(v.mig / v.tor * 100),
-      pct_cfg: Math.round(v.cfg / v.tor * 100)
-    }))
-    .sort((a,b) => b.tor - a.tor);
-
-
-
-  // AP from HQ-WL — col3=qty, col16=Migration, ข้าม summary rows (col2 มี "summary"/"รวม")
-  let apTotal=0, apMig=0;
-  const apLocMap = {};
-  let curLocWL = null;
-  wlRaw.slice(1).forEach(r => {
-    if (r[0]) curLocWL = String(r[0]).trim();
-    if (!curLocWL) return;
-    // ข้าม summary rows
-    const room = r[2] ? String(r[2]).toLowerCase() : '';
-    if (room.includes('summary') || room.includes('รวม') || room.includes('total')) return;
-    const qty = (typeof r[3]==='number' && r[3]>0) ? r[3] : 0;
-    const mig = (typeof r[16]==='number' && Number.isInteger(r[16]) && r[16]>0) ? r[16] : 0;
-    apTotal += qty;
-    apMig   += mig;
-    if (!apLocMap[curLocWL]) apLocMap[curLocWL] = {qty:0, mig:0};
-    apLocMap[curLocWL].qty += qty;
-    apLocMap[curLocWL].mig += mig;
-  });
-
-  // device_summary: Switch, AP, Infra
-  const switchCat = categories.find(c=>c.n==='Switch') || {tor:0,mig:0};
-  const infraCat  = categories.find(c=>c.n==='Infra')  || {tor:0,mig:0};
-  const device_summary = [
-    {n:'Switch', tor:switchCat.tor, mig:switchCat.mig, pct:Math.round(switchCat.mig/switchCat.tor*100)||0, color:'#4361ee'},
-    {n:'AP',     tor:apTotal,       mig:apMig,          pct:apTotal>0?Math.round(apMig/apTotal*100):0,      color:'#2bc48a'},
-    {n:'Infra',  tor:infraCat.tor,  mig:infraCat.mig,   pct:Math.round(infraCat.mig/infraCat.tor*100)||0,   color:'#ff9f43'},
-  ];
-
-  const totalTor    = (switchCat.tor||0) + apTotal + (infraCat.tor||0);
-  const totalMigAll = (switchCat.mig||0) + apMig   + (infraCat.mig||0);
-  const remainingAll = totalTor - totalMigAll;
-
-  console.log(`✓ Locations: ${locations.length} | ${locations.map(l=>l.n.slice(0,10)+':'+l.mig).join(', ')}`);
-
   return {
-    wk, wk_dates, today_wk: todayWk,
+    wk:        WK_BOUNDS.map(w => w.label),
+    today_wk:  todayWk,
     last_install_date: lastInstallDate,
-    meta: {total:totalTor, mig:totalMigAll, cfg:cfg_total, remaining:remainingAll, hold:hqHold, overdue:hqOverdue, on_time_qty:onTimeQty, on_time_pct:onTimePct},
-    insight: {
-      daily_rate:dailyRate, req_rate:reqRate, need_more:needMore,
-      pct_more:pctMore, days_late:daysLate, gauge_pct:gaugePct,
-      finish_date:finishDt.toISOString().slice(0,10), days_left:daysLeft
-    },
-    weekly: {plan:plan_wk, cfg:cfg_wk, mig:mig_wk, bd_plan, bd_act, plan_cum_pct, act_cum_pct},
-    daily:  {labels:dayLabels, plan:planDay, mig:migDay, plan_cum_pct:planCumD, act_cum_pct:actCumD},
+    meta:      { total:TOTAL, installed, remaining, hold, overdue, on_time_qty:onTimeQty, on_time_pct:onTimePct, on_time_early:earlyQty, on_time_late:lateQty },
+    hold_items: holdItems,
+    insight:   { daily_rate:dailyRate, req_rate:reqRate, need_more:needMore,
+                 pct_more:pctMore, days_late:daysLate, gauge_pct:gaugePct,
+                 finish_date:finishDt.toISOString().slice(0,10), days_left:daysLeft },
+    weekly:    { plan_all:PLAN_ALL, act_all:ACT_ALL, plan_sw:PLAN_SW, act_sw:ACT_SW,
+                 plan_ap:PLAN_AP, act_ap:ACT_AP, bd_plan:BD_PLAN, bd_act:BD_ACT },
+    fab_weekly: fabWeekly,
+    fab_daily:  fabDaily,
+    fab_daily_plan: fabDailyPlanOut,
+    daily,
+    fabrics,
+    fab_totals:      fabTotals,
+    fab_plan_totals: FAB_PLAN_T,
+    fab_colors:      FAB_COLORS,
+    types,
     locations,
-    categories,
-    device_summary
   };
 }
 
-async function getDashboard(force=false) {
+// ── Cache wrapper ─────────────────────────────────────────────────────────────
+async function getDashboard(forceRefresh = false) {
   const now = Date.now();
-  if (!force && cachedData && (now - cacheTime) < CACHE_TTL) return cachedData;
-  if (!fs.existsSync(LOCAL_EXCEL)) throw new Error('SAT Progress.xlsx not found');
-  console.log('Reading Excel...');
-  const wb = XLSX.readFile(LOCAL_EXCEL);
+  if (!forceRefresh && cachedData && (now - cacheTime) < CACHE_TTL) return cachedData;
+  const wb = await getWorkbook();
   cachedData = calcDashboard(wb);
-  cacheTime = now;
-  console.log(`✓ mig=${cachedData.meta.mig}/${TOTAL} rate=${cachedData.insight.daily_rate}`);
+  cacheTime  = now;
   return cachedData;
 }
 
-app.get('/api/dashboard', async (req,res) => {
-  try { res.json(await getDashboard()); }
-  catch(e) { res.status(500).json({error:e.message}); }
+// ── Routes ────────────────────────────────────────────────────────────────────
+app.get('/api/dashboard', async (req, res) => {
+  try   { res.json(await getDashboard()); }
+  catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.post('/api/cache/refresh', async (req,res) => {
-  try { res.json({success:true, data: await getDashboard(true)}); }
-  catch(e) { res.status(500).json({error:e.message}); }
+app.post('/api/cache/refresh', async (req, res) => {
+  try   { res.json({ success:true, data: await getDashboard(true) }); }
+  catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.get('/health', (req,res) => res.json({status:'ok', cached_at: cacheTime ? new Date(cacheTime).toISOString() : null}));
+app.get('/health', (req, res) => res.json({
+  status: 'ok',
+  source: SHAREPOINT_URL ? 'sharepoint' : 'local_excel',
+  cached_at: cacheTime ? new Date(cacheTime).toISOString() : null,
+  cache_age_s: cacheTime ? Math.round((Date.now() - cacheTime) / 1000) : null,
+}));
 
-app.use(express.static(path.join(__dirname,'../frontend')));
-app.get('*', (req,res) => res.sendFile(path.join(__dirname,'../frontend/index.html')));
+app.use(express.static(path.join(__dirname, '../frontend')));
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`HQ Dashboard on port ${PORT}`));
+app.get('/api/devices', async (req, res) => {
+  try {
+    const d = await getDashboard();
+    const { limit=20 } = req.query;
+    res.json({ data: (d.hold_items || []).slice(0, parseInt(limit)) });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('*', (req, res) => res.sendFile(path.join(__dirname, '../frontend/index.html')));
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`SVB Dashboard running on port ${PORT}`));
