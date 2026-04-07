@@ -193,10 +193,14 @@ function parseData() {
   const pctDone   = Math.round(installed/TOTAL*100);
   const todayWk   = Math.floor((today-PROJ_START)/(7*86400000));
 
-  let finishDate = null;
+  let finishDate = null, daysLate=0, daysEarly=0;
   if (dailyRate>0) {
     const fd=new Date(today); fd.setDate(fd.getDate()+Math.ceil(remaining/dailyRate));
+    fd.setHours(0,0,0,0);
     finishDate = fd.toISOString().slice(0,10);
+    const diffDays = Math.round((PROJ_END-fd)/86400000);
+    if (diffDays < 0) daysLate  = Math.abs(diffDays);
+    else              daysEarly = diffDays;
   }
 
   const COLORS=['#4361ee','#2bc48a','#ff9f43','#a855f7','#22b8cf','#f76707','#74c0fc'];
@@ -266,7 +270,7 @@ function parseData() {
     insight:{
       daily_rate:dailyRate, req_rate:reqRate, need_more:needMore,
       gauge_pct:gaugePct, elapsed, remaining,
-      days_left:daysLeft, days_late:0, days_early:0,
+      days_left:daysLeft, days_late:daysLate, days_early:daysEarly,
       finish_date:finishDate,
       pct_more:dailyRate>0?Math.round((reqRate/dailyRate-1)*100):0,
     },
