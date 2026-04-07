@@ -208,7 +208,7 @@ function parseData() {
   for (let i=1; i<wlEndIdx; i++) {
     const r = wlRows[i]; if (!r||!r.length) continue;
     const qty = typeof r[3]==='number' ? r[3] : 0;
-    const mig = typeof r[6]==='number' ? r[6] : 0;
+    const mig = typeof r[16]==='number' ? r[16] : 0;  // col Q(16) = Migration
     if (qty<=0) continue;
     apTotal += qty; apDone += mig;
   }
