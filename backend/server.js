@@ -7,7 +7,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const EXCEL_PATH = path.join(__dirname, 'SAT_Progress.xlsx');
+const EXCEL_PATH = path.join(__dirname, 'SAT Progress.xlsx');
 const TOTAL = 193;
 
 // Project dates

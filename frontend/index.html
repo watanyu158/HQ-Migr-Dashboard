@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>SVB Migration Progress Dashboard</title>
+<title>HQ SAT Migration Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
@@ -260,7 +260,7 @@ tr:hover td{background:#f8faff}
 
 
 
-/* ── FABRIC BREAKDOWN TABLE ─────────────────────────────────── */
+/* ── SITE BREAKDOWN TABLE ─────────────────────────────────── */
 .fab-table{width:100%;border-collapse:collapse;font-size:12px;min-width:600px}
 .fab-table th{background:#f8faff;padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);color:var(--text2);font-size:11px;font-weight:600;white-space:nowrap}
 .fab-table .sub-head th{background:#f1f5ff;font-size:10px;color:var(--text3);padding:4px 10px;border-bottom:1px solid var(--border)}
@@ -367,7 +367,7 @@ main { padding: 12px 10px; }
   .tabs { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
   .tab { padding: 10px 12px; font-size: 12px; white-space: nowrap; flex-shrink: 0; }
 
-  /* Fabric breakdown: 2 cols on mobile */
+  /* Site breakdown: 2 cols on mobile */
   .fab-bd-grid { grid-template-columns: repeat(2,1fr); gap: 7px; }
   .fab-bd-card { padding: 10px 8px; }
   .fab-bd-name { font-size: 11px; }
@@ -629,7 +629,7 @@ main { padding: 12px 10px; }
 }
 
 /* ── Print ───────────────────────────────────────────────────────────────── */
-/* ── FABRIC BREAKDOWN GRID ──────────────────────────────────── */
+/* ── SITE BREAKDOWN GRID ──────────────────────────────────── */
 .fab-breakdown{margin-bottom:14px}
 .fab-breakdown-head{display:flex;align-items:center;gap:7px;margin-bottom:10px;font-size:13px;font-weight:600;color:var(--text)}
 .fab-bd-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
@@ -742,7 +742,7 @@ main { padding: 12px 10px; }
     <div>
       <div class="tb-title" style="font-size:15px;letter-spacing:.3px">
         SDA Migration Progress Dashboard -
-        <span style="background:linear-gradient(90deg,#ffd700,#ffaa00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;font-size:17px;letter-spacing:.5px"> SVB</span>
+        <span style="background:linear-gradient(90deg,#ffd700,#ffaa00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;font-size:17px;letter-spacing:.5px"> HQ</span>
       </div>
       <div class="tb-sub">ข้อมูลล่าสุด: <span id="tb-last-install">กำลังโหลด...</span></div>
     </div>
@@ -920,14 +920,14 @@ main { padding: 12px 10px; }
     <div class="scard ap"><div class="sl" style="color:#065f46">📶 AP</div><div class="sn" id="ov-ap">–/445</div><div class="ss">AP ที่ติดตั้งแล้ว (<span id="ov-ap-pct">–</span>)</div><div class="sbar"><div class="sf" id="ov-ap-b" style="width:0%"></div></div><div class="sbadge" style="background:var(--success-l);color:#065f46" id="ov-ap-badge">–</div></div>
     <div class="scard inf"><div class="sl" style="color:#92400e">⚡ Infra</div><div class="sn" id="ov-inf">–/26</div><div class="ss">Infra ที่ติดตั้งแล้ว (<span id="ov-inf-pct">–</span>)</div><div class="sbar"><div class="sf" id="ov-inf-b" style="width:0%"></div></div><div class="sbadge" style="background:var(--warning-l);color:#92400e" id="ov-inf-badge">–</div></div>
   </div>
-  <!-- ── Fabric breakdown table ── -->
+  <!-- ── Site breakdown table ── -->
   <div class="card" style="margin-bottom:14px">
-    <div class="ch"><div class="chi" style="background:#eef1ff;color:var(--primary)">🏭</div>สรุปอุปกรณ์แยก Fabric — Switch / AP / Infra</div>
+    <div class="ch"><div class="chi" style="background:#eef1ff;color:var(--primary)">📍</div>สรุปอุปกรณ์แยกตามสถานที่</div>
     <div style="overflow-x:auto">
       <table class="fab-table">
         <thead>
           <tr>
-            <th>Fabric</th>
+            <th>สถานที่</th>
             <th colspan="2" style="text-align:center;border-left:1px solid var(--border)">Switch</th>
             <th colspan="2" style="text-align:center;border-left:1px solid var(--border)">AP</th>
             <th colspan="2" style="text-align:center;border-left:1px solid var(--border)">Infra</th>
@@ -947,11 +947,11 @@ main { padding: 12px 10px; }
     </div>
   </div>
 
-  <!-- Fabric breakdown grid -->
+  <!-- Site breakdown grid -->
   <div class="fab-breakdown">
     <div class="fab-breakdown-head">
-      <div class="sic" style="background:var(--primary-l);color:var(--primary)">🏭</div>
-      สรุป Switch / AP / Infra แยกตาม Fabric
+      <div class="sic" style="background:var(--primary-l);color:var(--primary)">📍</div>
+      สรุปความก้าวหน้าแยกตามสถานที่
     </div>
     <div class="fab-bd-grid" id="fab-bd-grid"></div>
   </div>
@@ -1018,8 +1018,8 @@ main { padding: 12px 10px; }
       </div>
     </div>
   </div>
-  <div class="card" style="margin-bottom:14px"><div class="ch"><div class="chi" style="background:var(--warning-l);color:var(--warning)">📊</div>Fabric Progress</div><div id="tl-wrap"></div><div class="cleg" style="margin-top:11px"><div class="cl"><div class="cll" style="background:var(--primary)"></div>ติดตั้งแล้ว</div><div class="cl"><div class="cll" style="background:#e2e8f0"></div>คงเหลือ</div><div class="cl" style="color:var(--danger)"><span style="display:inline-block;width:2px;height:12px;background:var(--danger);margin-right:4px;vertical-align:middle"></span>วันนี้</div></div></div>
-  <div class="card" style="margin-bottom:14px"><div class="ch"><div class="chi" style="background:var(--hold-l);color:var(--hold)">🗺</div>Fabric Heatmap</div><div class="heatmap" id="hm-wrap"></div></div>
+  <div class="card" style="margin-bottom:14px"><div class="ch"><div class="chi" style="background:var(--warning-l);color:var(--warning)">📊</div>Site Progress</div><div id="tl-wrap"></div><div class="cleg" style="margin-top:11px"><div class="cl"><div class="cll" style="background:var(--primary)"></div>ติดตั้งแล้ว</div><div class="cl"><div class="cll" style="background:#e2e8f0"></div>คงเหลือ</div><div class="cl" style="color:var(--danger)"><span style="display:inline-block;width:2px;height:12px;background:var(--danger);margin-right:4px;vertical-align:middle"></span>วันนี้</div></div></div>
+  <div class="card" style="margin-bottom:14px"><div class="ch"><div class="chi" style="background:var(--hold-l);color:var(--hold)">🗺</div>Site Heatmap</div><div class="heatmap" id="hm-wrap"></div></div>
   <div class="hold-tog" onclick="toggleHold(this)"><div class="hold-lbl">⏸ อุปกรณ์ที่ Hold</div><div style="display:flex;align-items:center;gap:7px"><span class="hold-badge" id="hold-cnt">– รายการ</span><span id="hold-arr" style="color:var(--hold);font-size:12px">▼</span></div></div>
   <div id="hold-body" style="display:none;margin-top:6px"></div>
 </div>
@@ -1070,10 +1070,10 @@ main { padding: 12px 10px; }
     <div class="cleg"><div class="cl"><div class="cld" style="border-color:#6ee7b7"></div>แผน (%)</div><div class="cl"><div class="cll" style="background:#2bc48a"></div>จริง (%)</div></div>
   </div>
 
-  <!-- Per Fabric charts -->
+  <!-- Per Site charts -->
   <div style="display:flex;align-items:center;gap:7px;margin-bottom:12px;font-size:13px;font-weight:600">
     <div class="sic" style="background:var(--primary-l);color:var(--primary)">🔬</div>
-    ความก้าวหน้าแยก Fabric — Switch &amp; AP (แผน vs จริง %)
+    ความก้าวหน้าแยกตามสถานที่ (แผน vs จริง %)
   </div>
   <div class="prog-fab-grid" id="fab-prog-charts"></div>
 
@@ -1130,10 +1130,10 @@ main { padding: 12px 10px; }
     </div>
   </div>
 
-  <!-- Per-Fabric daily charts -->
+  <!-- Per-Site daily charts -->
   <div id="per-fabric-header" style="display:flex;align-items:center;gap:7px;margin:16px 0 10px;font-size:13px;font-weight:600;color:var(--text)">
-    <div class="sic" style="background:var(--primary-l);color:var(--primary)">🏭</div>
-    อุปกรณ์ที่ติดตั้งตามวันที่ — แยกแต่ละ Fabric
+    <div class="sic" style="background:var(--primary-l);color:var(--primary)">📍</div>
+    อุปกรณ์ที่ติดตั้งตามวันที่ — แยกตามสถานที่
     <span style="font-size:11px;font-weight:400;color:var(--text2)">(Switch / AP / Infra)</span>
   </div>
 
@@ -1141,7 +1141,7 @@ main { padding: 12px 10px; }
   <div class="card" style="margin-bottom:14px">
     <div class="ch">
       <div class="chi" style="background:#eef1ff;color:var(--primary)">📊</div>
-      สรุปจำนวนติดตั้งแล้ว แยก Fabric
+      สรุปจำนวนติดตั้งแล้ว แยกตามสถานที่
       <span style="margin-left:8px;font-size:11px;font-weight:400;color:var(--text2)">
         ติดตั้งแล้ว <strong style="color:var(--primary)">441</strong> จากทั้งหมด <strong>1,592</strong> เครื่อง
         <span style="margin-left:6px;padding:2px 8px;border-radius:99px;background:#eef1ff;color:var(--primary);font-size:10px;font-weight:600">รวม 28%</span>
@@ -3042,7 +3042,7 @@ async function toggleHold(el){
   try{
     const r=await fetch(`${API}/api/devices?status=Hold&limit=20`);
     const{data}=await r.json();
-    b.innerHTML=`<div class="card" style="margin-top:5px"><div class="tblw"><table><thead><tr><th>No.</th><th>Fabric</th><th>Location</th><th>Device Type</th><th>Qty</th></tr></thead><tbody>${data.map(r=>`<tr><td>${r['No.']}</td><td><b>${r['Fabric']}</b></td><td>${r['Location']||'-'}</td><td>${r['Device Type']}</td><td>${r['Qty']}</td></tr>`).join('')}</tbody></table></div></div>`;
+    b.innerHTML=`<div class="card" style="margin-top:5px"><div class="tblw"><table><thead><tr><th>No.</th><th>สถานที่</th><th>Location</th><th>Device Type</th><th>Qty</th></tr></thead><tbody>${data.map(r=>`<tr><td>${r['No.']}</td><td><b>${r['Fabric']}</b></td><td>${r['Location']||'-'}</td><td>${r['Device Type']}</td><td>${r['Qty']}</td></tr>`).join('')}</tbody></table></div></div>`;
   }catch{b.innerHTML='<div style="padding:11px;color:var(--text2)">ไม่สามารถโหลดได้จาก API</div>';}
 }
 
@@ -3525,7 +3525,7 @@ async function loadData(){
       }
     }
 
-    console.log(`✓ SVB Dynamic: ${meta.installed}/${meta.total} rate=${ins.daily_rate} req=${ins.req_rate} W${d.today_wk+7}`);
+    console.log(`✓ HQ Dynamic: ${meta.installed}/${meta.total} rate=${ins.daily_rate} req=${ins.req_rate} W${d.today_wk+7}`);
   } catch(e){
     console.error('loadData error:', e.message);
     console.error('Stack:', e.stack);
@@ -3762,7 +3762,7 @@ function buildUpcoming(){
         }).join('')}
       </div>
       <div style="background:#fff;border-radius:10px;padding:12px 14px;border:1px solid #e0e7ff">
-        <div style="font-size:10px;color:var(--text2);margin-bottom:6px">Fabric</div>
+        <div style="font-size:10px;color:var(--text2);margin-bottom:6px">สถานที่</div>
         <div style="display:flex;flex-wrap:wrap;gap:4px">
           ${[...fabSet].map(f=>`<span style="font-size:10px;font-weight:700;background:${FAB_C[f]||'#888'}22;color:${FAB_C[f]||'#888'};padding:2px 8px;border-radius:99px">${f}</span>`).join('')}
         </div>
