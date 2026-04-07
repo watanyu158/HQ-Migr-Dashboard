@@ -1,292 +1,172 @@
 const express = require('express');
-const XLSX    = require('xlsx');
-const cors    = require('cors');
-const path    = require('path');
-const fs      = require('fs');
+const cors = require('cors');
+const XLSX = require('xlsx');
+const path = require('path');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const LOCAL_EXCEL = path.join(__dirname, 'SAT Progress.xlsx');
+const EXCEL_PATH = path.join(__dirname, 'SAT_Progress.xlsx');
 const TOTAL = 193;
-const PROJ_START = new Date('2026-02-03');
-const PROJ_END   = new Date('2026-04-03');
 
-let cacheTime = 0, cachedData = null;
-const CACHE_TTL = 5 * 60 * 1000;
+// Project dates
+const PROJ_START = new Date('2026-02-02');
+const PROJ_END   = new Date('2026-04-30');
 
-function calcDashboard(wb) {
-  const wsWk  = wb.Sheets['HQ-กราฟรายสัปดาห์'];
-  const wsDay = wb.Sheets['HQ-กราฟรายวัน'];
-  const wsHQ  = wb.Sheets['HQ'];
-  const wsWL  = wb.Sheets['HQ-WL'];
+let cache = null;
+let cacheTime = 0;
 
-  const wkRows  = XLSX.utils.sheet_to_json(wsWk,  {header:1, defval:null});
-  const dayRows = XLSX.utils.sheet_to_json(wsDay, {header:1, defval:null});
-  const hqRaw   = XLSX.utils.sheet_to_json(wsHQ,  {header:1, defval:null});
-  const wlRaw   = wsWL ? XLSX.utils.sheet_to_json(wsWL, {header:1, defval:null}) : [];
+function parseData() {
+  const wb = XLSX.readFile(EXCEL_PATH);
 
-  const N_WK = 9;
-  const num = v => typeof v === 'number' ? v : null;
-  const pct = v => typeof v === 'number' ? Math.round(v * 10000) / 100 : null;
+  // ── Sheet: HQ (device list) ─────────────────────────────────────────
+  const hqSheet = wb.Sheets['HQ'];
+  const hqRows  = XLSX.utils.sheet_to_json(hqSheet, { header: 1, defval: null });
 
-  // Weekly
-  const plan_wk      = wkRows[4].slice(1, N_WK+1).map(v => num(v) || 0);
-  const cfg_wk       = wkRows[5].slice(1, N_WK+1).map(num);
-  const mig_wk       = wkRows[7].slice(1, N_WK+1).map(num);
-  const plan_cum_pct = wkRows[12].slice(1, N_WK+1).map(pct);
-  const act_cum_pct  = wkRows[13].slice(1, N_WK+1).map(pct);
+  let installed = 0, inProgress = 0, notStarted = 0;
+  let lastInstallDate = null;
+  let curSite = null, curRoom = null, curFloor = null;
 
-  const wk = wkRows[3].slice(1, N_WK+1).map(v =>
-    v ? String(v).split('\n')[0].replace(/\r/g,'') : ''
-  );
-  const wk_dates = wkRows[3].slice(1, N_WK+1).map(v => {
-    if (!v) return '';
-    const parts = String(v).split('\n');
-    return parts[1] ? parts[1].replace(/[()]/g,'').replace(/\r/g,'') : '';
-  });
+  const siteMap = {};
+  const devices = [];
 
-  const mig_total = mig_wk.reduce((s,v) => s + (v||0), 0);
-  const cfg_total = cfg_wk.reduce((s,v) => s + (v||0), 0);
+  for (let i = 2; i < hqRows.length; i++) {
+    const r = hqRows[i];
+    if (!r || !r.length) continue;
 
-  // Burndown
-  let s = 0;
-  const bd_plan = plan_wk.map(v => TOTAL - (s += v));
-  s = 0; let last = null;
-  const bd_act = mig_wk.map((v,i) => {
-    if (v !== null) { s += v; last = TOTAL - s; }
-    return i <= 7 ? last : null;
-  });
+    if (r[0]) curSite  = String(r[0]).trim();
+    if (r[1]) curRoom  = String(r[1]).trim();
+    if (r[2]) curFloor = r[2];
 
-  // Insight
-  const today = new Date(); today.setHours(0,0,0,0);
-  const elapsed   = Math.max(1, Math.floor((today - PROJ_START) / 86400000) + 1);
-  const daysLeft  = Math.max(1, Math.floor((PROJ_END - today) / 86400000) + 1);
-  const remaining = TOTAL - mig_total;
-  const dailyRate = Math.round(mig_total / elapsed * 100) / 100;
-  const reqRate   = Math.ceil(remaining / daysLeft);
-  const needMore  = Math.round((reqRate - dailyRate) * 100) / 100;
-  const pctMore   = dailyRate > 0 ? Math.round((reqRate / dailyRate - 1) * 100) : 0;
-  const daysNeeded = dailyRate > 0 ? Math.ceil(remaining / dailyRate) : 9999;
-  const finishDt  = new Date(today); finishDt.setDate(today.getDate() + daysNeeded);
-  const daysLate  = Math.max(0, Math.floor((finishDt - PROJ_END) / 86400000));
-  const gaugePct  = reqRate > 0 ? Math.min(150, Math.round(dailyRate / reqRate * 100)) : 100;
-  const todayWk   = Math.max(0, Math.min(N_WK-1, Math.floor((elapsed-1) / 7)));
+    const device   = r[3] ? String(r[3]).trim() : null;
+    const qty      = typeof r[6] === 'number' ? r[6] : 0;
+    const status   = r[11] ? String(r[11]).trim() : '';
+    const instDt   = typeof r[9] === 'number'
+      ? new Date(Date.UTC(1899,11,30) + r[9]*86400000).toISOString().slice(0,10)
+      : null;
+    const compDt   = typeof r[10] === 'number'
+      ? new Date(Date.UTC(1899,11,30) + r[10]*86400000).toISOString().slice(0,10)
+      : null;
+    const planStart = typeof r[7] === 'number'
+      ? new Date(Date.UTC(1899,11,30) + r[7]*86400000).toISOString().slice(0,10)
+      : null;
+    const planEnd   = typeof r[8] === 'number'
+      ? new Date(Date.UTC(1899,11,30) + r[8]*86400000).toISOString().slice(0,10)
+      : null;
 
-  // Daily
-  const dayLabels=[], planDay=[], migDay=[], planCumD=[], actCumD=[];
-  for (let i = 1; i < (dayRows[3]||[]).length; i++) {
-    const raw = dayRows[3][i];
-    if (raw === null) continue;
-    dayLabels.push(String(raw).replace(/\r/g,'').replace('\n','/'));
-    planDay.push(typeof dayRows[4][i]==='number' ? dayRows[4][i] : 0);
-    migDay.push(typeof dayRows[5][i]==='number' ? dayRows[5][i] : 0);
-    planCumD.push(pct(dayRows[8][i]) || 0);
-    actCumD.push(pct(dayRows[9][i]));
+    if (!device || !curSite || qty <= 0) continue;
+
+    if (status === 'Complete') {
+      installed += qty;
+      if (instDt && (!lastInstallDate || instDt > lastInstallDate)) lastInstallDate = instDt;
+    } else if (status.includes('Progress')) {
+      inProgress += qty;
+    } else {
+      notStarted += qty;
+    }
+
+    // สรุปรายสถานที่
+    const siteName = curSite.length > 50
+      ? curSite.slice(0,50) + '…'
+      : curSite;
+    if (!siteMap[siteName]) siteMap[siteName] = { total:0, done:0, inp:0 };
+    siteMap[siteName].total += qty;
+    if (status === 'Complete')         siteMap[siteName].done += qty;
+    else if (status.includes('Progress')) siteMap[siteName].inp += qty;
+
+    devices.push({ site: curSite, room: curRoom, device, qty, status, instDt, compDt, planStart, planEnd });
   }
 
-  // Overdue + HOLD + on_time from HQ sheet
-  let hqOverdue=0, hqHold=0, swOnTime=0, swMigTotal=0;
-  hqRaw.slice(2).forEach(r => {
-    const device = r[3]; const newQty = r[6];
-    if (!device || typeof device !== 'string') return;
-    if (typeof newQty !== 'number' || !Number.isInteger(newQty) || newQty <= 0) return;
-    const mig    = typeof r[15] === 'number' ? Math.min(Math.round(r[15]), newQty) : 0;
-    const remark = r[12] ? String(r[12]).toLowerCase() : '';
-    const status = r[11] ? String(r[11]).toLowerCase() : '';
-    if (remark.includes('hold') || status.includes('hold')) hqHold += newQty;
-    else if (mig < newQty) hqOverdue += (newQty - mig);
-    // on_time: Install Date (col9) <= Scheduled Date (col8)
-    if (mig > 0) {
-      swMigTotal += mig;
-      let instDt = r[9]; let schedDt = r[8];
-      if (typeof instDt  === 'number') instDt  = new Date((instDt  - 25569)*86400000);
-      if (typeof schedDt === 'number') schedDt = new Date((schedDt - 25569)*86400000);
-      if (instDt instanceof Date && schedDt instanceof Date && !isNaN(instDt) && !isNaN(schedDt)) {
-        instDt.setHours(0,0,0,0); schedDt.setHours(0,0,0,0);
-        if (instDt <= schedDt) swOnTime += mig;
-      } else {
-        swOnTime += mig; // no date → count as on_time
+  // ── Sheet: HQ-กราฟรายสัปดาห์ (weekly plan vs actual) ─────────────
+  const wkSheet = wb.Sheets['HQ-กราฟรายสัปดาห์'];
+  const wkRows  = XLSX.utils.sheet_to_json(wkSheet, { header: 1, defval: null });
+
+  // หา row ที่มี W.1, W.2, ...
+  let wkLabels = [], planPct = [], actPct = [];
+  for (const row of wkRows) {
+    if (!row[1]) continue;
+    const lbl = String(row[1]);
+    if (lbl.startsWith('W.')) {
+      // นี่คือ header row
+      for (let i = 1; i < row.length; i++) {
+        if (row[i] && String(row[i]).startsWith('W.')) {
+          wkLabels.push(String(row[i]).split('\n')[0]);
+        }
       }
     }
-  });
-
-  // AP on_time from HQ-WL
-  let apOnTime=0, apMigTotal=0;
-  wlRaw.slice(1).forEach(r => {
-    const room = r[2] ? String(r[2]).toLowerCase() : '';
-    if (room.includes('summary') || room.includes('รวม') || room.includes('total')) return;
-    const mig = (typeof r[16]==='number' && Number.isInteger(r[16]) && r[16]>0) ? r[16] : 0;
-    if (mig <= 0) return;
-    apMigTotal += mig;
-    let instDt = r[8]; let planDt = r[7];
-    if (typeof instDt === 'number') instDt = new Date((instDt - 25569)*86400000);
-    if (typeof planDt === 'number') planDt = new Date((planDt - 25569)*86400000);
-    if (instDt instanceof Date && planDt instanceof Date && !isNaN(instDt) && !isNaN(planDt)) {
-      instDt.setHours(0,0,0,0); planDt.setHours(0,0,0,0);
-      if (instDt <= planDt) apOnTime += mig;
-    } else {
-      apOnTime += mig;
+    if (String(row[0]).includes('% ความก้าวหน้าโดยรวม')) {
+      planPct = wkLabels.map((_,i) => Math.round((row[i+1]||0)*100));
     }
-  });
+    if (String(row[0]).includes('จำนวนที่เสร็จสิ้นสะสม')) {
+      actPct = wkLabels.map((_,i) => Math.round((row[i+1]||0)*100));
+    }
+  }
 
-  const totalOnTime   = swOnTime + apOnTime;
-  const totalMigForOT = swMigTotal + apMigTotal;
-  const onTimePct     = totalMigForOT > 0 ? Math.round(totalOnTime / totalMigForOT * 1000) / 10 : 0;
-  const onTimeQty     = totalOnTime;
+  // fallback weekly labels
+  if (!wkLabels.length) {
+    wkLabels = ['W.1','W.2','W.3','W.4','W.5','W.6','W.7','W.8','W.9','W.10'];
+  }
 
-  // remaining from total TOR (Switch+AP+Infra)
+  // ── คำนวณ insight ──────────────────────────────────────────────────
+  const today    = new Date();
+  today.setHours(0,0,0,0);
+  const elapsed  = Math.max(1, Math.round((today - PROJ_START) / 86400000));
+  const projDays = Math.round((PROJ_END - PROJ_START) / 86400000);
+  const daysLeft = Math.max(0, Math.round((PROJ_END - today) / 86400000));
+  const remaining = TOTAL - installed;
+  const dailyRate = Math.round(installed / elapsed * 10) / 10;
+  const reqRate   = daysLeft > 0 ? Math.ceil(remaining / daysLeft) : 0;
+  const needMore  = Math.round((reqRate - dailyRate) * 10) / 10;
+  const gaugePct  = reqRate > 0 ? Math.min(150, Math.round(dailyRate / reqRate * 100)) : 100;
+  const pctDone   = Math.round(installed / TOTAL * 100);
 
-
-  // Last install date
-  let lastInstall = null;
-  hqRaw.slice(2).forEach(r => {
-    const d = r[9];
-    if (typeof d !== 'number') return;
-    const dt = new Date((d - 25569) * 86400000);
-    dt.setHours(0,0,0,0);
-    if (dt <= today && (!lastInstall || dt > lastInstall)) lastInstall = dt;
-  });
-  const lastInstallDate = lastInstall ? lastInstall.toISOString().slice(0,10) : null;
-
-  // Locations + Categories — col: 0=สถานที่,3=อุปกรณ์,6=NewQty,13=Cfg,14=Inst,15=Mig,18=Category
-  const locMap = {}, catMap = {}, locCatMap = {};
-  let curLoc = null;
-  hqRaw.slice(2).forEach(r => {
-    if (r[0]) curLoc = String(r[0]).trim();
-    if (!curLoc || curLoc === 'เพิ่มเติม') return;
-    const device = r[3];
-    const newQty = r[6];  // จำนวน ใหม่ — รวม = 193
-    if (!device || typeof device !== 'string') return;
-    if (typeof newQty !== 'number' || !Number.isInteger(newQty) || newQty <= 0) return;
-
-    const rawMig  = typeof r[15] === 'number' ? Math.round(r[15]) : 0;
-    const rawCfg  = typeof r[13] === 'number' ? Math.round(r[13]) : 0;
-    const rawInst = typeof r[14] === 'number' ? Math.round(r[14]) : 0;
-    const mig  = Math.min(rawMig,  newQty);
-    const cfg  = Math.min(rawCfg,  newQty);
-    const inst = Math.min(rawInst, newQty);
-    const cat  = r[18] ? String(r[18]).trim() : 'ไม่ระบุ';
-
-    // Location map
-    if (!locMap[curLoc]) locMap[curLoc] = {tor:0, cfg:0, inst:0, mig:0};
-    locMap[curLoc].tor  += newQty;
-    locMap[curLoc].cfg  += cfg;
-    locMap[curLoc].inst += inst;
-    locMap[curLoc].mig  += mig;
-
-    // Category map
-    if (!catMap[cat]) catMap[cat] = {tor:0, cfg:0, inst:0, mig:0};
-    catMap[cat].tor  += newQty;
-    catMap[cat].cfg  += cfg;
-    catMap[cat].inst += inst;
-    catMap[cat].mig  += mig;
-
-    // Location x Category map
-    const lk = curLoc;
-    if (!locCatMap[lk]) locCatMap[lk] = {};
-    if (!locCatMap[lk][cat]) locCatMap[lk][cat] = {tor:0, mig:0};
-    locCatMap[lk][cat].tor += newQty;
-    locCatMap[lk][cat].mig += mig;
-  });
-
-  const locations = Object.entries(locMap)
-    .filter(([,v]) => v.tor > 0)
-    .map(([n,v]) => ({
-      n, tor:v.tor, cfg:v.cfg, inst:v.inst, mig:v.mig,
-      pct: Math.round(v.mig / v.tor * 100),
-      cats: locCatMap[n] || {}
-    }))
-    .sort((a,b) => b.pct - a.pct || b.tor - a.tor);
-
-  const categories = Object.entries(catMap)
-    .map(([n,v]) => ({
-      n, tor:v.tor, cfg:v.cfg, inst:v.inst, mig:v.mig,
-      pct_mig: Math.round(v.mig / v.tor * 100),
-      pct_cfg: Math.round(v.cfg / v.tor * 100)
-    }))
-    .sort((a,b) => b.tor - a.tor);
-
-
-
-  // AP from HQ-WL — col3=qty, col16=Migration, ข้าม summary rows (col2 มี "summary"/"รวม")
-  let apTotal=0, apMig=0;
-  const apLocMap = {};
-  let curLocWL = null;
-  wlRaw.slice(1).forEach(r => {
-    if (r[0]) curLocWL = String(r[0]).trim();
-    if (!curLocWL) return;
-    // ข้าม summary rows
-    const room = r[2] ? String(r[2]).toLowerCase() : '';
-    if (room.includes('summary') || room.includes('รวม') || room.includes('total')) return;
-    const qty = (typeof r[3]==='number' && r[3]>0) ? r[3] : 0;
-    const mig = (typeof r[16]==='number' && Number.isInteger(r[16]) && r[16]>0) ? r[16] : 0;
-    apTotal += qty;
-    apMig   += mig;
-    if (!apLocMap[curLocWL]) apLocMap[curLocWL] = {qty:0, mig:0};
-    apLocMap[curLocWL].qty += qty;
-    apLocMap[curLocWL].mig += mig;
-  });
-
-  // device_summary: Switch, AP, Infra
-  const switchCat = categories.find(c=>c.n==='Switch') || {tor:0,mig:0};
-  const infraCat  = categories.find(c=>c.n==='Infra')  || {tor:0,mig:0};
-  const device_summary = [
-    {n:'Switch', tor:switchCat.tor, mig:switchCat.mig, pct:Math.round(switchCat.mig/switchCat.tor*100)||0, color:'#4361ee'},
-    {n:'AP',     tor:apTotal,       mig:apMig,          pct:apTotal>0?Math.round(apMig/apTotal*100):0,      color:'#2bc48a'},
-    {n:'Infra',  tor:infraCat.tor,  mig:infraCat.mig,   pct:Math.round(infraCat.mig/infraCat.tor*100)||0,   color:'#ff9f43'},
-  ];
-
-  const totalTor    = (switchCat.tor||0) + apTotal + (infraCat.tor||0);
-  const totalMigAll = (switchCat.mig||0) + apMig   + (infraCat.mig||0);
-  const remainingAll = totalTor - totalMigAll;
-
-  console.log(`✓ Locations: ${locations.length} | ${locations.map(l=>l.n.slice(0,10)+':'+l.mig).join(', ')}`);
+  // today_wk
+  const msPerWk = 7*86400000;
+  const todayWk = Math.floor((today - PROJ_START) / msPerWk);
 
   return {
-    wk, wk_dates, today_wk: todayWk,
-    last_install_date: lastInstallDate,
-    meta: {total:totalTor, mig:totalMigAll, cfg:cfg_total, remaining:remainingAll, hold:hqHold, overdue:hqOverdue, on_time_qty:onTimeQty, on_time_pct:onTimePct},
-    insight: {
-      daily_rate:dailyRate, req_rate:reqRate, need_more:needMore,
-      pct_more:pctMore, days_late:daysLate, gauge_pct:gaugePct,
-      finish_date:finishDt.toISOString().slice(0,10), days_left:daysLeft
+    meta: {
+      total: TOTAL, installed, in_progress: inProgress, not_started: notStarted,
+      remaining, pct_done: pctDone,
+      proj_start: PROJ_START.toISOString().slice(0,10),
+      proj_end:   PROJ_END.toISOString().slice(0,10),
+      proj_days: projDays, days_left: daysLeft,
     },
-    weekly: {plan:plan_wk, cfg:cfg_wk, mig:mig_wk, bd_plan, bd_act, plan_cum_pct, act_cum_pct},
-    daily:  {labels:dayLabels, plan:planDay, mig:migDay, plan_cum_pct:planCumD, act_cum_pct:actCumD},
-    locations,
-    categories,
-    device_summary
+    insight: {
+      daily_rate: dailyRate, req_rate: reqRate, need_more: needMore,
+      gauge_pct: gaugePct, elapsed, remaining,
+      days_late:  daysLeft < 0 ? Math.abs(daysLeft) : 0,
+      days_early: 0,
+    },
+    weekly: {
+      labels: wkLabels,
+      plan_pct: planPct,
+      act_pct:  actPct,
+    },
+    today_wk: todayWk,
+    last_install_date: lastInstallDate,
+    sites: Object.entries(siteMap)
+      .filter(([k]) => k && !k.match(/^[\d\.]+$/) && !k.startsWith('%'))
+      .map(([name,v]) => ({ name, total:v.total, done:v.done, inp:v.inp,
+        pct: v.total>0 ? Math.round(v.done/v.total*100) : 0 }))
+      .sort((a,b) => b.total - a.total),
+    devices: devices.slice(0, 200),
   };
 }
 
-async function getDashboard(force=false) {
+app.get('/api/dashboard', (req, res) => {
   const now = Date.now();
-  if (!force && cachedData && (now - cacheTime) < CACHE_TTL) return cachedData;
-  if (!fs.existsSync(LOCAL_EXCEL)) throw new Error('SAT Progress.xlsx not found');
-  console.log('Reading Excel...');
-  const wb = XLSX.readFile(LOCAL_EXCEL);
-  cachedData = calcDashboard(wb);
-  cacheTime = now;
-  console.log(`✓ mig=${cachedData.meta.mig}/${TOTAL} rate=${cachedData.insight.daily_rate}`);
-  return cachedData;
-}
-
-app.get('/api/dashboard', async (req,res) => {
-  try { res.json(await getDashboard()); }
-  catch(e) { res.status(500).json({error:e.message}); }
+  if (!cache || now - cacheTime > 60000) {
+    try { cache = parseData(); cacheTime = now; }
+    catch(e) { console.error(e); return res.status(500).json({error:String(e)}); }
+  }
+  res.json(cache);
 });
 
-app.post('/api/cache/refresh', async (req,res) => {
-  try { res.json({success:true, data: await getDashboard(true)}); }
-  catch(e) { res.status(500).json({error:e.message}); }
+app.post('/api/cache/refresh', (req, res) => {
+  cache = null; res.json({ok:true});
 });
 
-app.get('/health', (req,res) => res.json({status:'ok', cached_at: cacheTime ? new Date(cacheTime).toISOString() : null}));
-
-app.use(express.static(path.join(__dirname,'../frontend')));
-app.get('*', (req,res) => res.sendFile(path.join(__dirname,'../frontend/index.html')));
-
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`HQ Dashboard on port ${PORT}`));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`HQ Dashboard API running on port ${PORT}`));
