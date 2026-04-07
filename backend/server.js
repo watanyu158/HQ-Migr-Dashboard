@@ -11,9 +11,8 @@ app.use(express.json());
 
 const EXCEL_PATH = path.join(__dirname, 'SAT Progress.xlsx');
 const TMP_EXCEL  = '/tmp/hq_latest.xlsx';
-const PROJ_START = new Date('2026-02-02T00:00:00');
-const PROJ_END   = new Date('2026-04-30T00:00:00');
 const TOTAL      = 193;
+// PROJ_START/END คำนวณจาก Migration Plan column ใน parseData()
 
 let cache = null, cacheTime = 0;
 
@@ -50,6 +49,25 @@ function parseData() {
   const wb = XLSX.readFile(excelPath);
 
   const hqRows = XLSX.utils.sheet_to_json(wb.Sheets['HQ'], { header:1, defval:null });
+
+  // หา proj_start/end จาก Migration Plan column H(7)=เริ่ม, I(8)=สิ้นสุด
+  let planDates = [];
+  for (let i=2; i<hqRows.length; i++) {
+    const r=hqRows[i]; if(!r) continue;
+    [r[7], r[8]].forEach(v => {
+      if (typeof v==='number' && v>40000) {
+        planDates.push(new Date((v-25569)*86400000));
+      } else {
+        const d = toDate(v);
+        if (d) planDates.push(d);
+      }
+    });
+  }
+  planDates = planDates.filter(d=>d&&!isNaN(d.getTime()));
+  const PROJ_START = planDates.length ? new Date(Math.min(...planDates)) : new Date('2026-02-02');
+  const PROJ_END   = planDates.length ? new Date(Math.max(...planDates)) : new Date('2026-04-30');
+  PROJ_START.setHours(0,0,0,0); PROJ_END.setHours(0,0,0,0);
+  console.log('PROJ_START:', PROJ_START.toISOString().slice(0,10), 'PROJ_END:', PROJ_END.toISOString().slice(0,10));
 
   let installed=0, inProgress=0, notStarted=0, hold=0, overdue=0;
   let onTimeQty=0, earlyQty=0, lateQty=0;
@@ -90,14 +108,13 @@ function parseData() {
 
     if (schedStr) dayPlanMap[schedStr] = (dayPlanMap[schedStr]||0) + qty;
 
-    // นับจาก Migration column (index 15) แทน Status
+    // นับจาก Migration column (index 15) — เฉพาะ SW และ Infra
     const migration = typeof r[15]==='number' ? r[15] : 0;
-    if (migration > 0) {
+    if (migration > 0 && cat !== 'AP') {
       installed += migration;
       siteMap[site].done += migration;
       typeMap[dev].done += migration;
       if (cat==='Switch') instSW+=migration;
-      else if (cat==='AP') instAP+=migration;
       else if (cat==='Infra') instInf+=migration;
       if (instStr && migration>0) {
         if (!lastInstallDate||instStr>lastInstallDate) lastInstallDate=instStr;
@@ -212,8 +229,9 @@ function parseData() {
     if (qty<=0) continue;
     apTotal += qty; apDone += mig;
   }
-  // update instAP
+  // AP installed จาก HQ-WL
   instAP = apDone;
+  installed += apDone;
 
   // นับ SW/Infra total จาก HQ sheet
   let swTotal=0, infTotal=0;
