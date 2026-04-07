@@ -192,27 +192,6 @@ function parseData() {
   let bdCum=TOTAL; const bdAct=actPct.map((v,i)=>{ if(v>0) bdCum=Math.round((1-v/100)*TOTAL); return i<=9?bdCum:null; });
 
   // Insight
-  const elapsed   = Math.max(1,Math.round((today-PROJ_START)/86400000));
-  const projDays  = Math.round((PROJ_END-PROJ_START)/86400000);
-  const daysLeft  = Math.max(0,Math.round((PROJ_END-today)/86400000));
-  const remaining = TOTAL-installed;
-  const dailyRate = Math.round(installed/elapsed*10)/10;
-  const reqRate   = daysLeft>0 ? Math.ceil(remaining/daysLeft) : 0;
-  const needMore  = Math.round((reqRate-dailyRate)*10)/10;
-  const gaugePct  = reqRate>0 ? Math.min(150,Math.round(dailyRate/reqRate*100)) : 100;
-  const pctDone   = Math.round(installed/TOTAL*100);
-  const todayWk   = Math.floor((today-PROJ_START)/(7*86400000));
-
-  let finishDate = null, daysLate=0, daysEarly=0;
-  if (dailyRate>0) {
-    const fd=new Date(today); fd.setDate(fd.getDate()+Math.ceil(remaining/dailyRate));
-    fd.setHours(0,0,0,0);
-    finishDate = fd.toISOString().slice(0,10);
-    const diffDays = Math.round((PROJ_END-fd)/86400000);
-    if (diffDays < 0) daysLate  = Math.abs(diffDays);
-    else              daysEarly = diffDays;
-  }
-
   const COLORS=['#4361ee','#2bc48a','#ff9f43','#a855f7','#22b8cf','#f76707','#74c0fc'];
   const fabrics = Object.entries(siteMap)
     .filter(([k])=>k&&!k.match(/^\d/)&&!k.startsWith('%'))
@@ -247,6 +226,28 @@ function parseData() {
   instAP = apDone;
   installed += apDone;
   TOTAL += apTotal; // รวม AP total เข้า TOTAL
+
+  const elapsed   = Math.max(1,Math.round((today-PROJ_START)/86400000));
+  const projDays  = Math.round((PROJ_END-PROJ_START)/86400000);
+  const daysLeft  = Math.max(0,Math.round((PROJ_END-today)/86400000));
+  const remaining = TOTAL-installed;
+  const dailyRate = Math.round(installed/elapsed*10)/10;
+  const reqRate   = daysLeft>0 ? Math.ceil(remaining/daysLeft) : 0;
+  const needMore  = Math.round((reqRate-dailyRate)*10)/10;
+  const gaugePct  = reqRate>0 ? Math.min(150,Math.round(dailyRate/reqRate*100)) : 100;
+  const pctDone   = Math.round(installed/TOTAL*100);
+  const todayWk   = Math.floor((today-PROJ_START)/(7*86400000));
+
+  let finishDate = null, daysLate=0, daysEarly=0;
+  if (dailyRate>0) {
+    const fd=new Date(today); fd.setDate(fd.getDate()+Math.ceil(remaining/dailyRate));
+    fd.setHours(0,0,0,0);
+    finishDate = fd.toISOString().slice(0,10);
+    const diffDays = Math.round((PROJ_END-fd)/86400000);
+    if (diffDays < 0) daysLate  = Math.abs(diffDays);
+    else              daysEarly = diffDays;
+  }
+
 
   // นับ SW/Infra total จาก HQ sheet
   let swTotal=0, infTotal=0;
