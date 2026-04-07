@@ -3183,9 +3183,9 @@ async function loadData(){
         const planFrac=(DAILY_PROG_PLAN[i]||0)/100;
 
         DAILY_SW_PLAN.push(Math.round(planFrac*10000)/100);  // same % as overall plan
-        DAILY_SW_ACT.push(inAct?Math.round(cSW/(TOTAL_T||swT||1)*10000)/100:null);
+        DAILY_SW_ACT.push(inAct?Math.round(cSW/(TOTAL_T||window._swT||1)*10000)/100:null);
         DAILY_AP_PLAN.push(Math.round(planFrac*10000)/100);  // same % as overall plan
-        DAILY_AP_ACT.push(inAct?Math.round(cAP/(TOTAL_T||apT||1)*10000)/100:null);
+        DAILY_AP_ACT.push(inAct?Math.round(cAP/(TOTAL_T||window._apT||1)*10000)/100:null);
         // BD actual รวม infra — ใช้จาก DAILY_PROG_ACT ซึ่ง server คำนวณรวมทุก category
         const allPct=DAILY_PROG_ACT[i];
         DAILY_BD_ACT.push(inAct&&allPct!=null?Math.round((1-allPct/100)*TOTAL_T):null);
@@ -3312,8 +3312,8 @@ async function loadData(){
     const inf = meta.installed_inf || 0;
     // total จาก meta (server คำนวณ) หรือ fallback
     // total จาก server — HQ ไม่มี sw.t/ap.t ใน fabrics
-    const swT = meta.sw_total  || fabrics.reduce((a,f)=>a+(f.sw?.t||0),0) || 0;
-    const apT = meta.ap_total  || fabrics.reduce((a,f)=>a+(f.ap?.t||0),0) || 0;
+    const swT = meta.sw_total  || fabrics.reduce((a,f)=>a+(f.sw?.t||0),0) || 0; window._swT=swT;
+    const apT = meta.ap_total  || fabrics.reduce((a,f)=>a+(f.ap?.t||0),0) || 0; window._apT=apT;
     const infT= meta.inf_total || fabrics.reduce((a,f)=>a+(f.inf?.t||0),0) || 0;
     const allPct=(meta.installed/meta.total*100).toFixed(1);
     const swPct=(sw/swT*100).toFixed(1);
