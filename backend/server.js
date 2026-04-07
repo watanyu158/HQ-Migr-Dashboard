@@ -74,9 +74,9 @@ function parseData() {
     const instStr = isoDate(instDt);
     const schedStr= isoDate(schedDt);
 
-    let cat = 'Infra';
-    if (device && device.includes('Switch')) cat = 'Switch';
-    else if (device && (device.includes('Access Point')||device.includes(' AP '))) cat = 'AP';
+    // Category จาก column S (index 18) — Switch/AP/Infra
+    let cat = r[18] ? String(r[18]).trim() : 'Infra';
+    if (!['Switch','AP','Infra'].includes(cat)) cat = 'Infra';
 
     if (!device || !curSite || qty <= 0) continue;
 
@@ -192,6 +192,20 @@ function parseData() {
     }))
     .sort((a,b)=>b.t-a.t);
 
+  // ── AP จาก HQ-WL sheet ──────────────────────────────────────────────
+  const wlRows = XLSX.utils.sheet_to_json(wb.Sheets['HQ-WL'], { header:1, defval:null });
+  let apTotal=0, apDone=0;
+  // ข้าม row สุดท้าย (summary) — วน wlRows[1] ถึง length-2
+  for (let i=1; i<wlRows.length-1; i++) {
+    const r = wlRows[i]; if (!r||!r.length) continue;
+    const qty = typeof r[3]==='number' ? r[3] : 0;
+    const mig = typeof r[6]==='number' ? r[6] : 0;
+    if (qty<=0) continue;
+    apTotal += qty; apDone += mig;
+  }
+  // update instAP
+  instAP = apDone;
+
   const types = Object.entries(typeMap)
     .map(([n,v])=>({n,plan:v.plan,done:v.done}))
     .sort((a,b)=>b.plan-a.plan).slice(0,20);
@@ -204,6 +218,7 @@ function parseData() {
       total:TOTAL, installed, in_progress:inProgress, not_started:notStarted,
       remaining, pct_done:pctDone, hold, overdue,
       installed_sw:instSW, installed_ap:instAP, installed_inf:instInf,
+      ap_total:apTotal,
       on_time_qty:onTimeQty, on_time_pct:onTimePct,
       on_time_early:earlyQty, on_time_late:lateQty,
       proj_start:PROJ_START.toISOString().slice(0,10),
