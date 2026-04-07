@@ -90,16 +90,18 @@ function parseData() {
 
     if (schedStr) dayPlanMap[schedStr] = (dayPlanMap[schedStr]||0) + qty;
 
-    if (status === 'Complete') {
-      installed += qty;
-      siteMap[site].done += qty;
-      typeMap[dev].done += qty;
-      if (cat==='Switch') instSW+=qty;
-      else if (cat==='AP') instAP+=qty;
-      else instInf+=qty;
-      if (instStr) {
+    // นับจาก Migration column (index 15) แทน Status
+    const migration = typeof r[15]==='number' ? r[15] : 0;
+    if (migration > 0) {
+      installed += migration;
+      siteMap[site].done += migration;
+      typeMap[dev].done += migration;
+      if (cat==='Switch') instSW+=migration;
+      else if (cat==='AP') instAP+=migration;
+      else if (cat==='Infra') instInf+=migration;
+      if (instStr && migration>0) {
         if (!lastInstallDate||instStr>lastInstallDate) lastInstallDate=instStr;
-        dayActMap[instStr]=(dayActMap[instStr]||0)+qty;
+        dayActMap[instStr]=(dayActMap[instStr]||0)+migration;
       }
       if (instDt && schedDt) {
         const id=new Date(instDt); id.setHours(0,0,0,0);
@@ -195,8 +197,15 @@ function parseData() {
   // ── AP จาก HQ-WL sheet ──────────────────────────────────────────────
   const wlRows = XLSX.utils.sheet_to_json(wb.Sheets['HQ-WL'], { header:1, defval:null });
   let apTotal=0, apDone=0;
-  // ข้าม row สุดท้าย (summary) — วน wlRows[1] ถึง length-2
-  for (let i=1; i<wlRows.length-1; i++) {
+  // ข้าม row สุดท้าย (summary row) — วน wlRows[1] ถึง length-2
+  // หา index ของ summary row จริง (row ที่ col C = 'Summary :')
+  let wlEndIdx = wlRows.length - 1;
+  for (let i=wlRows.length-1; i>=1; i--) {
+    const r = wlRows[i]; if (!r||!r.length) continue;
+    const c2 = String(r[2]||'').trim();
+    if (c2.includes('Summary') || (typeof r[3]==='number' && r[3]>100)) { wlEndIdx=i; break; }
+  }
+  for (let i=1; i<wlEndIdx; i++) {
     const r = wlRows[i]; if (!r||!r.length) continue;
     const qty = typeof r[3]==='number' ? r[3] : 0;
     const mig = typeof r[6]==='number' ? r[6] : 0;
@@ -205,6 +214,17 @@ function parseData() {
   }
   // update instAP
   instAP = apDone;
+
+  // นับ SW/Infra total จาก HQ sheet
+  let swTotal=0, infTotal=0;
+  for (let i=2; i<hqRows.length; i++) {
+    const r=hqRows[i]; if(!r||!r.length) continue;
+    const qty = typeof r[6]==='number' ? r[6] : 0;
+    const cat = r[18] ? String(r[18]).trim() : '';
+    if (qty<=0) continue;
+    if (cat==='Switch') swTotal+=qty;
+    else if (cat==='Infra') infTotal+=qty;
+  }
 
   const types = Object.entries(typeMap)
     .map(([n,v])=>({n,plan:v.plan,done:v.done}))
@@ -218,7 +238,7 @@ function parseData() {
       total:TOTAL, installed, in_progress:inProgress, not_started:notStarted,
       remaining, pct_done:pctDone, hold, overdue,
       installed_sw:instSW, installed_ap:instAP, installed_inf:instInf,
-      ap_total:apTotal,
+      sw_total:swTotal, ap_total:apTotal, inf_total:infTotal,
       on_time_qty:onTimeQty, on_time_pct:onTimePct,
       on_time_early:earlyQty, on_time_late:lateQty,
       proj_start:PROJ_START.toISOString().slice(0,10),

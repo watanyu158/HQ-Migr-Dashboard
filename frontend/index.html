@@ -916,9 +916,9 @@ main { padding: 12px 10px; }
 <div class="tab-body" id="tab-overview">
   <div class="g4" style="margin-bottom:14px">
     <div class="scard all"><div class="sl" style="color:var(--primary)">🏗 สรุปผลการติดตั้งทั้งหมด</div><div class="sn" id="ov-all">–/1592</div><div class="ss">อุปกรณ์ที่ติดตั้งแล้ว (<span id="ov-all-pct">–</span>)</div><div class="sbar"><div class="sf" id="ov-all-b" style="width:0%"></div></div><div class="sbadge" style="background:var(--primary-l);color:var(--primary)" id="ov-all-badge">–</div></div>
-    <div class="scard sw"><div class="sl" style="color:#4361ee">🔀 Switch</div><div class="sn" id="ov-sw">–/1121</div><div class="ss">Switch ที่ติดตั้งแล้ว (<span id="ov-sw-pct">–</span>)</div><div class="sbar"><div class="sf" id="ov-sw-b" style="width:0%"></div></div><div class="sbadge" style="background:var(--primary-l);color:#4361ee" id="ov-sw-badge">–</div></div>
-    <div class="scard ap"><div class="sl" style="color:#065f46">📶 AP</div><div class="sn" id="ov-ap">–/445</div><div class="ss">AP ที่ติดตั้งแล้ว (<span id="ov-ap-pct">–</span>)</div><div class="sbar"><div class="sf" id="ov-ap-b" style="width:0%"></div></div><div class="sbadge" style="background:var(--success-l);color:#065f46" id="ov-ap-badge">–</div></div>
-    <div class="scard inf"><div class="sl" style="color:#92400e">⚡ Infra</div><div class="sn" id="ov-inf">–/26</div><div class="ss">Infra ที่ติดตั้งแล้ว (<span id="ov-inf-pct">–</span>)</div><div class="sbar"><div class="sf" id="ov-inf-b" style="width:0%"></div></div><div class="sbadge" style="background:var(--warning-l);color:#92400e" id="ov-inf-badge">–</div></div>
+    <div class="scard sw"><div class="sl" style="color:#4361ee">🔀 Switch</div><div class="sn" id="ov-sw">–/–</div><div class="ss">Switch ที่ติดตั้งแล้ว (<span id="ov-sw-pct">–</span>)</div><div class="sbar"><div class="sf" id="ov-sw-b" style="width:0%"></div></div><div class="sbadge" style="background:var(--primary-l);color:#4361ee" id="ov-sw-badge">–</div></div>
+    <div class="scard ap"><div class="sl" style="color:#065f46">📶 AP</div><div class="sn" id="ov-ap">–/–</div><div class="ss">AP ที่ติดตั้งแล้ว (<span id="ov-ap-pct">–</span>)</div><div class="sbar"><div class="sf" id="ov-ap-b" style="width:0%"></div></div><div class="sbadge" style="background:var(--success-l);color:#065f46" id="ov-ap-badge">–</div></div>
+    <div class="scard inf"><div class="sl" style="color:#92400e">⚡ Infra</div><div class="sn" id="ov-inf">–/–</div><div class="ss">Infra ที่ติดตั้งแล้ว (<span id="ov-inf-pct">–</span>)</div><div class="sbar"><div class="sf" id="ov-inf-b" style="width:0%"></div></div><div class="sbadge" style="background:var(--warning-l);color:#92400e" id="ov-inf-badge">–</div></div>
   </div>
   <!-- ── Site breakdown table ── -->
   <div class="card" style="margin-bottom:14px">
@@ -3307,12 +3307,14 @@ async function loadData(){
     }
 
     // overview cards
-    const sw  = meta.installed_sw  ?? fabrics.reduce((a,f)=>a+f.sw.d,0);
-    const ap  = meta.installed_ap  ?? fabrics.reduce((a,f)=>a+f.ap.d,0);
-    const inf = meta.installed_inf ?? fabrics.reduce((a,f)=>a+f.inf.d,0);
-    const swT=fabrics.reduce((a,f)=>a+f.sw.t,0)||1;
-    const apT=fabrics.reduce((a,f)=>a+f.ap.t,0)||1;
-    const infT=fabrics.reduce((a,f)=>a+f.inf.t,0)||1;
+    const sw  = meta.installed_sw  || 0;
+    const ap  = meta.installed_ap  || 0;
+    const inf = meta.installed_inf || 0;
+    // total จาก meta (server คำนวณ) หรือ fallback
+    // total จาก server — HQ ไม่มี sw.t/ap.t ใน fabrics
+    const swT = meta.sw_total  || fabrics.reduce((a,f)=>a+(f.sw?.t||0),0) || 182;
+    const apT = meta.ap_total  || fabrics.reduce((a,f)=>a+(f.ap?.t||0),0) || 167;
+    const infT= meta.inf_total || fabrics.reduce((a,f)=>a+(f.inf?.t||0),0) || 11;
     const allPct=(meta.installed/meta.total*100).toFixed(1);
     const swPct=(sw/swT*100).toFixed(1);
     const apPct=(ap/apT*100).toFixed(1);
