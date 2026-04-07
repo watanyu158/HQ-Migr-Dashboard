@@ -11,8 +11,7 @@ app.use(express.json());
 
 const EXCEL_PATH = path.join(__dirname, 'SAT Progress.xlsx');
 const TMP_EXCEL  = '/tmp/hq_latest.xlsx';
-const TOTAL      = 193;
-// PROJ_START/END คำนวณจาก Migration Plan column ใน parseData()
+// TOTAL, PROJ_START/END คำนวณจาก Excel ใน parseData()
 
 let cache = null, cacheTime = 0;
 
@@ -67,6 +66,17 @@ function parseData() {
   const PROJ_START = planDates.length ? new Date(Math.min(...planDates)) : new Date('2026-02-02');
   const PROJ_END   = planDates.length ? new Date(Math.max(...planDates)) : new Date('2026-04-30');
   PROJ_START.setHours(0,0,0,0); PROJ_END.setHours(0,0,0,0);
+
+  // คำนวณ TOTAL จาก col G(6) จำนวนใหม่ ทุก row ที่มี Category
+  let TOTAL = 0;
+  for (let i=2; i<hqRows.length; i++) {
+    const r=hqRows[i]; if(!r) continue;
+    const qty = typeof r[6]==='number' ? r[6] : 0;
+    const cat = r[18] ? String(r[18]).trim() : '';
+    if (qty>0 && ['Switch','Infra'].includes(cat)) TOTAL += qty;
+  }
+  // เพิ่ม AP total จาก HQ-WL (คำนวณทีหลัง จะ += apTotal)
+  // TOTAL จะถูก update หลัง parse HQ-WL
   console.log('PROJ_START:', PROJ_START.toISOString().slice(0,10), 'PROJ_END:', PROJ_END.toISOString().slice(0,10));
 
   let installed=0, inProgress=0, notStarted=0, hold=0, overdue=0;
@@ -236,6 +246,7 @@ function parseData() {
   // AP installed จาก HQ-WL
   instAP = apDone;
   installed += apDone;
+  TOTAL += apTotal; // รวม AP total เข้า TOTAL
 
   // นับ SW/Infra total จาก HQ sheet
   let swTotal=0, infTotal=0;

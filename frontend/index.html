@@ -1886,7 +1886,7 @@ function buildBurndown(){
   const ex=Chart.getChart(cv); if(ex) ex.destroy();
 
   // คำนวณ BD จาก DAILY_PROG_PLAN/ACT ถ้ามี ไม่งั้น weekly fallback
-  const TOTAL_T = 193;
+  const TOTAL_T = meta.total || 0;
   let _labels, _bdPlan, _bdAct, useDaily;
 
   if(DAILY_PROG_LABELS.length > 0){
@@ -3147,7 +3147,7 @@ async function loadData(){
     }
     // ── คำนวณ daily SW/AP/BD/Fab (รันหลัง DAILY_L/SW/AP/FAB_DAILY populate แล้ว) ──
     if(DAILY_PROG_LABELS.length && DAILY_L.length){
-      const TOTAL_T = 193;
+      const TOTAL_T = meta.total || 0;
 
       // map label → index
       const lblMap={};
@@ -3183,9 +3183,9 @@ async function loadData(){
         const planFrac=(DAILY_PROG_PLAN[i]||0)/100;
 
         DAILY_SW_PLAN.push(Math.round(planFrac*10000)/100);  // same % as overall plan
-        DAILY_SW_ACT.push(inAct?Math.round(cSW/(TOTAL_T||193)*10000)/100:null);
+        DAILY_SW_ACT.push(inAct?Math.round(cSW/(TOTAL_T||swT||1)*10000)/100:null);
         DAILY_AP_PLAN.push(Math.round(planFrac*10000)/100);  // same % as overall plan
-        DAILY_AP_ACT.push(inAct?Math.round(cAP/(TOTAL_T||193)*10000)/100:null);
+        DAILY_AP_ACT.push(inAct?Math.round(cAP/(TOTAL_T||apT||1)*10000)/100:null);
         // BD actual รวม infra — ใช้จาก DAILY_PROG_ACT ซึ่ง server คำนวณรวมทุก category
         const allPct=DAILY_PROG_ACT[i];
         DAILY_BD_ACT.push(inAct&&allPct!=null?Math.round((1-allPct/100)*TOTAL_T):null);
@@ -3268,7 +3268,7 @@ async function loadData(){
     const finTH = `${fd.getDate()} ${thM[fd.getMonth()]} ${(fd.getFullYear()+543)%100}`;
 
     // topbar
-    const TOTAL_HQ = meta.total || 193;
+    const TOTAL_HQ = meta.total || 0;
     if(_e('ts-done'))   _e('ts-done').textContent   = `${meta.installed}/${TOTAL_HQ}`;
     if(_e('tb-days'))   _e('tb-days').textContent   = ins.days_left;
     if(_e('pill-days-left')) _e('pill-days-left').textContent = ins.days_left;
@@ -3312,9 +3312,9 @@ async function loadData(){
     const inf = meta.installed_inf || 0;
     // total จาก meta (server คำนวณ) หรือ fallback
     // total จาก server — HQ ไม่มี sw.t/ap.t ใน fabrics
-    const swT = meta.sw_total  || fabrics.reduce((a,f)=>a+(f.sw?.t||0),0) || 182;
-    const apT = meta.ap_total  || fabrics.reduce((a,f)=>a+(f.ap?.t||0),0) || 167;
-    const infT= meta.inf_total || fabrics.reduce((a,f)=>a+(f.inf?.t||0),0) || 11;
+    const swT = meta.sw_total  || fabrics.reduce((a,f)=>a+(f.sw?.t||0),0) || 0;
+    const apT = meta.ap_total  || fabrics.reduce((a,f)=>a+(f.ap?.t||0),0) || 0;
+    const infT= meta.inf_total || fabrics.reduce((a,f)=>a+(f.inf?.t||0),0) || 0;
     const allPct=(meta.installed/meta.total*100).toFixed(1);
     const swPct=(sw/swT*100).toFixed(1);
     const apPct=(ap/apT*100).toFixed(1);
