@@ -3075,9 +3075,9 @@ async function loadData(){
     window.INSTALLED_SW  = meta.installed_sw  || 0;
     window.INSTALLED_AP  = meta.installed_ap  || 0;
     window.INSTALLED_INF = meta.installed_inf || 0;
-    WK.length=0;           d.wk.forEach(v=>WK.push(v));
-    PLAN_ALL.length=0;     weekly.plan_all.forEach(v=>PLAN_ALL.push(v));
-    ACT_ALL_RAW.length=0;  weekly.act_all.forEach(v=>ACT_ALL_RAW.push(v));
+    WK.length=0;           (d.wk||weekly.labels||[]).forEach(v=>WK.push(v));
+    PLAN_ALL.length=0;     (weekly.plan_all||weekly.plan_pct||[]).forEach(v=>PLAN_ALL.push(v));
+    ACT_ALL_RAW.length=0;  (weekly.act_all||weekly.act_pct||[]).forEach(v=>ACT_ALL_RAW.push(v));
     // daily progress
     if(d.daily_progress){
       const dp=d.daily_progress;
@@ -3101,37 +3101,41 @@ async function loadData(){
       });
     console.warn('today_wk=', d.today_wk, '| last_install=', d.last_install_date,
       '| act_all W13=', weekly&&weekly.act_all?weekly.act_all[6]:'?');
-    PLAN_SW.length=0;      weekly.plan_sw.forEach(v=>PLAN_SW.push(v));
-    ACT_SW_RAW.length=0;   weekly.act_sw.forEach(v=>ACT_SW_RAW.push(v));
-    PLAN_AP.length=0;      weekly.plan_ap.forEach(v=>PLAN_AP.push(v));
-    ACT_AP_RAW.length=0;   weekly.act_ap.forEach(v=>ACT_AP_RAW.push(v));
-    BD_PLAN.length=0;      weekly.bd_plan.forEach(v=>BD_PLAN.push(v));
-    BD_ACT.length=0;       weekly.bd_act.forEach(v=>BD_ACT.push(v));
-    DAILY_L.length=0;      daily.labels.forEach(v=>DAILY_L.push(v));
-    DAILY_SW.length=0;     daily.sw.forEach(v=>DAILY_SW.push(v));
-    DAILY_AP.length=0;     daily.ap.forEach(v=>DAILY_AP.push(v));
-    DAILY_INF.length=0;    daily.inf.forEach(v=>DAILY_INF.push(v));
-    DAILY_PLAN.length=0;   daily.plan.forEach(v=>DAILY_PLAN.push(v));
-    CUM_D.length=0;        daily.cum_d.forEach(v=>CUM_D.push(v));
-    CUM_SW.length=0;       daily.cum_sw.forEach(v=>CUM_SW.push(v));
-    CUM_AP.length=0;       daily.cum_ap.forEach(v=>CUM_AP.push(v));
-    CUM_INF.length=0;      daily.cum_inf.forEach(v=>CUM_INF.push(v));
+    PLAN_SW.length=0;      (weekly.plan_sw||[]).forEach(v=>PLAN_SW.push(v));
+    ACT_SW_RAW.length=0;   (weekly.act_sw||[]).forEach(v=>ACT_SW_RAW.push(v));
+    PLAN_AP.length=0;      (weekly.plan_ap||[]).forEach(v=>PLAN_AP.push(v));
+    ACT_AP_RAW.length=0;   (weekly.act_ap||[]).forEach(v=>ACT_AP_RAW.push(v));
+    BD_PLAN.length=0;      (weekly.bd_plan||[]).forEach(v=>BD_PLAN.push(v));
+    BD_ACT.length=0;       (weekly.bd_act||[]).forEach(v=>BD_ACT.push(v));
+    const _daily = daily||{};
+    DAILY_L.length=0;      (_daily.labels||[]).forEach(v=>DAILY_L.push(v));
+    DAILY_SW.length=0;     (_daily.sw||[]).forEach(v=>DAILY_SW.push(v));
+    DAILY_AP.length=0;     (_daily.ap||[]).forEach(v=>DAILY_AP.push(v));
+    DAILY_INF.length=0;    (_daily.inf||[]).forEach(v=>DAILY_INF.push(v));
+    DAILY_PLAN.length=0;   (_daily.plan||[]).forEach(v=>DAILY_PLAN.push(v));
+    CUM_D.length=0;        (_daily.cum_d||[]).forEach(v=>CUM_D.push(v));
+    CUM_SW.length=0;       (_daily.cum_sw||[]).forEach(v=>CUM_SW.push(v));
+    CUM_AP.length=0;       (_daily.cum_ap||[]).forEach(v=>CUM_AP.push(v));
+    CUM_INF.length=0;      (_daily.cum_inf||[]).forEach(v=>CUM_INF.push(v));
 
     // carry-forward ACT — ใช้ getActAll/SW/AP() แทน
 
     // Objects
-    Object.assign(FAB_COLORS,      d.fab_colors);
-    Object.assign(FAB_PLAN_TOTALS, d.fab_plan_totals);
-    Object.assign(FAB_TOTALS,      d.fab_totals);
-    Object.assign(FAB_WEEKLY,      d.fab_weekly);
-    Object.assign(FAB_DAILY,       d.fab_daily);
-    Object.assign(FAB_DAILY_PLAN,  d.fab_daily_plan);
-    Object.assign(LOC_DATA,        locations||d.locations||{});
+    Object.assign(FAB_COLORS,      d.fab_colors||{});
+    Object.assign(FAB_PLAN_TOTALS, d.fab_plan_totals||{});
+    Object.assign(FAB_TOTALS,      d.fab_totals||{});
+    Object.assign(FAB_WEEKLY,      d.fab_weekly||{});
+    Object.assign(FAB_DAILY,       d.fab_daily||{});
+    Object.assign(FAB_DAILY_PLAN,  d.fab_daily_plan||{});
+    Object.assign(LOC_DATA,        d.locations||{});
     FABRICS.length=0;
-    fabrics.forEach(f=>FABRICS.push({
-      n:f.n, t:f.t, d:f.d, p:f.p, h:f.h, r:f.r, c:f.c,
+    (d.fabrics||d.sites||[]).forEach(f=>FABRICS.push({
+      n:f.n||f.name||'', t:f.t||f.total||0, d:f.d||f.done||0,
+      p:f.p||f.pct||0, h:f.h||0, r:f.r||0, c:f.c||'#4361ee',
       s:f.s||'–', e:f.e||'–',
-      sw:{t:f.sw.t,d:f.sw.d}, ap:{t:f.ap.t,d:f.ap.d}, inf:{t:f.inf.t,d:f.inf.d}
+      sw:{t:f.sw?(f.sw.t||0):0, d:f.sw?(f.sw.d||0):0},
+      ap:{t:f.ap?(f.ap.t||0):0, d:f.ap?(f.ap.d||0):0},
+      inf:{t:f.inf?(f.inf.t||0):0, d:f.inf?(f.inf.d||0):0}
     }));
     TYPE_DATA.length=0;
     (types||[]).forEach(t=>TYPE_DATA.push({n:t.n,plan:t.plan,done:t.done}));

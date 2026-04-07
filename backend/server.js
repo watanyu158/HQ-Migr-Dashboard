@@ -139,11 +139,30 @@ function parseData() {
       days_late:  daysLeft < 0 ? Math.abs(daysLeft) : 0,
       days_early: 0,
     },
+    wk: wkLabels,
     weekly: {
-      labels: wkLabels,
+      labels:   wkLabels,
       plan_pct: planPct,
       act_pct:  actPct,
+      plan_all: planPct,
+      act_all:  actPct,
+      plan_sw:[], act_sw:[], plan_ap:[], act_ap:[], bd_plan:[], bd_act:[],
     },
+    daily: { labels:[], sw:[], ap:[], inf:[], plan:[], cum_d:[], cum_sw:[], cum_ap:[], cum_inf:[] },
+    daily_progress: null,
+    fab_colors:{}, fab_plan_totals:{}, fab_totals:{}, fab_weekly:{}, fab_daily:{}, fab_daily_plan:{},
+    locations:{},
+    types:[],
+    hold_items:[],
+    fabrics: siteMap ? Object.entries(siteMap)
+      .filter(([k])=>k&&!k.match(/^[\d\.]+$/)&&!k.startsWith('%'))
+      .map(([name,v],i)=>({
+        n: name.length>40?name.slice(0,40)+'…':name,
+        t: v.total, d: v.done, p: v.total>0?Math.round(v.done/v.total*100):0,
+        h:0, r:0, c:['#4361ee','#2bc48a','#ff9f43','#a855f7','#22b8cf','#f76707','#74c0fc'][i%7],
+        s:'–', e:'–',
+        sw:{t:0,d:0}, ap:{t:0,d:0}, inf:{t:0,d:0}
+      })) : [],
     today_wk: todayWk,
     last_install_date: lastInstallDate,
     sites: Object.entries(siteMap)
