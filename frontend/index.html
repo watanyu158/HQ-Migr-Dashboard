@@ -1886,7 +1886,7 @@ function buildBurndown(){
   const ex=Chart.getChart(cv); if(ex) ex.destroy();
 
   // คำนวณ BD จาก DAILY_PROG_PLAN/ACT ถ้ามี ไม่งั้น weekly fallback
-  const TOTAL_T = meta.total || 0;
+  const TOTAL_T = window.TOTAL_HQ || 0;
   let _labels, _bdPlan, _bdAct, useDaily;
 
   if(DAILY_PROG_LABELS.length > 0){
@@ -3147,7 +3147,7 @@ async function loadData(){
     }
     // ── คำนวณ daily SW/AP/BD/Fab (รันหลัง DAILY_L/SW/AP/FAB_DAILY populate แล้ว) ──
     if(DAILY_PROG_LABELS.length && DAILY_L.length){
-      const TOTAL_T = meta.total || 0;
+      const TOTAL_T = window.TOTAL_HQ || 0;
 
       // map label → index
       const lblMap={};
@@ -3268,7 +3268,7 @@ async function loadData(){
     const finTH = `${fd.getDate()} ${thM[fd.getMonth()]} ${(fd.getFullYear()+543)%100}`;
 
     // topbar
-    const TOTAL_HQ = meta.total || 0;
+    const TOTAL_HQ = meta.total || 0; window.TOTAL_HQ = TOTAL_HQ;
     if(_e('ts-done'))   _e('ts-done').textContent   = `${meta.installed}/${TOTAL_HQ}`;
     if(_e('tb-days'))   _e('tb-days').textContent   = ins.days_left;
     if(_e('pill-days-left')) _e('pill-days-left').textContent = ins.days_left;
