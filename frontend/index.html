@@ -3183,9 +3183,9 @@ async function loadData(){
         const planFrac=(DAILY_PROG_PLAN[i]||0)/100;
 
         DAILY_SW_PLAN.push(Math.round(planFrac*10000)/100);  // same % as overall plan
-        DAILY_SW_ACT.push(inAct?Math.round(cSW/TOTAL_SW_T*10000)/100:null);
+        DAILY_SW_ACT.push(inAct?Math.round(cSW/(TOTAL_T||193)*10000)/100:null);
         DAILY_AP_PLAN.push(Math.round(planFrac*10000)/100);  // same % as overall plan
-        DAILY_AP_ACT.push(inAct?Math.round(cAP/TOTAL_AP_T*10000)/100:null);
+        DAILY_AP_ACT.push(inAct?Math.round(cAP/(TOTAL_T||193)*10000)/100:null);
         // BD actual รวม infra — ใช้จาก DAILY_PROG_ACT ซึ่ง server คำนวณรวมทุก category
         const allPct=DAILY_PROG_ACT[i];
         DAILY_BD_ACT.push(inAct&&allPct!=null?Math.round((1-allPct/100)*TOTAL_T):null);
