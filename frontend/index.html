@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
+  <link rel="icon" href="data:,">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>HQ SAT Migration Dashboard</title>
@@ -3673,7 +3674,8 @@ async function exportPDF(){
     });
 
     const date=new Date().toLocaleDateString('th-TH');
-    const html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    const html=`<!DOCTYPE html><html><head>
+  <link rel="icon" href="data:,"><meta charset="UTF-8">
 <title>SAT Migration Dashboard — HQ</title>
 <style>
 @page{size:A4 landscape;margin:8mm 10mm}
