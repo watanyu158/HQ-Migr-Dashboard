@@ -81,6 +81,7 @@ function parseData() {
   console.log('PROJ_START:', PROJ_START.toISOString().slice(0,10), 'PROJ_END:', PROJ_END.toISOString().slice(0,10));
 
   let installed=0, inProgress=0, notStarted=0, hold=0, overdue=0;
+  let _curSite = null;
   let onTimeQty=0, earlyQty=0, lateQty=0;
   let instSW=0, instAP=0, instInf=0;
   let lastInstallDate = null;
@@ -193,6 +194,21 @@ function parseData() {
   let bdCum=TOTAL; const bdAct=actPct.map((v,i)=>{ if(v>0) bdCum=Math.round((1-v/100)*TOTAL); return i<=9?bdCum:null; });
 
   // Insight
+  // sw_inf_sites — แยก SW/Infra per site จาก HQ sheet
+  const swInfSiteMap = {};
+  for (let i=2; i<hqRows.length; i++) {
+    const r=hqRows[i]; if(!r||!r.length) continue;
+    if (r[0]) _curSite = String(r[0]).trim();
+    const qty = typeof r[6]==='number' ? r[6] : 0;
+    const mig = typeof r[15]==='number' ? r[15] : 0;
+    const cat = r[18] ? String(r[18]).trim() : '';
+    if (qty<=0 || !_curSite || !['Switch','Infra'].includes(cat)) continue;
+    const site = _curSite.length>50?_curSite.slice(0,50)+'…':_curSite;
+    if (!swInfSiteMap[site]) swInfSiteMap[site]={sw_t:0,sw_d:0,inf_t:0,inf_d:0};
+    if (cat==='Switch') { swInfSiteMap[site].sw_t+=qty; swInfSiteMap[site].sw_d+=mig; }
+    else               { swInfSiteMap[site].inf_t+=qty; swInfSiteMap[site].inf_d+=mig; }
+  }
+
   const COLORS=['#4361ee','#2bc48a','#ff9f43','#a855f7','#22b8cf','#f76707','#74c0fc'];
   const fabrics = Object.entries(siteMap)
     .filter(([k])=>k&&!k.match(/^\d/)&&!k.startsWith('%'))
@@ -216,12 +232,21 @@ function parseData() {
     const c2 = String(r[2]||'').trim();
     if (c2.includes('Summary') || (typeof r[3]==='number' && r[3]>100)) { wlEndIdx=i; break; }
   }
+  const apSiteMap = {};
+  let _apCurSite = null;
   for (let i=1; i<wlEndIdx; i++) {
     const r = wlRows[i]; if (!r||!r.length) continue;
+    if (r[0] && typeof r[0]==='string' && r[0].trim().length>3)
+      _apCurSite = r[0].trim();
     const qty = typeof r[3]==='number' ? r[3] : 0;
-    const mig = typeof r[16]==='number' ? r[16] : 0;  // col Q(16) = Migration
+    const mig = typeof r[16]==='number' ? r[16] : 0;
     if (qty<=0) continue;
     apTotal += qty; apDone += mig;
+    if (_apCurSite) {
+      if (!apSiteMap[_apCurSite]) apSiteMap[_apCurSite]={total:0,done:0};
+      apSiteMap[_apCurSite].total += qty;
+      apSiteMap[_apCurSite].done  += mig;
+    }
   }
   // AP installed จาก HQ-WL
   instAP = apDone;
@@ -305,6 +330,14 @@ function parseData() {
     types, hold_items:holdItems, fabrics,
     today_wk:todayWk, last_install_date:lastInstallDate, upcoming:{},
     sites:fabrics.map(f=>({name:f.n,total:f.t,done:f.d,inp:siteMap[f.n]?.inp||0,pct:f.p})),
+    sw_inf_sites: Object.entries(swInfSiteMap).map(([name,v])=>({
+      name, sw_t:v.sw_t, sw_d:v.sw_d, inf_t:v.inf_t, inf_d:v.inf_d,
+      total:v.sw_t+v.inf_t, done:v.sw_d+v.inf_d
+    })).sort((a,b)=>b.total-a.total),
+    ap_sites: Object.entries(apSiteMap).map(([name,v])=>({
+      name, total:v.total, done:v.done,
+      pct: v.total>0?Math.round(v.done/v.total*100):0
+    })).sort((a,b)=>b.total-a.total),
   };
 }
 

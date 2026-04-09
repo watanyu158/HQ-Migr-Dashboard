@@ -948,6 +948,39 @@ main { padding: 12px 10px; }
     </div>
   </div>
 
+  <!-- SW/Infra site breakdown -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="ch"><div class="chi" style="background:#eff6ff;color:#1d4ed8">🔀</div>Switch & Infra แยกตามสถานที่</div>
+    <div style="overflow-x:auto"><table class="fab-table">
+      <thead><tr>
+        <th>สถานที่</th>
+        <th colspan="2" style="text-align:center;border-left:1px solid var(--border)">Switch</th>
+        <th colspan="2" style="text-align:center;border-left:1px solid var(--border)">Infra</th>
+        <th colspan="2" style="text-align:center;border-left:1px solid var(--border)">รวม</th>
+      </tr><tr class="sub-head">
+        <th></th>
+        <th style="border-left:1px solid var(--border)">ติดตั้ง</th><th>เป้า</th>
+        <th style="border-left:1px solid var(--border)">ติดตั้ง</th><th>เป้า</th>
+        <th style="border-left:1px solid var(--border)">ติดตั้ง</th><th>เป้า</th>
+      </tr></thead>
+      <tbody id="sw-inf-site-tbody"></tbody>
+    </table></div>
+  </div>
+
+  <!-- AP site breakdown -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="ch"><div class="chi" style="background:#f0fdf4;color:#15803d">📶</div>AP แยกตามสถานที่</div>
+    <div style="overflow-x:auto"><table class="fab-table">
+      <thead><tr>
+        <th>สถานที่</th>
+        <th style="text-align:center;border-left:1px solid var(--border)">ติดตั้ง</th>
+        <th style="text-align:center">เป้า</th>
+        <th style="text-align:center;border-left:1px solid var(--border)">%</th>
+      </tr></thead>
+      <tbody id="ap-site-tbody"></tbody>
+    </table></div>
+  </div>
+
   <!-- Site breakdown grid -->
   <div class="fab-breakdown">
     <div class="fab-breakdown-head">
@@ -1309,6 +1342,8 @@ let FAB_WEEKLY = {};
 
 let FABRICS = []; // populated from API
 let SITES   = []; // populated from API
+let SW_INF_SITES = [];
+let AP_SITES = [];
 let LOC_DATA = {};
 
 // ── CHART OPTIONS FACTORY ─────────────────────────────────────────────────────
@@ -2962,6 +2997,50 @@ function buildFabCards(){
 }
 
 // ── FABRIC BREAKDOWN TABLE ───────────────────────────────────────────────────
+
+function buildSiteBreakdowns(){
+  // SW/Infra table
+  const swTbody = document.getElementById('sw-inf-site-tbody');
+  if(swTbody && SW_INF_SITES.length){
+    const COLORS=['#4361ee','#2bc48a','#ff9f43','#a855f7','#22b8cf','#f76707','#74c0fc'];
+    swTbody.innerHTML = SW_INF_SITES.map((s,i)=>{
+      const swPct  = s.sw_t>0  ? Math.round(s.sw_d/s.sw_t*100)   : 0;
+      const infPct = s.inf_t>0 ? Math.round(s.inf_d/s.inf_t*100) : 0;
+      const totPct = s.total>0 ? Math.round(s.done/s.total*100)  : 0;
+      const bar=(p)=>p>=80?'var(--success)':p>=40?'var(--warning)':'var(--primary)';
+      const cell=(d,t,p)=>`<td class="fab-cell" style="border-left:1px solid var(--border)">
+        <div class="fab-pct-bar"><div class="fpb"><div class="fpb-fill" style="width:${p}%;background:${bar(p)}"></div></div>
+        <span class="fpb-pct">${p}%</span></div>
+        <div style="font-size:11px"><span class="fab-done">${d}</span><span class="fab-plan">/${t}</span></div></td>
+        <td style="font-size:11px;color:var(--text2)">${t}</td>`;
+      return `<tr>
+        <td><div class="fab-name"><div class="fab-dot" style="background:${COLORS[i%7]}"></div>${s.name}</div></td>
+        ${cell(s.sw_d,s.sw_t,swPct)}
+        ${cell(s.inf_d,s.inf_t,infPct)}
+        ${cell(s.done,s.total,totPct)}
+      </tr>`;
+    }).join('');
+  }
+
+  // AP table
+  const apTbody = document.getElementById('ap-site-tbody');
+  if(apTbody && AP_SITES.length){
+    apTbody.innerHTML = AP_SITES.map((s,i)=>{
+      const pct = s.total>0 ? Math.round(s.done/s.total*100) : 0;
+      const bar = pct>=80?'var(--success)':pct>=40?'var(--warning)':'var(--primary)';
+      return `<tr>
+        <td><div class="fab-name">${s.name}</div></td>
+        <td style="border-left:1px solid var(--border);text-align:center;font-weight:600">${s.done}</td>
+        <td style="text-align:center;color:var(--text2)">${s.total}</td>
+        <td style="border-left:1px solid var(--border)">
+          <div class="fab-pct-bar"><div class="fpb"><div class="fpb-fill" style="width:${pct}%;background:${bar}"></div></div>
+          <span class="fpb-pct">${pct}%</span></div>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+}
+
 function buildFabBreakdown(){
   const tbody = document.getElementById('fab-breakdown-tbody');
   const tfoot = document.getElementById('fab-breakdown-tfoot');
@@ -3145,6 +3224,8 @@ async function loadData(){
     Object.assign(LOC_DATA,        d.locations||{});
     FABRICS.length=0;
     SITES.length=0; (d.sites||[]).forEach(s=>SITES.push(s));
+    SW_INF_SITES.length=0; (d.sw_inf_sites||[]).forEach(s=>SW_INF_SITES.push(s));
+    AP_SITES.length=0; (d.ap_sites||[]).forEach(s=>AP_SITES.push(s));
     (d.fabrics||d.sites||[]).forEach(f=>FABRICS.push({
       n:f.n||f.name||'', t:f.t||f.total||0, d:f.d||f.done||0,
       p:f.p||f.pct||0, h:f.h||0, r:f.r||0, c:f.c||'#4361ee',
@@ -3502,7 +3583,7 @@ async function loadData(){
     if(_e('donut-late-cnt'))    _e('donut-late-cnt').textContent    = lateQ.toLocaleString();
     if(_e('donut-pending-cnt')) _e('donut-pending-cnt').textContent = pendQ.toLocaleString();
     buildGauge(ins.gauge_pct); buildBurndown();
-    gblt=false; buildProgressCharts(); buildFabBreakdown(); buildTypeBarChart();
+    gblt=false; buildProgressCharts(); buildFabBreakdown(); buildSiteBreakdowns(); buildTypeBarChart();
     buildVelocityChart(); buildWeekdayChart(); buildFabGap();
     // wd-cells populate ทันทีหลัง data load
     if(document.getElementById('wd-cells') && DAILY_L.length){
