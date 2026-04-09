@@ -2967,47 +2967,60 @@ function buildFabBreakdown(){
   if(!tbody || !tfoot) return;
   tbody.innerHTML=''; tfoot.innerHTML='';
 
-  const rows = FABRICS.map(f => {
+  // HQ ใช้ SITES (total/done รวม) แทน FABRICS ที่แยก SW/AP/Infra
+  const useSites = SITES.length > 0 && FABRICS.every(f=>f.sw.t===0&&f.ap.t===0&&f.inf.t===0);
+  const COLORS=['#4361ee','#2bc48a','#ff9f43','#a855f7','#22b8cf','#f76707','#74c0fc'];
+
+  const rows = useSites ? SITES.map((s,i) => {
+    const pct = s.total>0 ? Math.round(s.done/s.total*100) : 0;
+    const bar = pct>=80?'var(--success)':pct>=40?'var(--warning)':'var(--primary)';
+    const c   = COLORS[i%7];
+    return `<tr>
+      <td><div class="fab-name"><div class="fab-dot" style="background:${c}"></div>${s.name}</div></td>
+      <td class="fab-cell" colspan="2" style="border-left:1px solid var(--border)">–</td>
+      <td class="fab-cell" colspan="2" style="border-left:1px solid var(--border)">–</td>
+      <td class="fab-cell" colspan="2" style="border-left:1px solid var(--border)">–</td>
+      <td class="fab-cell" style="border-left:1px solid var(--border)">
+        <div class="fab-pct-bar">
+          <div class="fpb"><div class="fpb-fill" style="width:${pct}%;background:${bar}"></div></div>
+          <span class="fpb-pct">${pct}%</span>
+        </div>
+        <div style="font-size:11px;margin-top:2px"><span class="fab-done">${s.done}</span><span class="fab-plan"> /${s.total}</span></div>
+      </td>
+      <td style="font-size:11px;color:var(--text2)">${s.total}</td>
+    </tr>`;
+  }) : FABRICS.map(f => {
     const swPct  = f.sw.t  > 0 ? Math.round(f.sw.d  / f.sw.t  * 100) : 0;
     const apPct  = f.ap.t  > 0 ? Math.round(f.ap.d  / f.ap.t  * 100) : 0;
     const infPct = f.inf.t > 0 ? Math.round(f.inf.d / f.inf.t * 100) : 0;
     const totD   = f.sw.d  + f.ap.d  + f.inf.d;
     const totT   = f.sw.t  + f.ap.t  + f.inf.t;
     const totPct = totT > 0 ? Math.round(totD / totT * 100) : 0;
-
-    const swBar  = swPct>=80  ? '#4361ee' : swPct>=40  ? '#7b93f5' : '#c7d2fe';
-    const apBar  = apPct>=80  ? '#2bc48a' : apPct>=40  ? '#52e3aa' : '#a7f3d0';
-    const infBar = infPct>=80 ? '#ff9f43' : infPct>=40 ? '#ffc27d' : '#fde8c8';
-    const totBar = totPct>=80 ? 'var(--success)' : totPct>=40 ? 'var(--warning)' : 'var(--primary)';
-
-    const cell = (done, plan, pct, barColor) => `
-      <td class="fab-cell">
-        <div class="fab-pct-bar">
-          <div class="fpb"><div class="fpb-fill" style="width:${pct}%;background:${barColor}"></div></div>
-          <span class="fpb-pct">${pct}%</span>
-        </div>
-        <div style="font-size:11px;margin-top:2px"><span class="fab-done">${done}</span><span class="fab-plan"> /${plan}</span></div>
-      </td>
-      <td style="font-size:11px;color:var(--text2);white-space:nowrap">${plan}</td>`;
-
+    const swBar  = swPct>=80?'#4361ee':swPct>=40?'#7b93f5':'#c7d2fe';
+    const apBar  = apPct>=80?'#2bc48a':apPct>=40?'#52e3aa':'#a7f3d0';
+    const infBar = infPct>=80?'#ff9f43':infPct>=40?'#ffc27d':'#fde8c8';
+    const totBar = totPct>=80?'var(--success)':totPct>=40?'var(--warning)':'var(--primary)';
+    const cell = (done,plan,pct,barColor) => `<td class="fab-cell">
+      <div class="fab-pct-bar"><div class="fpb"><div class="fpb-fill" style="width:${pct}%;background:${barColor}"></div></div>
+      <span class="fpb-pct">${pct}%</span></div>
+      <div style="font-size:11px;margin-top:2px"><span class="fab-done">${done}</span><span class="fab-plan"> /${plan}</span></div>
+      </td><td style="font-size:11px;color:var(--text2)">${plan}</td>`;
     return `<tr>
       <td><div class="fab-name"><div class="fab-dot" style="background:${f.c}"></div>${f.n}</div></td>
-      ${cell(f.sw.d, f.sw.t, swPct, swBar)}
-      ${cell(f.ap.d, f.ap.t, apPct, apBar)}
-      ${cell(f.inf.d, f.inf.t, infPct, infBar)}
-      ${cell(totD, totT, totPct, totBar)}
+      ${cell(f.sw.d,f.sw.t,swPct,swBar)}${cell(f.ap.d,f.ap.t,apPct,apBar)}
+      ${cell(f.inf.d,f.inf.t,infPct,infBar)}${cell(totD,totT,totPct,totBar)}
     </tr>`;
   });
   tbody.innerHTML = rows.join('');
 
   // Footer totals
-  const tSwD  = FABRICS.reduce((a,f)=>a+f.sw.d, 0);
-  const tSwT  = FABRICS.reduce((a,f)=>a+f.sw.t, 0);
-  const tApD  = FABRICS.reduce((a,f)=>a+f.ap.d, 0);
-  const tApT  = FABRICS.reduce((a,f)=>a+f.ap.t, 0);
-  const tInfD = FABRICS.reduce((a,f)=>a+f.inf.d, 0);
-  const tInfT = FABRICS.reduce((a,f)=>a+f.inf.t, 0);
-  const tTotD = tSwD+tApD+tInfD;
+  const tSwD  = useSites ? 0 : FABRICS.reduce((a,f)=>a+f.sw.d, 0);
+  const tSwT  = useSites ? 0 : FABRICS.reduce((a,f)=>a+f.sw.t, 0);
+  const tApD  = useSites ? 0 : FABRICS.reduce((a,f)=>a+f.ap.d, 0);
+  const tApT  = useSites ? 0 : FABRICS.reduce((a,f)=>a+f.ap.t, 0);
+  const tInfD = useSites ? 0 : FABRICS.reduce((a,f)=>a+f.inf.d, 0);
+  const tInfT = useSites ? 0 : FABRICS.reduce((a,f)=>a+f.inf.t, 0);
+  const tTotD = useSites ? SITES.reduce((a,s)=>a+s.done,0) : tSwD+tApD+tInfD;
   const tTotT = tSwT+tApT+tInfT;
   const pct = (d,t)=> t>0?Math.round(d/t*100):0;
   tfoot.innerHTML = `<tr>
@@ -3130,6 +3143,7 @@ async function loadData(){
     Object.assign(FAB_DAILY_PLAN,  d.fab_daily_plan||{});
     Object.assign(LOC_DATA,        d.locations||{});
     FABRICS.length=0;
+    SITES.length=0; (d.sites||[]).forEach(s=>SITES.push(s));
     (d.fabrics||d.sites||[]).forEach(f=>FABRICS.push({
       n:f.n||f.name||'', t:f.t||f.total||0, d:f.d||f.done||0,
       p:f.p||f.pct||0, h:f.h||0, r:f.r||0, c:f.c||'#4361ee',
