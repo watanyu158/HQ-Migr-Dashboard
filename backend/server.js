@@ -323,21 +323,25 @@ function parseData() {
       labels:dailyLabels, plan_cum:dailyPlanCum, act_cum:dailyActCum,
       sw_plan:dailyPlanCum, sw_act:dailyActCum,
       ap_plan:dailyPlanCum, ap_act:dailyActCum,
+      bd_plan:dailyPlanCum.map(p=>Math.round((1-p/100)*TOTAL)),
+      bd_act: dailyActCum.map(p=>p!=null?Math.round((1-p/100)*TOTAL):null),
       fab:{},
     },
     fab_colors:{}, fab_plan_totals:{}, fab_totals:{}, fab_weekly:{}, fab_daily:{}, fab_daily_plan:{},
     locations:{},
     types, hold_items:holdItems, fabrics,
     today_wk:todayWk, last_install_date:lastInstallDate, upcoming:{},
-    sites:fabrics.map(f=>({name:f.n,total:f.t,done:f.d,inp:siteMap[f.n]?.inp||0,pct:f.p})),
+    sites:fabrics.filter(f=>f.t>0).map(f=>({name:f.n,total:f.t,done:f.d,inp:siteMap[f.n]?.inp||0,pct:f.p})),
     sw_inf_sites: Object.entries(swInfSiteMap).map(([name,v])=>({
       name, sw_t:v.sw_t, sw_d:v.sw_d, inf_t:v.inf_t, inf_d:v.inf_d,
       total:v.sw_t+v.inf_t, done:v.sw_d+v.inf_d
     })).sort((a,b)=>b.total-a.total),
-    ap_sites: Object.entries(apSiteMap).map(([name,v])=>({
-      name, total:v.total, done:v.done,
-      pct: v.total>0?Math.round(v.done/v.total*100):0
-    })).sort((a,b)=>b.total-a.total),
+    ap_sites: Object.entries(apSiteMap)
+      .filter(([,v])=>v.total>0)
+      .map(([name,v])=>({
+        name, total:v.total, done:v.done,
+        pct: v.total>0?Math.round(v.done/v.total*100):0
+      })).sort((a,b)=>b.total-a.total),
   };
 }
 

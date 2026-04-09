@@ -922,31 +922,7 @@ main { padding: 12px 10px; }
     <div class="scard inf"><div class="sl" style="color:#92400e">⚡ Infra</div><div class="sn" id="ov-inf">–/–</div><div class="ss">Infra ที่ติดตั้งแล้ว (<span id="ov-inf-pct">–</span>)</div><div class="sbar"><div class="sf" id="ov-inf-b" style="width:0%"></div></div><div class="sbadge" style="background:var(--warning-l);color:#92400e" id="ov-inf-badge">–</div></div>
   </div>
   <!-- ── Site breakdown table ── -->
-  <div class="card" style="margin-bottom:14px">
-    <div class="ch"><div class="chi" style="background:#eef1ff;color:var(--primary)">📍</div>สรุปอุปกรณ์แยกตามสถานที่</div>
-    <div style="overflow-x:auto">
-      <table class="fab-table">
-        <thead>
-          <tr>
-            <th>สถานที่</th>
-            <th colspan="2" style="text-align:center;border-left:1px solid var(--border)">Switch</th>
-            <th colspan="2" style="text-align:center;border-left:1px solid var(--border)">AP</th>
-            <th colspan="2" style="text-align:center;border-left:1px solid var(--border)">Infra</th>
-            <th colspan="2" style="text-align:center;border-left:1px solid var(--border)">รวม</th>
-          </tr>
-          <tr class="sub-head">
-            <th></th>
-            <th style="border-left:1px solid var(--border)">ติดตั้ง</th><th>เป้า</th>
-            <th style="border-left:1px solid var(--border)">ติดตั้ง</th><th>เป้า</th>
-            <th style="border-left:1px solid var(--border)">ติดตั้ง</th><th>เป้า</th>
-            <th style="border-left:1px solid var(--border)">ติดตั้ง</th><th>เป้า</th>
-          </tr>
-        </thead>
-        <tbody id="fab-breakdown-tbody"></tbody>
-        <tfoot id="fab-breakdown-tfoot"></tfoot>
-      </table>
-    </div>
-  </div>
+
 
   <!-- SW/Infra site breakdown -->
   <div class="card" style="margin-bottom:14px">
@@ -964,6 +940,7 @@ main { padding: 12px 10px; }
         <th style="border-left:1px solid var(--border)">ติดตั้ง</th><th>เป้า</th>
       </tr></thead>
       <tbody id="sw-inf-site-tbody"></tbody>
+      <tfoot id="sw-inf-site-tfoot"></tfoot>
     </table></div>
   </div>
 
@@ -975,9 +952,10 @@ main { padding: 12px 10px; }
         <th>สถานที่</th>
         <th style="text-align:center;border-left:1px solid var(--border)">ติดตั้ง</th>
         <th style="text-align:center">เป้า</th>
-        <th style="text-align:center;border-left:1px solid var(--border)">%</th>
+        <th style="text-align:center;border-left:1px solid var(--border)">ความคืบหน้า (%)</th>
       </tr></thead>
       <tbody id="ap-site-tbody"></tbody>
+      <tfoot id="ap-site-tfoot"></tfoot>
     </table></div>
   </div>
 
@@ -2043,11 +2021,13 @@ function buildTimeline(){
     const gapColor=gap>=0?'#16a34a':'#dc2626';
     const bg=p>=80?'#ecfdf5;color:#065f46':p>=30?'#fff5e6;color:#92400e':'#eef1ff;color:var(--primary)';
 
+    const _fname = f.n||f.name||'';
+    const _fcolor = f.c||'#4361ee';
     return `<div class="tlr">
       <div class="tlt">
-        <div class="tln">${f.n}</div>
+        <div class="tln">${_fname}</div>
         <div style="display:flex;align-items:center;gap:5px;font-size:11px;flex-wrap:wrap">
-          <span style="color:var(--text2)">${f.d}/${f.t}</span>
+          <span style="color:var(--text2)">${f.d||f.done||0}/${f.t||f.total||0}</span>
           <span class="tlpct" style="background:${bg}">${p}%</span>
           <span style="font-size:10px;font-weight:700;color:${gapColor}">(แผน ${pp}% ${gapStr})</span>
         </div>
@@ -2059,7 +2039,7 @@ function buildTimeline(){
              border-right:2px dashed rgba(100,116,139,0.6);
              border-radius:5px 0 0 5px;z-index:1"></div>
         <!-- actual bar -->
-        <div class="tlfill" style="width:${p}%;background:${f.c};position:absolute;top:0;left:0;z-index:2">
+        <div class="tlfill" style="width:${p}%;background:${_fcolor};position:absolute;top:0;left:0;z-index:2">
           ${p>8?`<span>${p}%</span>`:''}
         </div>
         <!-- today line -->
@@ -2999,45 +2979,69 @@ function buildFabCards(){
 // ── FABRIC BREAKDOWN TABLE ───────────────────────────────────────────────────
 
 function buildSiteBreakdowns(){
+  const bar=(p)=>p>=80?'var(--success)':p>=40?'var(--warning)':'var(--primary)';
+  const COLORS=['#4361ee','#2bc48a','#ff9f43','#a855f7','#22b8cf','#f76707','#74c0fc'];
+
   // SW/Infra table
   const swTbody = document.getElementById('sw-inf-site-tbody');
+  const swTfoot = document.getElementById('sw-inf-site-tfoot');
   if(swTbody && SW_INF_SITES.length){
-    const COLORS=['#4361ee','#2bc48a','#ff9f43','#a855f7','#22b8cf','#f76707','#74c0fc'];
+    const cell=(d,t,p)=>`<td class="fab-cell" style="border-left:1px solid var(--border)">
+      <div class="fab-pct-bar"><div class="fpb"><div class="fpb-fill" style="width:${Math.min(p,100)}%;background:${bar(p)}"></div></div>
+      <span class="fpb-pct">${p}%</span></div>
+      <div style="font-size:11px"><span class="fab-done">${d}</span><span class="fab-plan">/${t}</span></div></td>
+      <td style="font-size:11px;color:var(--text2)">${t}</td>`;
     swTbody.innerHTML = SW_INF_SITES.map((s,i)=>{
-      const swPct  = s.sw_t>0  ? Math.round(s.sw_d/s.sw_t*100)   : 0;
-      const infPct = s.inf_t>0 ? Math.round(s.inf_d/s.inf_t*100) : 0;
-      const totPct = s.total>0 ? Math.round(s.done/s.total*100)  : 0;
-      const bar=(p)=>p>=80?'var(--success)':p>=40?'var(--warning)':'var(--primary)';
-      const cell=(d,t,p)=>`<td class="fab-cell" style="border-left:1px solid var(--border)">
-        <div class="fab-pct-bar"><div class="fpb"><div class="fpb-fill" style="width:${p}%;background:${bar(p)}"></div></div>
-        <span class="fpb-pct">${p}%</span></div>
-        <div style="font-size:11px"><span class="fab-done">${d}</span><span class="fab-plan">/${t}</span></div></td>
-        <td style="font-size:11px;color:var(--text2)">${t}</td>`;
+      const swPct  = s.sw_t>0  ? Math.round(s.sw_d/s.sw_t*100)  : 0;
+      const infPct = s.inf_t>0 ? Math.round(s.inf_d/s.inf_t*100): 0;
+      const totPct = s.total>0 ? Math.round(s.done/s.total*100) : 0;
       return `<tr>
         <td><div class="fab-name"><div class="fab-dot" style="background:${COLORS[i%7]}"></div>${s.name}</div></td>
-        ${cell(s.sw_d,s.sw_t,swPct)}
-        ${cell(s.inf_d,s.inf_t,infPct)}
-        ${cell(s.done,s.total,totPct)}
+        ${cell(s.sw_d,s.sw_t,swPct)}${cell(s.inf_d,s.inf_t,infPct)}${cell(s.done,s.total,totPct)}
       </tr>`;
     }).join('');
+    // Footer
+    const tSwD=SW_INF_SITES.reduce((a,s)=>a+s.sw_d,0), tSwT=SW_INF_SITES.reduce((a,s)=>a+s.sw_t,0);
+    const tInfD=SW_INF_SITES.reduce((a,s)=>a+s.inf_d,0), tInfT=SW_INF_SITES.reduce((a,s)=>a+s.inf_t,0);
+    const tD=tSwD+tInfD, tT=tSwT+tInfT;
+    const tp=tT>0?Math.round(tD/tT*100):0;
+    if(swTfoot) swTfoot.innerHTML=`<tr style="font-weight:700;background:var(--primary-l)">
+      <td>รวมทั้งหมด</td>
+      <td class="fab-cell" style="border-left:1px solid var(--border)">${tSwD}</td><td style="color:var(--text2)">${tSwT} <span style="color:${bar(tSwT>0?Math.round(tSwD/tSwT*100):0)};font-size:10px">${tSwT>0?Math.round(tSwD/tSwT*100):0}%</span></td>
+      <td class="fab-cell" style="border-left:1px solid var(--border)">${tInfD}</td><td style="color:var(--text2)">${tInfT} <span style="color:${bar(tInfT>0?Math.round(tInfD/tInfT*100):0)};font-size:10px">${tInfT>0?Math.round(tInfD/tInfT*100):0}%</span></td>
+      <td class="fab-cell" style="border-left:1px solid var(--border)">${tD}</td><td style="color:var(--text2)">${tT} <span style="color:${bar(tp)};font-size:10px">${tp}%</span></td>
+    </tr>`;
   }
 
-  // AP table
+  // AP table — เรียงตาม % มากไปน้อย
   const apTbody = document.getElementById('ap-site-tbody');
+  const apTfoot = document.getElementById('ap-site-tfoot');
   if(apTbody && AP_SITES.length){
-    apTbody.innerHTML = AP_SITES.map((s,i)=>{
-      const pct = s.total>0 ? Math.round(s.done/s.total*100) : 0;
-      const bar = pct>=80?'var(--success)':pct>=40?'var(--warning)':'var(--primary)';
+    const sorted=[...AP_SITES].sort((a,b)=>b.pct-a.pct);
+    apTbody.innerHTML = sorted.map(s=>{
+      const pct=s.pct||0;
       return `<tr>
         <td><div class="fab-name">${s.name}</div></td>
         <td style="border-left:1px solid var(--border);text-align:center;font-weight:600">${s.done}</td>
         <td style="text-align:center;color:var(--text2)">${s.total}</td>
         <td style="border-left:1px solid var(--border)">
-          <div class="fab-pct-bar"><div class="fpb"><div class="fpb-fill" style="width:${pct}%;background:${bar}"></div></div>
+          <div class="fab-pct-bar"><div class="fpb"><div class="fpb-fill" style="width:${pct}%;background:${bar(pct)}"></div></div>
           <span class="fpb-pct">${pct}%</span></div>
         </td>
       </tr>`;
     }).join('');
+    // Footer
+    const tD=AP_SITES.reduce((a,s)=>a+s.done,0), tT=AP_SITES.reduce((a,s)=>a+s.total,0);
+    const tp=tT>0?Math.round(tD/tT*100):0;
+    if(apTfoot) apTfoot.innerHTML=`<tr style="font-weight:700;background:var(--primary-l)">
+      <td>รวมทั้งหมด</td>
+      <td style="border-left:1px solid var(--border);text-align:center">${tD}</td>
+      <td style="text-align:center;color:var(--text2)">${tT}</td>
+      <td style="border-left:1px solid var(--border)">
+        <div class="fab-pct-bar"><div class="fpb"><div class="fpb-fill" style="width:${tp}%;background:${bar(tp)}"></div></div>
+        <span class="fpb-pct">${tp}%</span></div>
+      </td>
+    </tr>`;
   }
 }
 
@@ -3366,6 +3370,8 @@ async function loadData(){
 
     // topbar
     const TOTAL_HQ = meta.total || 0; window.TOTAL_HQ = TOTAL_HQ;
+    window._projStartStr = meta.proj_start || '2026-02-03';
+    window._projEndStr   = meta.proj_end   || '2026-04-12';
     if(_e('ts-done'))   _e('ts-done').textContent   = `${meta.installed}/${TOTAL_HQ}`;
     if(_e('tb-days'))   _e('tb-days').textContent   = ins.days_left;
     if(_e('pill-days-left')) _e('pill-days-left').textContent = ins.days_left;
