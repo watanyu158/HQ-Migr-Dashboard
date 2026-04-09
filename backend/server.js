@@ -51,20 +51,21 @@ function parseData() {
 
   // หา proj_start/end จาก Migration Plan column H(7)=เริ่ม, I(8)=สิ้นสุด
   let planDates = [];
+  let startDates=[], endDates=[];
   for (let i=2; i<hqRows.length; i++) {
     const r=hqRows[i]; if(!r) continue;
-    [r[7], r[8]].forEach(v => {
-      if (typeof v==='number' && v>40000) {
-        planDates.push(new Date((v-25569)*86400000));
-      } else {
-        const d = toDate(v);
-        if (d) planDates.push(d);
-      }
+    // col H(7) = เริ่ม, col I(8) = สิ้นสุด
+    [r[7]].forEach(v => {
+      const d = typeof v==='number'&&v>40000 ? new Date((v-25569)*86400000) : toDate(v);
+      if (d&&!isNaN(d.getTime())) startDates.push(d);
+    });
+    [r[8]].forEach(v => {
+      const d = typeof v==='number'&&v>40000 ? new Date((v-25569)*86400000) : toDate(v);
+      if (d&&!isNaN(d.getTime())) endDates.push(d);
     });
   }
-  planDates = planDates.filter(d=>d&&!isNaN(d.getTime()));
-  const PROJ_START = planDates.length ? new Date(Math.min(...planDates)) : new Date('2026-02-02');
-  const PROJ_END   = planDates.length ? new Date(Math.max(...planDates)) : new Date('2026-04-30');
+  const PROJ_START = startDates.length ? new Date(Math.min(...startDates)) : new Date('2026-02-02');
+  const PROJ_END   = endDates.length   ? new Date(Math.max(...endDates))   : new Date('2026-04-30');
   PROJ_START.setHours(0,0,0,0); PROJ_END.setHours(0,0,0,0);
 
   // คำนวณ TOTAL จาก col G(6) จำนวนใหม่ ทุก row ที่มี Category
