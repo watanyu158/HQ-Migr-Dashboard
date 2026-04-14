@@ -155,18 +155,21 @@ function parseData() {
   // Daily cumulative
   const PROJ_START_D = new Date(PROJ_START); PROJ_START_D.setHours(0,0,0,0);
   const PROJ_END_D   = new Date(PROJ_END);   PROJ_END_D.setHours(0,0,0,0);
+  // extend ถึง today+7 เพื่อให้ chart แสดงครบ
+  const _chartEnd = new Date(Math.max(PROJ_END_D.getTime(), today.getTime()+7*86400000));
   const lastActDt    = lastInstallDate ? new Date(lastInstallDate+'T00:00:00') : null;
 
   const dailyLabels=[],dailyActCum=[],dailyPlanCum=[];
   const totalProjDays = Math.max(1, Math.round((PROJ_END_D-PROJ_START_D)/86400000));
   let cumAct=0; let dayIdx=0;
   const cur = new Date(PROJ_START_D);
-  while (cur <= PROJ_END_D) {
+  while (cur <= _chartEnd) {
     const k   = cur.toISOString().slice(0,10);
     const lbl = fmtLbl(cur);
     cumAct += dayActMap[k]||0;
     const inAct = lastActDt && cur <= lastActDt;
-    const linearPlanPct = Math.round(Math.min(dayIdx/totalProjDays,1)*10000)/100;
+    const _afterEnd = cur > PROJ_END_D;
+    const linearPlanPct = _afterEnd ? 100 : Math.round(Math.min(dayIdx/totalProjDays,1)*10000)/100;
     dailyLabels.push(lbl);
     dailyActCum.push(inAct ? Math.round(cumAct/TOTAL*10000)/100 : null);
     dailyPlanCum.push(linearPlanPct);
