@@ -259,7 +259,9 @@ function parseData() {
   const daysLeft  = Math.max(0,Math.round((PROJ_END-today)/86400000));
   const remaining = TOTAL-installed;
   const dailyRate = Math.round(installed/elapsed*10)/10;
-  const reqRate   = daysLeft>0 ? Math.ceil(remaining/daysLeft) : 0;
+  // ถ้าเลยกำหนดแล้ว ใช้ finish_date คำนวณ req_rate แทน
+  const _daysToFinish = dailyRate>0 ? Math.ceil(remaining/dailyRate) : 0;
+  const reqRate   = daysLeft>0 ? Math.ceil(remaining/daysLeft) : (remaining>0 ? Math.ceil(remaining/Math.max(_daysToFinish,1)) : 0);
   const needMore  = Math.round((reqRate-dailyRate)*10)/10;
   const gaugePct  = reqRate>0 ? Math.min(150,Math.round(dailyRate/reqRate*100)) : 100;
   const pctDone   = Math.round(installed/TOTAL*100);
