@@ -2013,9 +2013,9 @@ function buildTimeline(){
     planPcts[f.n]=Math.round(planCum/planTotal*100);
   });
 
-  w.innerHTML=FABRICS.map((f,_fi)=>{
-    const p  =Math.round(f.p);
-    const pp =planPcts[f.n]||0;
+  w.innerHTML=_tlItems.map((f,_fi)=>{
+    const p  = f.p!=null ? Math.round(f.p) : Math.round((f.done||0)/(f.total||1)*100);
+    const pp = Math.min(100, Math.round(_overallPlanNow));
     const gap=p-pp;
     const gapStr=(gap>=0?'+':'')+gap+'%';
     const gapColor=gap>=0?'#16a34a':'#dc2626';
