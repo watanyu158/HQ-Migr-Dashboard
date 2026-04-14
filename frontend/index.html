@@ -3283,18 +3283,19 @@ async function loadData(){
         const inAct=lastInstIdx<0||i<=lastInstIdx;
         const planFrac=(DAILY_PROG_PLAN[i]||0)/100;
 
-        DAILY_SW_PLAN.push(Math.round(planFrac*10000)/100);  // same % as overall plan
+        DAILY_SW_PLAN.push(Math.round(planFrac*10000)/100);
         DAILY_SW_ACT.push(inAct?Math.round(cSW/(TOTAL_T||window._swT||1)*10000)/100:null);
-        DAILY_AP_PLAN.push(Math.round(planFrac*10000)/100);  // same % as overall plan
+        DAILY_AP_PLAN.push(Math.round(planFrac*10000)/100);
         DAILY_AP_ACT.push(inAct?Math.round(cAP/(TOTAL_T||window._apT||1)*10000)/100:null);
-        // BD actual รวม infra — ใช้จาก DAILY_PROG_ACT ซึ่ง server คำนวณรวมทุก category
         const allPct=DAILY_PROG_ACT[i];
-        DAILY_BD_ACT.push(inAct&&allPct!=null?Math.round((1-allPct/100)*TOTAL_T):null);
+        DAILY_BD_ACT.push(inAct&&allPct!=null?Math.round((1-allPct/100)*(TOTAL_HQ||1)):null);
       });
 
-      // BD plan
-      DAILY_BD_PLAN.length=0;
-      DAILY_PROG_PLAN.forEach(p=>DAILY_BD_PLAN.push(Math.round((1-p/100)*TOTAL_T)));
+      // BD plan — ใช้จาก server ถ้ามี ไม่งั้นคำนวณจาก TOTAL_HQ
+      if(!DAILY_BD_PLAN.length || DAILY_BD_PLAN.every(v=>v===0)){
+        DAILY_BD_PLAN.length=0;
+        DAILY_PROG_PLAN.forEach(p=>DAILY_BD_PLAN.push(Math.round((1-p/100)*(TOTAL_HQ||1))));
+      }
 
       // per-fabric SW/AP — รองรับทั้ง server ใหม่ {sw,ap,inf} และเก่า (number[])
       FABRICS.forEach(fab_obj=>{
