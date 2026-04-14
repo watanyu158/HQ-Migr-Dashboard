@@ -3288,7 +3288,7 @@ async function loadData(){
         DAILY_AP_PLAN.push(Math.round(planFrac*10000)/100);
         DAILY_AP_ACT.push(inAct?Math.round(cAP/(TOTAL_T||window._apT||1)*10000)/100:null);
         const allPct=DAILY_PROG_ACT[i];
-        DAILY_BD_ACT.push(inAct&&allPct!=null?Math.round((1-allPct/100)*(TOTAL_HQ||1)):null);
+        DAILY_BD_ACT.push(inAct&&allPct!=null?Math.round((1-allPct/100)*(window.TOTAL_HQ||1)):null);
       });
 
       // BD plan — ใช้จาก server ถ้ามี ไม่งั้นคำนวณจาก TOTAL_HQ
