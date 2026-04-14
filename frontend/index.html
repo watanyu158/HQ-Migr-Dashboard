@@ -1922,7 +1922,7 @@ function buildBurndown(){
   }
   if(!_labels.length) return;
 
-  const todayLbl=_todayGMT7().getDate()+'/'+(String(_todayGMT7().getMonth()+1).padStart(2,'0'));
+  const todayLbl=String(_todayGMT7().getDate()).padStart(2,'0')+'/'+(String(_todayGMT7().getMonth()+1).padStart(2,'0'));
   const lastActIdx=_bdAct.reduce((a,v,j)=>v!=null?j:a,-1);
   const _uid='burndown_'+Date.now();
   const tickStep=useDaily?14:1;
