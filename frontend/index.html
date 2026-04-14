@@ -3007,9 +3007,9 @@ function buildSiteBreakdowns(){
     const tp=tT>0?Math.round(tD/tT*100):0;
     if(swTfoot) swTfoot.innerHTML=`<tr style="font-weight:700;background:var(--primary-l)">
       <td>รวมทั้งหมด</td>
-      <td class="fab-cell" style="border-left:1px solid var(--border)">${tSwD}</td><td style="color:var(--text2)">${tSwT} <span style="color:${bar(tSwT>0?Math.round(tSwD/tSwT*100):0)};font-size:10px">${tSwT>0?Math.round(tSwD/tSwT*100):0}%</span></td>
-      <td class="fab-cell" style="border-left:1px solid var(--border)">${tInfD}</td><td style="color:var(--text2)">${tInfT} <span style="color:${bar(tInfT>0?Math.round(tInfD/tInfT*100):0)};font-size:10px">${tInfT>0?Math.round(tInfD/tInfT*100):0}%</span></td>
-      <td class="fab-cell" style="border-left:1px solid var(--border)">${tD}</td><td style="color:var(--text2)">${tT} <span style="color:${bar(tp)};font-size:10px">${tp}%</span></td>
+      <td class="fab-cell" style="border-left:1px solid var(--border)">${tSwD}</td><td style="color:var(--text2)">${tSwT} <span style="color:${bar(tSwT>0?Math.round(tSwD/tSwT*100):0)}">(${tSwT>0?Math.round(tSwD/tSwT*100):0}%)</span></td>
+      <td class="fab-cell" style="border-left:1px solid var(--border)">${tInfD}</td><td style="color:var(--text2)">${tInfT} <span style="color:${bar(tInfT>0?Math.round(tInfD/tInfT*100):0)}">(${tInfT>0?Math.round(tInfD/tInfT*100):0}%)</span></td>
+      <td class="fab-cell" style="border-left:1px solid var(--border)">${tD}</td><td style="color:var(--text2)">${tT} <span style="color:${bar(tp)}">(${tp}%)</span></td>
     </tr>`;
   }
 

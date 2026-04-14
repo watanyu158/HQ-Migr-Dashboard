@@ -158,18 +158,19 @@ function parseData() {
   const lastActDt    = lastInstallDate ? new Date(lastInstallDate+'T00:00:00') : null;
 
   const dailyLabels=[],dailyActCum=[],dailyPlanCum=[];
-  let cumAct=0, cumPlan=0;
+  const totalProjDays = Math.max(1, Math.round((PROJ_END_D-PROJ_START_D)/86400000));
+  let cumAct=0; let dayIdx=0;
   const cur = new Date(PROJ_START_D);
   while (cur <= PROJ_END_D) {
     const k   = cur.toISOString().slice(0,10);
     const lbl = fmtLbl(cur);
-    cumAct  += dayActMap[k]||0;
-    cumPlan += dayPlanMap[k]||0;
+    cumAct += dayActMap[k]||0;
     const inAct = lastActDt && cur <= lastActDt;
+    const linearPlanPct = Math.round(Math.min(dayIdx/totalProjDays,1)*10000)/100;
     dailyLabels.push(lbl);
     dailyActCum.push(inAct ? Math.round(cumAct/TOTAL*10000)/100 : null);
-    dailyPlanCum.push(Math.round(cumPlan/TOTAL*10000)/100);
-    cur.setDate(cur.getDate()+1);
+    dailyPlanCum.push(linearPlanPct);
+    dayIdx++; cur.setDate(cur.getDate()+1);
   }
 
   // Weekly
@@ -334,7 +335,8 @@ function parseData() {
     sites:fabrics.filter(f=>f.t>0).map(f=>({name:f.n,total:f.t,done:f.d,inp:siteMap[f.n]?.inp||0,pct:f.p})),
     sw_inf_sites: Object.entries(swInfSiteMap).map(([name,v])=>({
       name, sw_t:v.sw_t, sw_d:v.sw_d, inf_t:v.inf_t, inf_d:v.inf_d,
-      total:v.sw_t+v.inf_t, done:v.sw_d+v.inf_d
+      total:v.sw_t+v.inf_t, done:v.sw_d+v.inf_d,
+      pct: (v.sw_t+v.inf_t)>0 ? Math.round((v.sw_d+v.inf_d)/(v.sw_t+v.inf_t)*100) : 0
     })).sort((a,b)=>b.total-a.total),
     ap_sites: Object.entries(apSiteMap)
       .filter(([,v])=>v.total>0)
