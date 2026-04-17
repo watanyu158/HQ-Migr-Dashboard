@@ -18,7 +18,11 @@ let cache = null, cacheTime = 0;
 function toDate(v) {
   if (!v) return null;
   if (v instanceof Date) return isNaN(v.getTime()) ? null : v;
-  if (typeof v === 'number') return new Date((v - 25569) * 86400000);
+  if (typeof v === 'number') {
+    // Buddhist calendar serial (> 200000) ต้องหัก offset 198347
+    const serial = v > 200000 ? v - 198347 : v;
+    return new Date((serial - 25569) * 86400000);
+  }
   if (typeof v === 'string') {
     const s = v.trim();
     const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
