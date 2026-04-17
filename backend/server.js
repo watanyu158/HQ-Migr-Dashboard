@@ -158,28 +158,6 @@ function parseData() {
 
   const onTimePct = installed>0 ? Math.round(onTimeQty/installed*1000)/10 : 0;
 
-  // Daily cumulative
-  const PROJ_START_D = new Date(PROJ_START); PROJ_START_D.setHours(0,0,0,0);
-  const PROJ_END_D   = new Date(PROJ_END);   PROJ_END_D.setHours(0,0,0,0);
-  // extend ถึง today+7 เพื่อให้ chart แสดงครบ
-  const _chartEnd = new Date(Math.max(PROJ_END_D.getTime(), today.getTime()+7*86400000));
-  const lastActDt    = lastInstallDate ? new Date(lastInstallDate+'T00:00:00') : null;
-
-  const dailyLabels=[],dailyActCum=[],dailyPlanCum=[];
-  let cumAct=0, cumPlan=0;
-  const cur = new Date(PROJ_START_D);
-  while (cur <= _chartEnd) {
-    const k   = cur.toISOString().slice(0,10);
-    const lbl = fmtLbl(cur);
-    cumAct  += dayActMap[k]||0;
-    cumPlan += dayPlanMap[k]||0;
-    const inAct = lastActDt && cur <= lastActDt;
-    dailyLabels.push(lbl);
-    dailyActCum.push(inAct ? Math.round(cumAct/TOTAL*10000)/100 : null);
-    dailyPlanCum.push(Math.round(Math.min(cumPlan/TOTAL,1)*10000)/100);
-    cur.setDate(cur.getDate()+1);
-  }
-
   // Weekly
   const wkSheet = wb.Sheets['HQ-กราฟรายสัปดาห์'];
   const wkRows  = wkSheet ? XLSX.utils.sheet_to_json(wkSheet,{header:1,defval:null}) : [];
@@ -281,6 +259,27 @@ function parseData() {
   instAP = apDone;
   installed += apDone;
   TOTAL += apTotal; // รวม AP total เข้า TOTAL
+
+  // Daily cumulative — ต้องอยู่หลัง AP loops ทั้งหมด
+  const PROJ_START_D = new Date(PROJ_START); PROJ_START_D.setHours(0,0,0,0);
+  const PROJ_END_D   = new Date(PROJ_END);   PROJ_END_D.setHours(0,0,0,0);
+  const _chartEnd = new Date(Math.max(PROJ_END_D.getTime(), today.getTime()+7*86400000));
+  const lastActDt    = lastInstallDate ? new Date(lastInstallDate+'T00:00:00') : null;
+
+  const dailyLabels=[],dailyActCum=[],dailyPlanCum=[];
+  let cumAct=0, cumPlan=0;
+  const cur2 = new Date(PROJ_START_D);
+  while (cur2 <= _chartEnd) {
+    const k   = cur2.toISOString().slice(0,10);
+    const lbl = fmtLbl(cur2);
+    cumAct  += dayActMap[k]||0;
+    cumPlan += dayPlanMap[k]||0;
+    const inAct = lastActDt && cur2 <= lastActDt;
+    dailyLabels.push(lbl);
+    dailyActCum.push(inAct ? Math.round(cumAct/TOTAL*10000)/100 : null);
+    dailyPlanCum.push(Math.round(Math.min(cumPlan/TOTAL,1)*10000)/100);
+    cur2.setDate(cur2.getDate()+1);
+  }
 
   const elapsed   = Math.max(1,Math.round((today-PROJ_START)/86400000));
   const projDays  = Math.round((PROJ_END-PROJ_START)/86400000);
