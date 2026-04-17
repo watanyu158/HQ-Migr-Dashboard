@@ -122,9 +122,10 @@ function parseData() {
     if (!typeMap[dev]) typeMap[dev] = {plan:0,done:0,cat};
     typeMap[dev].plan += qty;
 
-    // dayPlanMap ใช้ col T(19) วันที่เริ่ม Helper
+    // dayPlanMap ใช้ col T(19) วันที่เริ่ม Helper — clamp ไม่ต่ำกว่า PROJ_START
     const helperDt = toDate(r[19]);
-    const helperStr = helperDt ? helperDt.toISOString().slice(0,10) : schedStr;
+    let helperStr = helperDt ? helperDt.toISOString().slice(0,10) : schedStr;
+    if (helperStr && helperStr < PROJ_START.toISOString().slice(0,10)) helperStr = PROJ_START.toISOString().slice(0,10);
     if (helperStr && cat !== 'AP') dayPlanMap[helperStr] = (dayPlanMap[helperStr]||0) + qty;
 
     // นับจาก Migration column (index 15) — เฉพาะ SW และ Infra
@@ -135,10 +136,11 @@ function parseData() {
       typeMap[dev].done += migration;
       if (cat==='Switch') instSW+=migration;
       else if (cat==='Infra') instInf+=migration;
-      // ใช้ col U(20) วันที่ติดตั้ง Helper สำหรับ dayActMap
+      // ใช้ col U(20) วันที่ติดตั้ง Helper — clamp ไม่ต่ำกว่า PROJ_START
       const instDt2 = toDate(r[20]);
-      const instStr2 = instDt2 ? instDt2.toISOString().slice(0,10) : null;
+      let instStr2 = instDt2 ? instDt2.toISOString().slice(0,10) : null;
       if (instStr2) {
+        if (instStr2 < PROJ_START.toISOString().slice(0,10)) instStr2 = PROJ_START.toISOString().slice(0,10);
         if (!lastInstallDate||instStr2>lastInstallDate) lastInstallDate=instStr2;
         dayActMap[instStr2]=(dayActMap[instStr2]||0)+migration;
       }
@@ -238,23 +240,26 @@ function parseData() {
       apSiteMap[_apCurSite].done  += mig;
     }
   }
-  // AP plan จาก HQ-WL col T(19) = วันที่เริ่ม Helper
+  // AP plan จาก HQ-WL col T(19) = วันที่เริ่ม Helper — clamp ไม่ต่ำกว่า PROJ_START
+  const _projStartStr = PROJ_START.toISOString().slice(0,10);
   for (let i=1; i<wlEndIdx; i++) {
     const r = wlRows[i]; if (!r||!r.length) continue;
     const qty = typeof r[3]==='number' ? r[3] : 0;
     const planDt = toDate(r[19]);
-    const planStr = planDt ? planDt.toISOString().slice(0,10) : null;
-    if (qty<=0 || !planStr) continue;
+    let planStr = planDt ? planDt.toISOString().slice(0,10) : null;
+    if (!planStr || qty<=0) continue;
+    if (planStr < _projStartStr) planStr = _projStartStr;
     dayPlanMap[planStr] = (dayPlanMap[planStr]||0) + qty;
   }
 
-  // AP actual — ไม่มี install date ใช้ col T(19) helper แทน สำหรับ row ที่ migration > 0
+  // AP actual — ใช้ col T(19) helper แทน install date — clamp ไม่ต่ำกว่า PROJ_START
   for (let i=1; i<wlEndIdx; i++) {
     const r = wlRows[i]; if (!r||!r.length) continue;
     const mig = typeof r[16]==='number' ? r[16] : 0;
-    const helperDt = toDate(r[19]); // col T = วันที่เริ่ม helper
-    const helperStr = helperDt ? helperDt.toISOString().slice(0,10) : null;
+    const helperDt = toDate(r[19]);
+    let helperStr = helperDt ? helperDt.toISOString().slice(0,10) : null;
     if (mig<=0 || !helperStr) continue;
+    if (helperStr < _projStartStr) helperStr = _projStartStr;
     dayActMap[helperStr] = (dayActMap[helperStr]||0) + mig;
     if (!lastInstallDate||helperStr>lastInstallDate) lastInstallDate=helperStr;
   }
