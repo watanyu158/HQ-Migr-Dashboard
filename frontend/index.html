@@ -1958,6 +1958,7 @@ function buildBurndown(){
     },
     options:{
       responsive:true,maintainAspectRatio:false,
+      layout:{padding:{top:24}},
       interaction:{mode:'index',intersect:false},
       plugins:{
         legend:{display:false},
@@ -3270,29 +3271,20 @@ async function loadData(){
 
       // SW plan: ใช้ DAILY_PROG_PLAN * (TOTAL_SW_T/TOTAL_T) — linear scale
       // AP plan: ใช้ DAILY_PROG_PLAN * (TOTAL_AP_T/TOTAL_T)
+      // BD_ACT/BD_PLAN ใช้จาก server (_safe populate แล้ว) — ไม่ recalculate
+      // คำนวณแค่ SW/AP act
       let cSW=0, cAP=0;
       DAILY_SW_PLAN.length=0; DAILY_SW_ACT.length=0;
       DAILY_AP_PLAN.length=0; DAILY_AP_ACT.length=0;
-      DAILY_BD_ACT.length=0;
-
       DAILY_PROG_LABELS.forEach((_,i)=>{
         cSW+=swActDay[i]; cAP+=apActDay[i];
         const inAct=lastInstIdx<0||i<=lastInstIdx;
         const planFrac=(DAILY_PROG_PLAN[i]||0)/100;
-
         DAILY_SW_PLAN.push(Math.round(planFrac*10000)/100);
-        DAILY_SW_ACT.push(inAct?Math.round(cSW/(TOTAL_T||window._swT||1)*10000)/100:null);
+        DAILY_SW_ACT.push(inAct?Math.round(cSW/(window._swT||1)*10000)/100:null);
         DAILY_AP_PLAN.push(Math.round(planFrac*10000)/100);
-        DAILY_AP_ACT.push(inAct?Math.round(cAP/(TOTAL_T||window._apT||1)*10000)/100:null);
-        const allPct=DAILY_PROG_ACT[i];
-        DAILY_BD_ACT.push(inAct&&allPct!=null?Math.round((1-allPct/100)*(window.TOTAL_HQ||1)):null);
+        DAILY_AP_ACT.push(inAct?Math.round(cAP/(window._apT||1)*10000)/100:null);
       });
-
-      // BD plan — ใช้จาก server ถ้ามี ไม่งั้นคำนวณจาก TOTAL_HQ
-      if(!DAILY_BD_PLAN.length || DAILY_BD_PLAN.every(v=>v===0)){
-        DAILY_BD_PLAN.length=0;
-        DAILY_PROG_PLAN.forEach(p=>DAILY_BD_PLAN.push(Math.round((1-p/100)*(TOTAL_HQ||1))));
-      }
 
       // per-fabric SW/AP — รองรับทั้ง server ใหม่ {sw,ap,inf} และเก่า (number[])
       FABRICS.forEach(fab_obj=>{
