@@ -118,7 +118,10 @@ function parseData() {
     if (!typeMap[dev]) typeMap[dev] = {plan:0,done:0,cat};
     typeMap[dev].plan += qty;
 
-    if (schedStr) dayPlanMap[schedStr] = (dayPlanMap[schedStr]||0) + qty;
+    // dayPlanMap ใช้ col T(19) วันที่เริ่ม Helper
+    const helperDt = toDate(r[19]);
+    const helperStr = helperDt ? helperDt.toISOString().slice(0,10) : schedStr;
+    if (helperStr && cat !== 'AP') dayPlanMap[helperStr] = (dayPlanMap[helperStr]||0) + qty;
 
     // นับจาก Migration column (index 15) — เฉพาะ SW และ Infra
     const migration = typeof r[15]==='number' ? r[15] : 0;
@@ -128,8 +131,8 @@ function parseData() {
       typeMap[dev].done += migration;
       if (cat==='Switch') instSW+=migration;
       else if (cat==='Infra') instInf+=migration;
-      // ใช้ Install Date (col J=9) สำหรับ dayActMap
-      const instDt2 = toDate(r[9]);
+      // ใช้ col U(20) วันที่ติดตั้ง Helper สำหรับ dayActMap
+      const instDt2 = toDate(r[20]);
       const instStr2 = instDt2 ? instDt2.toISOString().slice(0,10) : null;
       if (instStr2) {
         if (!lastInstallDate||instStr2>lastInstallDate) lastInstallDate=instStr2;
@@ -163,20 +166,18 @@ function parseData() {
   const lastActDt    = lastInstallDate ? new Date(lastInstallDate+'T00:00:00') : null;
 
   const dailyLabels=[],dailyActCum=[],dailyPlanCum=[];
-  const totalProjDays = Math.max(1, Math.round((PROJ_END_D-PROJ_START_D)/86400000));
-  let cumAct=0; let dayIdx=0;
+  let cumAct=0, cumPlan=0;
   const cur = new Date(PROJ_START_D);
   while (cur <= _chartEnd) {
     const k   = cur.toISOString().slice(0,10);
     const lbl = fmtLbl(cur);
-    cumAct += dayActMap[k]||0;
+    cumAct  += dayActMap[k]||0;
+    cumPlan += dayPlanMap[k]||0;
     const inAct = lastActDt && cur <= lastActDt;
-    const _afterEnd = cur > PROJ_END_D;
-    const linearPlanPct = _afterEnd ? 100 : Math.round(Math.min(dayIdx/totalProjDays,1)*10000)/100;
     dailyLabels.push(lbl);
     dailyActCum.push(inAct ? Math.round(cumAct/TOTAL*10000)/100 : null);
-    dailyPlanCum.push(linearPlanPct);
-    dayIdx++; cur.setDate(cur.getDate()+1);
+    dailyPlanCum.push(Math.round(Math.min(cumPlan/TOTAL,1)*10000)/100);
+    cur.setDate(cur.getDate()+1);
   }
 
   // Weekly
@@ -231,6 +232,16 @@ function parseData() {
   // ── AP จาก HQ-WL sheet ──────────────────────────────────────────────
   const wlRows = XLSX.utils.sheet_to_json(wb.Sheets['HQ-WL'], { header:1, defval:null });
   let apTotal=0, apDone=0;
+  // เพิ่ม AP plan จาก HQ-WL col H(7) = Migration Plan เริ่ม
+  for (let i=1; i<wlEndIdx; i++) {
+    const r = wlRows[i]; if (!r||!r.length) continue;
+    const qty = typeof r[3]==='number' ? r[3] : 0;
+    const planDt = toDate(r[7]);
+    const planStr = planDt ? planDt.toISOString().slice(0,10) : null;
+    if (qty<=0 || !planStr) continue;
+    dayPlanMap[planStr] = (dayPlanMap[planStr]||0) + qty;
+  }
+
   // ข้าม row สุดท้าย (summary row) — วน wlRows[1] ถึง length-2
   // หา index ของ summary row จริง (row ที่ col C = 'Summary :')
   let wlEndIdx = wlRows.length - 1;
@@ -255,6 +266,17 @@ function parseData() {
       apSiteMap[_apCurSite].done  += mig;
     }
   }
+  // AP actual — เพิ่ม dayActMap จาก HQ-WL col I(8) = Install Date, col Q(16) = Migration
+  for (let i=1; i<wlEndIdx; i++) {
+    const r = wlRows[i]; if (!r||!r.length) continue;
+    const mig = typeof r[16]==='number' ? r[16] : 0;
+    const instDt = toDate(r[8]);
+    const instStr = instDt ? instDt.toISOString().slice(0,10) : null;
+    if (mig<=0 || !instStr) continue;
+    dayActMap[instStr] = (dayActMap[instStr]||0) + mig;
+    if (!lastInstallDate||instStr>lastInstallDate) lastInstallDate=instStr;
+  }
+
   // AP installed จาก HQ-WL
   instAP = apDone;
   installed += apDone;
