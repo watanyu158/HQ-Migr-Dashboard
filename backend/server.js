@@ -256,6 +256,9 @@ function parseData() {
     if (planStr < _projStartStr) planStr = _projStartStr;
     apPlanByDate[planStr] = (apPlanByDate[planStr]||0) + qty;
   }
+  const _apPlanSum = Object.values(apPlanByDate).reduce((a,v)=>a+v,0);
+  console.log('[DEBUG] apPlanByDate sum:', _apPlanSum, 'entries:', Object.keys(apPlanByDate).length);
+  console.log('[DEBUG] first entry:', Object.entries(apPlanByDate)[0]);
   Object.entries(apPlanByDate).forEach(([d,q])=>{
     dayPlanMap[d] = (dayPlanMap[d]||0) + q;
   });
