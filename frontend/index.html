@@ -1989,29 +1989,26 @@ function buildDonut(){
 function buildTimeline(){
   const w=document.getElementById('tl-wrap');
   if(!w) return;
-  const _projStart=new Date(2026,1,10);
-  const _projEnd  =new Date(2026,5,23);
-  const _projDays =Math.round((_projEnd-_projStart)/(24*60*60*1000));
+  // ใช้ proj dates จาก meta
+  const _psStr = window._projStartStr||'2026-02-03';
+  const _peStr = window._projEndStr  ||'2026-04-12';
+  const _projStart=new Date(_psStr+'T00:00:00');
+  const _projEnd  =new Date(_peStr+'T00:00:00');
+  const _projDays =Math.max(1,Math.round((_projEnd-_projStart)/(24*60*60*1000)));
   const _elapsed  =Math.round((_todayGMT7()-_projStart)/(24*60*60*1000));
   const tdp=Math.max(0,Math.min(100,Math.round(_elapsed/_projDays*100)));
-  const _todayLabel=_todayGMT7().getDate()+'/'+(String(_todayGMT7().getMonth()+1).padStart(2,'0'));
-  const _fabLen=FABRICS.length;
+  const _todayLabel=String(_todayGMT7().getDate()).padStart(2,'0')+'/'+(String(_todayGMT7().getMonth()+1).padStart(2,'0'));
 
-  // plan % ณ วันนี้ per Fabric
-  const todayDT=new Date(); todayDT.setHours(0,0,0,0);
-  const planPcts={};
-  FABRICS.forEach(f=>{
-    let planCum=0;
-    const planTotal=FAB_PLAN_TOTALS[f.n]||f.t||1;
-    if(FAB_DAILY_PLAN[f.n]){
-      DAILY_L.forEach((lbl,di)=>{
-        const [day,mo]=lbl.split('/').map(Number);
-        const dt=new Date(2026,mo-1,day); dt.setHours(0,0,0,0);
-        if(dt<=todayDT) planCum+=(FAB_DAILY_PLAN[f.n][di]||0);
-      });
-    }
-    planPcts[f.n]=Math.round(planCum/planTotal*100);
-  });
+  // overall plan % ณ วันนี้
+  const _todayStr2=String(_todayGMT7().getDate()).padStart(2,'0')+'/'+(String(_todayGMT7().getMonth()+1).padStart(2,'0'));
+  const _tiNow=DAILY_PROG_LABELS.indexOf(_todayStr2);
+  const _overallPlanNow=_tiNow>=0
+    ? (DAILY_PROG_PLAN[_tiNow]||0)
+    : (DAILY_PROG_PLAN.length ? DAILY_PROG_PLAN[DAILY_PROG_PLAN.length-1]||0 : 0);
+
+  // ใช้ SW_INF_SITES ถ้ามี ไม่งั้นใช้ FABRICS
+  const _tlItems = SW_INF_SITES.length ? SW_INF_SITES : FABRICS;
+  const _fabLen = _tlItems.length;
 
   w.innerHTML=_tlItems.map((f,_fi)=>{
     const p  = f.p!=null ? Math.round(f.p) : Math.round((f.done||0)/(f.total||1)*100);
@@ -2068,7 +2065,7 @@ function buildDailyChart(canvasId, labels, planData, actData, planColor, actColo
   const ex=Chart.getChart(ctx); if(ex) ex.destroy();
   if(!labels||!labels.length) return;
 
-  const todayLbl=_todayGMT7().getDate()+'/'+(String(_todayGMT7().getMonth()+1).padStart(2,'0'));
+  const todayLbl=String(_todayGMT7().getDate()).padStart(2,'0')+'/'+(String(_todayGMT7().getMonth()+1).padStart(2,'0'));
   const lastActIdx=actData.reduce((a,v,j)=>v!=null?j:a,-1);
   const _uid=canvasId+'_'+Date.now();
   const isDaily=labels.length>30; // daily ถ้า label เยอะ, weekly ถ้าน้อย
@@ -2170,7 +2167,7 @@ function buildDailyChart(canvasId, labels, planData, actData, planColor, actColo
 
 function buildProgressCharts(){
   // todayLbl ใช้ร่วมกันทุก chart ใน function นี้
-  const todayLbl=_todayGMT7().getDate()+'/'+(String(_todayGMT7().getMonth()+1).padStart(2,'0'));
+  const todayLbl=String(_todayGMT7().getDate()).padStart(2,'0')+'/'+(String(_todayGMT7().getMonth()+1).padStart(2,'0'));
 
   // ── Overall: กราฟรายวัน แผน vs จริง ──
   (()=>{
@@ -2187,7 +2184,7 @@ function buildProgressCharts(){
     if(!_pLabels.length) return;
 
     const _uid=Date.now();
-    const todayLbl=_todayGMT7().getDate()+'/'+(String(_todayGMT7().getMonth()+1).padStart(2,'0'));
+    const todayLbl=String(_todayGMT7().getDate()).padStart(2,'0')+'/'+(String(_todayGMT7().getMonth()+1).padStart(2,'0'));
 
     // today line plugin
     const tdPlugin={id:'tdAll_'+_uid,afterDraw(chart){
@@ -2360,7 +2357,7 @@ function buildProgressCharts(){
       const _uid3=cid+'_'+Date.now();
       const lastSwIdx=fabDailyData.sw_act.reduce((a,v,j)=>v!=null?j:a,-1);
       const lastApIdx=fabDailyData.ap_act.reduce((a,v,j)=>v!=null?j:a,-1);
-      const _tod=_todayGMT7().getDate()+'/'+(String(_todayGMT7().getMonth()+1).padStart(2,'0'));
+      const _tod=String(_todayGMT7().getDate()).padStart(2,'0')+'/'+(String(_todayGMT7().getMonth()+1).padStart(2,'0'));
       const tdPl3={id:'td3_'+_uid3,afterDraw(chart){
         const {top,bottom}=chart.chartArea; const cv3=chart.ctx;
         const tIdx=chart.data.labels.indexOf(_tod);
@@ -2636,7 +2633,7 @@ function buildGraphs(){
         cs+=DAILY_SW[i]||0; ca+=DAILY_AP[i]||0; ci+=DAILY_INF[i]||0;
         _cumSW.push(cs); _cumAP.push(ca); _cumInf.push(ci);
       });
-      const _todayL=_todayGMT7().getDate()+'/'+(String(_todayGMT7().getMonth()+1).padStart(2,'0'));
+      const _todayL=String(_todayGMT7().getDate()).padStart(2,'0')+'/'+(String(_todayGMT7().getMonth()+1).padStart(2,'0'));
       const _lastIdx=DAILY_L.length-1;
       const _tdCum={id:'tdCum',afterDraw(chart){
         const {top,bottom}=chart.chartArea; const cv2=chart.ctx;
@@ -3446,7 +3443,7 @@ async function loadData(){
     if(_e('plan-remaining')) _e('plan-remaining').textContent = meta.remaining.toLocaleString()+' อุปกรณ์';
     // plan-plan-pct: plan ณ วันนี้
     const _todayPlanIdx=(()=>{
-      const tl=_todayGMT7().getDate()+'/'+(String(_todayGMT7().getMonth()+1).padStart(2,'0'));
+      const tl=String(_todayGMT7().getDate()).padStart(2,'0')+'/'+(String(_todayGMT7().getMonth()+1).padStart(2,'0'));
       const ti=DAILY_PROG_LABELS.indexOf(tl);
       return ti>=0?ti:DAILY_PROG_LABELS.length-1;
     })();

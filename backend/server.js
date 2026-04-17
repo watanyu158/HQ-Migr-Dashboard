@@ -128,9 +128,12 @@ function parseData() {
       typeMap[dev].done += migration;
       if (cat==='Switch') instSW+=migration;
       else if (cat==='Infra') instInf+=migration;
-      if (instStr && migration>0) {
-        if (!lastInstallDate||instStr>lastInstallDate) lastInstallDate=instStr;
-        dayActMap[instStr]=(dayActMap[instStr]||0)+migration;
+      // ใช้ Install Date (col J=9) สำหรับ dayActMap
+      const instDt2 = toDate(r[9]);
+      const instStr2 = instDt2 ? instDt2.toISOString().slice(0,10) : null;
+      if (instStr2) {
+        if (!lastInstallDate||instStr2>lastInstallDate) lastInstallDate=instStr2;
+        dayActMap[instStr2]=(dayActMap[instStr2]||0)+migration;
       }
       if (instDt && schedDt) {
         const id=new Date(instDt); id.setHours(0,0,0,0);
