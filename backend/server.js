@@ -232,16 +232,6 @@ function parseData() {
   // ── AP จาก HQ-WL sheet ──────────────────────────────────────────────
   const wlRows = XLSX.utils.sheet_to_json(wb.Sheets['HQ-WL'], { header:1, defval:null });
   let apTotal=0, apDone=0;
-  // เพิ่ม AP plan จาก HQ-WL col H(7) = Migration Plan เริ่ม
-  for (let i=1; i<wlEndIdx; i++) {
-    const r = wlRows[i]; if (!r||!r.length) continue;
-    const qty = typeof r[3]==='number' ? r[3] : 0;
-    const planDt = toDate(r[7]);
-    const planStr = planDt ? planDt.toISOString().slice(0,10) : null;
-    if (qty<=0 || !planStr) continue;
-    dayPlanMap[planStr] = (dayPlanMap[planStr]||0) + qty;
-  }
-
   // ข้าม row สุดท้าย (summary row) — วน wlRows[1] ถึง length-2
   // หา index ของ summary row จริง (row ที่ col C = 'Summary :')
   let wlEndIdx = wlRows.length - 1;
@@ -266,6 +256,16 @@ function parseData() {
       apSiteMap[_apCurSite].done  += mig;
     }
   }
+  // AP plan จาก HQ-WL col H(7) = Migration Plan เริ่ม
+  for (let i=1; i<wlEndIdx; i++) {
+    const r = wlRows[i]; if (!r||!r.length) continue;
+    const qty = typeof r[3]==='number' ? r[3] : 0;
+    const planDt = toDate(r[7]);
+    const planStr = planDt ? planDt.toISOString().slice(0,10) : null;
+    if (qty<=0 || !planStr) continue;
+    dayPlanMap[planStr] = (dayPlanMap[planStr]||0) + qty;
+  }
+
   // AP actual — เพิ่ม dayActMap จาก HQ-WL col I(8) = Install Date, col Q(16) = Migration
   for (let i=1; i<wlEndIdx; i++) {
     const r = wlRows[i]; if (!r||!r.length) continue;
