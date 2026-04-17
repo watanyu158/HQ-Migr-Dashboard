@@ -218,11 +218,15 @@ function parseData() {
   let apTotal=0, apDone=0;
   // ข้าม row สุดท้าย (summary row) — วน wlRows[1] ถึง length-2
   // หา index ของ summary row จริง (row ที่ col C = 'Summary :')
-  let wlEndIdx = wlRows.length - 1;
+  // หา wlEndIdx — ข้าม summary rows ทั้งหมดท้าย sheet
+  // summary row = col C มี 'Summary' หรือ col D > 100 (ผลรวม)
+  let wlEndIdx = wlRows.length;
   for (let i=wlRows.length-1; i>=1; i--) {
     const r = wlRows[i]; if (!r||!r.length) continue;
     const c2 = String(r[2]||'').trim();
-    if (c2.includes('Summary') || (typeof r[3]==='number' && r[3]>100)) { wlEndIdx=i; break; }
+    const d3 = typeof r[3]==='number' ? r[3] : 0;
+    if (c2.includes('Summary') || d3 > 100) { wlEndIdx=i; }
+    else if (d3 > 0) break; // เจอ data row จริง หยุด
   }
   const apSiteMap = {};
   let _apCurSite = null;
@@ -240,8 +244,9 @@ function parseData() {
       apSiteMap[_apCurSite].done  += mig;
     }
   }
-  // AP plan จาก HQ-WL col T(19) = วันที่เริ่ม Helper — clamp ไม่ต่ำกว่า PROJ_START
+  // AP plan จาก HQ-WL col T(19) — sheet มีข้อมูล 2 ชุดซ้ำ หาร 2
   const _projStartStr = PROJ_START.toISOString().slice(0,10);
+  const apPlanByDate = {};
   for (let i=1; i<wlEndIdx; i++) {
     const r = wlRows[i]; if (!r||!r.length) continue;
     const qty = typeof r[3]==='number' ? r[3] : 0;
@@ -249,10 +254,14 @@ function parseData() {
     let planStr = planDt ? planDt.toISOString().slice(0,10) : null;
     if (!planStr || qty<=0) continue;
     if (planStr < _projStartStr) planStr = _projStartStr;
-    dayPlanMap[planStr] = (dayPlanMap[planStr]||0) + qty;
+    apPlanByDate[planStr] = (apPlanByDate[planStr]||0) + qty;
   }
+  Object.entries(apPlanByDate).forEach(([d,q])=>{
+    dayPlanMap[d] = (dayPlanMap[d]||0) + q;
+  });
 
-  // AP actual — ใช้ col T(19) helper แทน install date — clamp ไม่ต่ำกว่า PROJ_START
+  // AP actual — col Q(16) migration + col T(19) date — หาร 2 เพราะข้อมูลซ้ำ
+  const apActByDate = {};
   for (let i=1; i<wlEndIdx; i++) {
     const r = wlRows[i]; if (!r||!r.length) continue;
     const mig = typeof r[16]==='number' ? r[16] : 0;
@@ -260,9 +269,12 @@ function parseData() {
     let helperStr = helperDt ? helperDt.toISOString().slice(0,10) : null;
     if (mig<=0 || !helperStr) continue;
     if (helperStr < _projStartStr) helperStr = _projStartStr;
-    dayActMap[helperStr] = (dayActMap[helperStr]||0) + mig;
-    if (!lastInstallDate||helperStr>lastInstallDate) lastInstallDate=helperStr;
+    apActByDate[helperStr] = (apActByDate[helperStr]||0) + mig;
   }
+  Object.entries(apActByDate).forEach(([d,q])=>{
+    dayActMap[d] = (dayActMap[d]||0) + q;
+    if (!lastInstallDate||d>lastInstallDate) lastInstallDate=d;
+  });
 
   // AP installed จาก HQ-WL
   instAP = apDone;
