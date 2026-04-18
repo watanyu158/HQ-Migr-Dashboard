@@ -91,7 +91,7 @@ function parseData() {
   let lastInstallDate = null;
   let curSite = null;
 
-  const siteMap={}, typeMap={}, dayActMap={}, dayPlanMap={}, dayActBySite={}, dayPlanBySite={};
+  const siteMap={}, typeMap={}, dayActMap={}, dayPlanMap={}, dayActBySite={}, dayPlanBySite={}, daySwActMap={}, dayApActMap={};
   const devices=[];
   const today = new Date(); today.setHours(0,0,0,0);
 
@@ -144,6 +144,9 @@ function parseData() {
         if (instStr2 < PROJ_START.toISOString().slice(0,10)) instStr2 = PROJ_START.toISOString().slice(0,10);
         if (!lastInstallDate||instStr2>lastInstallDate) lastInstallDate=instStr2;
         dayActMap[instStr2]=(dayActMap[instStr2]||0)+migration;
+        // per-category tracking
+        if (cat==='Switch') daySwActMap[instStr2]=(daySwActMap[instStr2]||0)+migration;
+        else daySwActMap[instStr2]=(daySwActMap[instStr2]||0); // Infra นับรวม SW
         // per-site tracking
         if (site) {
           if (!dayActBySite[site]) dayActBySite[site]={};
@@ -291,6 +294,7 @@ function parseData() {
   console.log('[AP ACT] apActByDate sum:', _apActSum, 'entries:', Object.keys(apActByDate).length);
   Object.entries(apActByDate).forEach(([d,q])=>{
     dayActMap[d] = (dayActMap[d]||0) + q;
+    dayApActMap[d] = (dayApActMap[d]||0) + q;
     if (!lastInstallDate||d>lastInstallDate) lastInstallDate=d;
   });
   const _totalActMap = Object.values(dayActMap).reduce((a,v)=>a+v,0);
@@ -312,8 +316,8 @@ function parseData() {
   Object.entries(dayActMap).forEach(([d,v])=>{ if(d<=lastInstallDate) _cumCheck+=v; });
   console.log('[DAILY] cumAct up to lastInstallDate:', _cumCheck, 'of TOTAL:', TOTAL);
 
-  const dailyLabels=[],dailyActCum=[],dailyPlanCum=[],dailyBdPlan=[],dailyBdAct=[];
-  let cumAct=0, cumPlan=0;
+  const dailyLabels=[],dailyActCum=[],dailyPlanCum=[],dailyBdPlan=[],dailyBdAct=[],dailySwActCum=[],dailyApActCum=[];
+  let cumAct=0, cumPlan=0, cumSwAct=0, cumApAct=0;
   const cur2 = new Date(PROJ_START_D);
   while (cur2 <= _chartEnd) {
     const k   = cur2.toISOString().slice(0,10);
@@ -323,11 +327,15 @@ function parseData() {
     dailyBdPlan.push(TOTAL - Math.round(Math.min(cumPlan/TOTAL,1)*TOTAL));
     dailyBdAct.push(inAct ? TOTAL - Math.round(cumAct) : null);
     // accumulate ก่อน push % สะสม ทำให้วันสุดท้ายได้ครบ
-    cumAct  += dayActMap[k]||0;
-    cumPlan += dayPlanMap[k]||0;
+    cumSwAct += daySwActMap[k]||0;
+    cumApAct += dayApActMap[k]||0;
+    cumAct   += dayActMap[k]||0;
+    cumPlan  += dayPlanMap[k]||0;
     dailyLabels.push(lbl);
     dailyPlanCum.push(Math.round(Math.min(cumPlan/TOTAL,1)*10000)/100);
     dailyActCum.push(inAct ? Math.round(cumAct/TOTAL*10000)/100 : null);
+    dailySwActCum.push(inAct ? Math.round(cumSwAct/Math.max(swTotal,1)*10000)/100 : null);
+    dailyApActCum.push(inAct ? Math.round(cumApAct/Math.max(apTotal,1)*10000)/100 : null);
     cur2.setDate(cur2.getDate()+1);
   }
 
@@ -401,8 +409,8 @@ function parseData() {
     daily:{labels:dailyLabels,sw:[],ap:[],inf:[],plan:[],cum_d:[],cum_sw:[],cum_ap:[],cum_inf:[]},
     daily_progress:{
       labels:dailyLabels, plan_cum:dailyPlanCum, act_cum:dailyActCum,
-      sw_plan:dailyPlanCum, sw_act:dailyActCum,
-      ap_plan:dailyPlanCum, ap_act:dailyActCum,
+      sw_plan:dailyPlanCum, sw_act:dailySwActCum,
+      ap_plan:dailyPlanCum, ap_act:dailyApActCum,
       bd_plan:dailyBdPlan,
       bd_act: dailyBdAct,
       fab: (() => {
