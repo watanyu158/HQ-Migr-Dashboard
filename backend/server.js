@@ -171,6 +171,8 @@ function parseData() {
     devices.push({site:curSite, device, qty, status, instDt:instStr, schedDt:schedStr, cat});
   }
 
+  const _swInfActSum = Object.values(dayActMap).reduce((a,v)=>a+v,0);
+  console.log('[SW/INF ACT] dayActMap sum before AP:', _swInfActSum, 'instSW:', instSW, 'instInf:', instInf);
   const onTimePct = installed>0 ? Math.round(onTimeQty/installed*1000)/10 : 0;
 
   // Weekly
