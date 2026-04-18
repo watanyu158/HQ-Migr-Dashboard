@@ -293,6 +293,8 @@ function parseData() {
     dayActMap[d] = (dayActMap[d]||0) + q;
     if (!lastInstallDate||d>lastInstallDate) lastInstallDate=d;
   });
+  const _totalActMap = Object.values(dayActMap).reduce((a,v)=>a+v,0);
+  console.log('[TOTAL ACT] dayActMap after AP merge:', _totalActMap);
 
   // AP installed จาก HQ-WL
   instAP = apDone;
