@@ -3277,20 +3277,33 @@ async function loadData(){
 
       // SW plan: ใช้ DAILY_PROG_PLAN * (TOTAL_SW_T/TOTAL_T) — linear scale
       // AP plan: ใช้ DAILY_PROG_PLAN * (TOTAL_AP_T/TOTAL_T)
-      // BD_ACT/BD_PLAN ใช้จาก server (_safe populate แล้ว) — ไม่ recalculate
-      // คำนวณแค่ SW/AP act
-      let cSW=0, cAP=0;
-      DAILY_SW_PLAN.length=0; DAILY_SW_ACT.length=0;
-      DAILY_AP_PLAN.length=0; DAILY_AP_ACT.length=0;
-      DAILY_PROG_LABELS.forEach((_,i)=>{
-        cSW+=swActDay[i]; cAP+=apActDay[i];
-        const inAct=lastInstIdx<0||i<=lastInstIdx;
-        const planFrac=(DAILY_PROG_PLAN[i]||0)/100;
-        DAILY_SW_PLAN.push(Math.round(planFrac*10000)/100);
-        DAILY_SW_ACT.push(inAct?Math.round(cSW/(window._swT||1)*10000)/100:null);
-        DAILY_AP_PLAN.push(Math.round(planFrac*10000)/100);
-        DAILY_AP_ACT.push(inAct?Math.round(cAP/(window._apT||1)*10000)/100:null);
-      });
+      // SW/AP act — ใช้จาก server ถ้า DAILY_SW ว่าง (HQ)
+      if(DAILY_SW_ACT.every(v=>!v) && DAILY_PROG_ACT.some(v=>v!=null)){
+        // ใช้ act_cum จาก server แทน
+        DAILY_SW_PLAN.length=0; DAILY_SW_ACT.length=0;
+        DAILY_AP_PLAN.length=0; DAILY_AP_ACT.length=0;
+        DAILY_PROG_LABELS.forEach((_,i)=>{
+          const planFrac=(DAILY_PROG_PLAN[i]||0)/100;
+          const inAct=lastInstIdx<0||i<=lastInstIdx;
+          DAILY_SW_PLAN.push(Math.round(planFrac*10000)/100);
+          DAILY_SW_ACT.push(inAct?(DAILY_PROG_ACT[i]!=null?DAILY_PROG_ACT[i]:null):null);
+          DAILY_AP_PLAN.push(Math.round(planFrac*10000)/100);
+          DAILY_AP_ACT.push(null);
+        });
+      } else {
+        let cSW=0, cAP=0;
+        DAILY_SW_PLAN.length=0; DAILY_SW_ACT.length=0;
+        DAILY_AP_PLAN.length=0; DAILY_AP_ACT.length=0;
+        DAILY_PROG_LABELS.forEach((_,i)=>{
+          cSW+=swActDay[i]; cAP+=apActDay[i];
+          const inAct=lastInstIdx<0||i<=lastInstIdx;
+          const planFrac=(DAILY_PROG_PLAN[i]||0)/100;
+          DAILY_SW_PLAN.push(Math.round(planFrac*10000)/100);
+          DAILY_SW_ACT.push(inAct?Math.round(cSW/(window._swT||1)*10000)/100:null);
+          DAILY_AP_PLAN.push(Math.round(planFrac*10000)/100);
+          DAILY_AP_ACT.push(inAct?Math.round(cAP/(window._apT||1)*10000)/100:null);
+        });
+      }
 
       // per-fabric SW/AP — รองรับทั้ง server ใหม่ {sw,ap,inf} และเก่า (number[])
       FABRICS.forEach(fab_obj=>{
