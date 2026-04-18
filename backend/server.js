@@ -305,6 +305,16 @@ function parseData() {
   installed += apDone;
   TOTAL += apTotal; // รวม AP total เข้า TOTAL
 
+  // คำนวณ swTotal/infTotal สำหรับใช้ใน daily loop
+  let swTotal=0, infTotal=0;
+  for (let i=2; i<hqRows.length; i++) {
+    const r=hqRows[i]; if(!r||!r.length) continue;
+    const qty = typeof r[6]==='number' ? r[6] : 0;
+    const cat = r[18] ? String(r[18]).trim() : '';
+    if (cat==='Switch') swTotal+=qty;
+    else if (cat==='Infra') infTotal+=qty;
+  }
+
   // Daily cumulative — ต้องอยู่หลัง AP loops ทั้งหมด
   const PROJ_START_D = new Date(PROJ_START); PROJ_START_D.setHours(0,0,0,0);
   const PROJ_END_D   = new Date(PROJ_END);   PROJ_END_D.setHours(0,0,0,0);
@@ -363,16 +373,7 @@ function parseData() {
   }
 
 
-  // นับ SW/Infra total จาก HQ sheet
-  let swTotal=0, infTotal=0;
-  for (let i=2; i<hqRows.length; i++) {
-    const r=hqRows[i]; if(!r||!r.length) continue;
-    const qty = typeof r[6]==='number' ? r[6] : 0;
-    const cat = r[18] ? String(r[18]).trim() : '';
-    if (qty<=0) continue;
-    if (cat==='Switch') swTotal+=qty;
-    else if (cat==='Infra') infTotal+=qty;
-  }
+
 
   const types = Object.entries(typeMap)
     .map(([n,v])=>({n,plan:v.plan,done:v.done}))
