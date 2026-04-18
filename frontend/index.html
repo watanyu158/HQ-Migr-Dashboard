@@ -2316,7 +2316,9 @@ function buildProgressCharts(){
     const fdone = f.done!=null?f.done:f.d||0;
     const ftotal= f.total!=null?f.total:f.t||1;
     const fabData = DAILY_FAB_PROG[fname];
-    if(!fabData||!fabData.sw_plan||!fabData.sw_plan.length) return;
+    // ถ้าไม่มี per-site data ให้ใช้ overall แทน
+    const _swPlan = (fabData&&fabData.sw_plan&&fabData.sw_plan.length) ? fabData.sw_plan : DAILY_PROG_PLAN;
+    const _swAct  = (fabData&&fabData.sw_act &&fabData.sw_act.length)  ? fabData.sw_act  : DAILY_SW_ACT;
     const swPct = Math.round(fdone/Math.max(ftotal,1)*100);
     const apPct = 0;
     const totPct= swPct;
@@ -2424,18 +2426,18 @@ function buildProgressCharts(){
         data:{
           labels:DAILY_PROG_LABELS,
           datasets:[
-            {label:'SW แผน',data:fabDailyData.sw_plan,borderColor:'#818cf8',borderDash:[5,3],
+            {label:'SW แผน',data:_swPlan,borderColor:'#818cf8',borderDash:[5,3],
              borderWidth:1.5,
              pointRadius:(c)=>c.dataIndex===lastSwIdx?3:0,
              pointBackgroundColor:'#818cf8',tension:0.3,fill:false,spanGaps:true},
-            {label:'SW จริง',data:fabDailyData.sw_act,borderColor:'#4361ee',borderWidth:2,
+            {label:'SW จริง',data:_swAct,borderColor:'#4361ee',borderWidth:2,
              pointRadius:(c)=>c.dataIndex===lastSwIdx?3:0,
              pointBackgroundColor:'#4361ee',tension:0.3,fill:false,spanGaps:false},
-            {label:'AP แผน',data:fabDailyData.ap_plan,borderColor:'#6ee7b7',borderDash:[5,3],
+            {label:'AP แผน',data:[],borderColor:'#6ee7b7',borderDash:[5,3],
              borderWidth:1.5,
              pointRadius:(c)=>c.dataIndex===lastApIdx?3:0,
              pointBackgroundColor:'#6ee7b7',tension:0.3,fill:false,spanGaps:true},
-            {label:'AP จริง',data:fabDailyData.ap_act,borderColor:'#2bc48a',borderWidth:2,
+            {label:'AP จริง',data:[],borderColor:'#2bc48a',borderWidth:2,
              pointRadius:(c)=>c.dataIndex===lastApIdx?3:0,
              pointBackgroundColor:'#2bc48a',tension:0.3,fill:false,spanGaps:false},
           ]
@@ -3288,7 +3290,7 @@ async function loadData(){
           DAILY_SW_PLAN.push(Math.round(planFrac*10000)/100);
           DAILY_SW_ACT.push(inAct?(DAILY_PROG_ACT[i]!=null?DAILY_PROG_ACT[i]:null):null);
           DAILY_AP_PLAN.push(Math.round(planFrac*10000)/100);
-          DAILY_AP_ACT.push(null);
+          DAILY_AP_ACT.push(inAct?(DAILY_PROG_ACT[i]!=null?DAILY_PROG_ACT[i]:null):null);
         });
       } else {
         let cSW=0, cAP=0;
