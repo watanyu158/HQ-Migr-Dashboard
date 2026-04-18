@@ -2309,32 +2309,38 @@ function buildProgressCharts(){
   wrap.querySelectorAll('canvas').forEach(cv=>{ const ch=Chart.getChart(cv); if(ch) ch.destroy(); });
   wrap.innerHTML = '';
 
-  FABRICS.forEach(f => {
-    if(!DAILY_FAB_PROG[f.n]||!DAILY_FAB_PROG[f.n].sw_plan||!DAILY_FAB_PROG[f.n].sw_plan.length) return;
-    const swPct = Math.round(f.sw.d/Math.max(f.sw.t,1)*100);
-    const apPct = Math.round(f.ap.d/Math.max(f.ap.t,1)*100);
-    const totPct= Math.round(f.d/Math.max(f.t,1)*100);
-    const cid   = 'fab-prog-'+f.n.replace(/-/g,'')+'-c';
+  // ใช้ SW_INF_SITES ถ้ามี ไม่งั้นใช้ FABRICS
+  const _progItems = SW_INF_SITES.length ? SW_INF_SITES : FABRICS;
+  _progItems.forEach(f => {
+    const fname = f.name||f.n||'';
+    const fdone = f.done!=null?f.done:f.d||0;
+    const ftotal= f.total!=null?f.total:f.t||1;
+    const fabData = DAILY_FAB_PROG[fname];
+    if(!fabData||!fabData.sw_plan||!fabData.sw_plan.length) return;
+    const swPct = Math.round(fdone/Math.max(ftotal,1)*100);
+    const apPct = 0;
+    const totPct= swPct;
+    const cid   = 'fab-prog-'+(fname).replace(/[^a-zA-Z0-9]/g,'')+'-c';
 
     const div = document.createElement('div');
     div.className = 'card';
     // ใช้ last actual index เพื่อ header — ตรงกับ label บนกราฟ
-    const fd2=DAILY_FAB_PROG[f.n];
+    const fd2=DAILY_FAB_PROG[fname];
     const _swLastI=fd2&&fd2.sw_act?fd2.sw_act.reduce((a,v,j)=>v!=null?j:a,-1):-1;
     const _apLastI=fd2&&fd2.ap_act?fd2.ap_act.reduce((a,v,j)=>v!=null?j:a,-1):-1;
     const swActVal=_swLastI>=0?fd2.sw_act[_swLastI]:null;
     const apActVal=_apLastI>=0?fd2.ap_act[_apLastI]:null;
     // แสดง SW%/AP% จริงจาก f.sw.d/f.sw.t (ตรงและแม่นยำที่สุด)
-    const swPctLbl=(f.sw.t>0?Math.round(f.sw.d/f.sw.t*1000)/10:0).toFixed(1)+'%';
-    const apPctLbl=(f.ap.t>0?Math.round(f.ap.d/f.ap.t*1000)/10:0).toFixed(1)+'%';
+    const swPctLbl=totPct.toFixed(1)+'%';
+    const apPctLbl='–';
 
     div.innerHTML =
       '<div class="ch" style="margin-bottom:8px;flex-wrap:wrap;gap:4px">'+
-        '<div style="width:10px;height:10px;border-radius:50%;background:'+f.c+';flex-shrink:0"></div>'+
-        '<span style="font-size:13px;font-weight:700">'+f.n+'</span>'+
+        '<div style="width:10px;height:10px;border-radius:50%;background:'+(f.c||'#4361ee')+';flex-shrink:0"></div>'+
+        '<span style="font-size:13px;font-weight:700">'+fname+'</span>'+
         '<div style="display:flex;gap:8px;margin-left:auto;font-size:11px">'+
           '<span style="color:#818cf8">SW: '+swPctLbl+'</span>'+
-          (f.ap.t>0?'<span style="color:#2bc48a">AP: '+apPctLbl+'</span>':'')+
+          ''+ // HQ ไม่มี AP per site
         '</div>'+
       '</div>'+
       '<div style="height:190px"><canvas id="'+cid+'"></canvas></div>'+
@@ -2350,7 +2356,7 @@ function buildProgressCharts(){
     const ctx2 = document.getElementById(cid);
     if (!ctx2) return;
     // ใช้ DAILY_FAB_PROG เสมอ (คำนวณจาก FAB_DAILY daily data แล้ว)
-    const fabDailyData = DAILY_FAB_PROG[f.n];
+    const fabDailyData = DAILY_FAB_PROG[fname];
     if(fabDailyData && fabDailyData.sw_plan && fabDailyData.sw_plan.length){
       const ctx3=document.getElementById(cid);
       if(!ctx3) return;
@@ -2390,9 +2396,9 @@ function buildProgressCharts(){
         // actual values จาก fab_obj (ตรงกับ Dashboard)
         const actualVals=[
           null,  // di=0: SW แผน — ใช้จาก data
-          f.sw.t>0?Math.round(f.sw.d/f.sw.t*1000)/10:null,  // di=1: SW จริง
+          ftotal>0?Math.round(fdone/ftotal*1000)/10:null,  // di=1: จริง
           null,  // di=2: AP แผน — ใช้จาก data
-          f.ap.t>0?Math.round(f.ap.d/f.ap.t*1000)/10:null,  // di=3: AP จริง
+          null,  // di=3: AP จริง HQ ไม่มี
         ];
         pairs.forEach(([di,sharedIdx])=>{
           if(sharedIdx<0) return;

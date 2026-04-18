@@ -91,7 +91,7 @@ function parseData() {
   let lastInstallDate = null;
   let curSite = null;
 
-  const siteMap={}, typeMap={}, dayActMap={}, dayPlanMap={};
+  const siteMap={}, typeMap={}, dayActMap={}, dayPlanMap={}, dayActBySite={}, dayPlanBySite={};
   const devices=[];
   const today = new Date(); today.setHours(0,0,0,0);
 
@@ -143,6 +143,13 @@ function parseData() {
         if (instStr2 < PROJ_START.toISOString().slice(0,10)) instStr2 = PROJ_START.toISOString().slice(0,10);
         if (!lastInstallDate||instStr2>lastInstallDate) lastInstallDate=instStr2;
         dayActMap[instStr2]=(dayActMap[instStr2]||0)+migration;
+        // per-site tracking
+        if (site) {
+          if (!dayActBySite[site]) dayActBySite[site]={};
+          dayActBySite[site][instStr2]=(dayActBySite[site][instStr2]||0)+migration;
+          if (!dayPlanBySite[site]) dayPlanBySite[site]={total:0};
+          dayPlanBySite[site].total += qty;
+        }
       }
       if (instDt && schedDt) {
         const id=new Date(instDt); id.setHours(0,0,0,0);
@@ -188,7 +195,6 @@ function parseData() {
   // Insight
   // DEBUG HQ plan
   const _hqPlanSum = Object.values(dayPlanMap).reduce((a,v)=>a+v,0);
-  console.log('[DEBUG] HQ dayPlanMap sum after HQ loop:', _hqPlanSum);
 
   // sw_inf_sites — แยก SW/Infra per site จาก HQ sheet
   const swInfSiteMap = {};
@@ -261,13 +267,11 @@ function parseData() {
     apPlanByDate[planStr] = (apPlanByDate[planStr]||0) + qty;
   }
   const _apPlanSum = Object.values(apPlanByDate).reduce((a,v)=>a+v,0);
-  console.log('[DEBUG] apPlanByDate sum:', _apPlanSum, 'entries:', Object.keys(apPlanByDate).length);
-  console.log('[DEBUG] first entry:', Object.entries(apPlanByDate)[0]);
+
   Object.entries(apPlanByDate).forEach(([d,q])=>{
     dayPlanMap[d] = (dayPlanMap[d]||0) + q;
   });
   const _totalPlanSum = Object.values(dayPlanMap).reduce((a,v)=>a+v,0);
-  console.log('[DEBUG] dayPlanMap TOTAL after AP merge:', _totalPlanSum);
 
   // AP actual — col Q(16) migration + col T(19) date — หาร 2 เพราะข้อมูลซ้ำ
   const apActByDate = {};
@@ -386,7 +390,24 @@ function parseData() {
       ap_plan:dailyPlanCum, ap_act:dailyActCum,
       bd_plan:dailyPlanCum,
       bd_act: dailyActCum,
-      fab:{},
+      fab: (() => {
+        // per-site daily act จาก dayActBySite
+        const fab = {};
+        Object.entries(dayActBySite||{}).forEach(([site, dateMap]) => {
+          let cum = 0;
+          const act_cum = dailyLabels.map((lbl, i) => {
+            const k = cur2 ? null : null; // ใช้ key จาก dailyLabels
+            // map lbl DD/MM กลับเป็น YYYY-MM-DD
+            const parts = lbl.split('/');
+            const k2 = `2026-${parts[1]}-${parts[0]}`;
+            cum += (dateMap[k2]||0);
+            const inAct = lastActDt && new Date(k2+'T00:00:00') <= lastActDt;
+            return inAct ? Math.round(cum/(dayPlanBySite[site]?.total||1)*10000)/100 : null;
+          });
+          fab[site] = { sw_plan: dailyPlanCum, sw_act: act_cum, ap_plan: [], ap_act: [] };
+        });
+        return fab;
+      })(),
     },
     fab_colors:{}, fab_plan_totals:{}, fab_totals:{}, fab_weekly:{}, fab_daily:{}, fab_daily_plan:{},
     locations:{},
