@@ -186,6 +186,10 @@ function parseData() {
   let bdCum=TOTAL; const bdAct=actPct.map((v,i)=>{ if(v>0) bdCum=Math.round((1-v/100)*TOTAL); return i<=9?bdCum:null; });
 
   // Insight
+  // DEBUG HQ plan
+  const _hqPlanSum = Object.values(dayPlanMap).reduce((a,v)=>a+v,0);
+  console.log('[DEBUG] HQ dayPlanMap sum after HQ loop:', _hqPlanSum);
+
   // sw_inf_sites — แยก SW/Infra per site จาก HQ sheet
   const swInfSiteMap = {};
   for (let i=2; i<hqRows.length; i++) {
