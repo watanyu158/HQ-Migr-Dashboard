@@ -232,16 +232,12 @@ function parseData() {
   // หา index ของ summary row จริง (row ที่ col C = 'Summary :')
   // หา wlEndIdx — ข้าม summary rows ทั้งหมดท้าย sheet
   // summary row = col C มี 'Summary' หรือ col D > 100 (ผลรวม)
-  // หา wlEndIdx — ข้าม Summary row และ empty rows ท้าย sheet
-  let wlEndIdx = wlRows.length;
-  for (let i=wlRows.length-1; i>=1; i--) {
-    const r = wlRows[i]; if (!r||!r.length) { wlEndIdx=i; continue; }
-    const c2 = String(r[2]||'').trim();
+  // หา wlEndIdx — หา last data row ที่ D (col3) > 0 และ <= 100
+  let wlEndIdx = 1;
+  for (let i=1; i<wlRows.length; i++) {
+    const r = wlRows[i]; if (!r||!r.length) continue;
     const d3 = typeof r[3]==='number' ? r[3] : 0;
-    if (!c2 && !d3) { wlEndIdx=i; continue; } // empty row
-    if (c2.includes('Summary')) { wlEndIdx=i; continue; } // summary row
-    if (d3 > 100) { wlEndIdx=i; continue; } // total row (D > 100)
-    break; // เจอ data row จริง หยุด
+    if (d3 > 0 && d3 <= 100) wlEndIdx = i + 1; // +1 เพราะ loop ใช้ i < wlEndIdx
   }
   const apSiteMap = {};
   let _apCurSite = null;
