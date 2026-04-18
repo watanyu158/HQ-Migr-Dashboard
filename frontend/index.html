@@ -3278,7 +3278,7 @@ async function loadData(){
       // SW plan: ใช้ DAILY_PROG_PLAN * (TOTAL_SW_T/TOTAL_T) — linear scale
       // AP plan: ใช้ DAILY_PROG_PLAN * (TOTAL_AP_T/TOTAL_T)
       // SW/AP act — ใช้จาก server ถ้า DAILY_SW ว่าง (HQ)
-      if(DAILY_SW_ACT.every(v=>!v) && DAILY_PROG_ACT.some(v=>v!=null)){
+      if(!DAILY_SW.some(v=>v>0) && DAILY_PROG_ACT.some(v=>v!=null)){
         // ใช้ act_cum จาก server แทน
         DAILY_SW_PLAN.length=0; DAILY_SW_ACT.length=0;
         DAILY_AP_PLAN.length=0; DAILY_AP_ACT.length=0;
