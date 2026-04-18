@@ -299,17 +299,16 @@ function parseData() {
   const dailyLabels=[],dailyActCum=[],dailyPlanCum=[];
   let cumAct=0, cumPlan=0;
   const cur2 = new Date(PROJ_START_D);
-  let _firstDay=true;
   while (cur2 <= _chartEnd) {
     const k   = cur2.toISOString().slice(0,10);
     const lbl = fmtLbl(cur2);
-    cumAct  += dayActMap[k]||0;
-    cumPlan += dayPlanMap[k]||0;
-    if(_firstDay){console.log('[DEBUG] day0 k=',k,'planOnDay=',dayPlanMap[k]||0,'cumPlan=',cumPlan);_firstDay=false;}
+    // push ก่อน แล้วค่อย accumulate — ทำให้วันแรก = TOTAL (ยังไม่ได้ทำอะไร)
     const inAct = lastActDt && cur2 <= lastActDt;
     dailyLabels.push(lbl);
-    dailyActCum.push(inAct ? Math.round(cumAct/TOTAL*10000)/100 : null);
-    dailyPlanCum.push(Math.round(Math.min(cumPlan/TOTAL,1)*10000)/100);
+    dailyActCum.push(inAct ? Math.round((TOTAL-cumAct)/TOTAL*TOTAL) : null);
+    dailyPlanCum.push(Math.round(Math.min((TOTAL-cumPlan)/TOTAL*TOTAL)));
+    cumAct  += dayActMap[k]||0;
+    cumPlan += dayPlanMap[k]||0;
     cur2.setDate(cur2.getDate()+1);
   }
 
@@ -385,8 +384,8 @@ function parseData() {
       labels:dailyLabels, plan_cum:dailyPlanCum, act_cum:dailyActCum,
       sw_plan:dailyPlanCum, sw_act:dailyActCum,
       ap_plan:dailyPlanCum, ap_act:dailyActCum,
-      bd_plan:dailyPlanCum.map(p=>Math.round((1-p/100)*TOTAL)),
-      bd_act: dailyActCum.map(p=>p!=null?Math.round((1-p/100)*TOTAL):null),
+      bd_plan:dailyPlanCum,
+      bd_act: dailyActCum,
       fab:{},
     },
     fab_colors:{}, fab_plan_totals:{}, fab_totals:{}, fab_weekly:{}, fab_daily:{}, fab_daily_plan:{},
