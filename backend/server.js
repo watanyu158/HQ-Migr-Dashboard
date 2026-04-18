@@ -285,6 +285,8 @@ function parseData() {
     if (helperStr < _projStartStr) helperStr = _projStartStr;
     apActByDate[helperStr] = (apActByDate[helperStr]||0) + mig;
   }
+  const _apActSum = Object.values(apActByDate).reduce((a,v)=>a+v,0);
+  console.log('[AP ACT] apActByDate sum:', _apActSum, 'entries:', Object.keys(apActByDate).length);
   Object.entries(apActByDate).forEach(([d,q])=>{
     dayActMap[d] = (dayActMap[d]||0) + q;
     if (!lastInstallDate||d>lastInstallDate) lastInstallDate=d;
