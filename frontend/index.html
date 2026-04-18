@@ -2359,13 +2359,13 @@ function buildProgressCharts(){
     if (!ctx2) return;
     // ใช้ DAILY_FAB_PROG เสมอ (คำนวณจาก FAB_DAILY daily data แล้ว)
     const fabDailyData = DAILY_FAB_PROG[fname];
-    if(fabDailyData && fabDailyData.sw_plan && fabDailyData.sw_plan.length){
+    if(true){
       const ctx3=document.getElementById(cid);
       if(!ctx3) return;
       const ex3=Chart.getChart(ctx3); if(ex3) ex3.destroy();
       const _uid3=cid+'_'+Date.now();
-      const lastSwIdx=fabDailyData.sw_act.reduce((a,v,j)=>v!=null?j:a,-1);
-      const lastApIdx=fabDailyData.ap_act.reduce((a,v,j)=>v!=null?j:a,-1);
+      const lastSwIdx=_swAct.reduce((a,v,j)=>v!=null?j:a,-1);
+      const lastApIdx=-1;
       const _tod=String(_todayGMT7().getDate()).padStart(2,'0')+'/'+(String(_todayGMT7().getMonth()+1).padStart(2,'0'));
       const tdPl3={id:'td3_'+_uid3,afterDraw(chart){
         const {top,bottom}=chart.chartArea; const cv3=chart.ctx;
