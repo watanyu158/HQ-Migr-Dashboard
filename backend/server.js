@@ -266,6 +266,8 @@ function parseData() {
   Object.entries(apPlanByDate).forEach(([d,q])=>{
     dayPlanMap[d] = (dayPlanMap[d]||0) + q;
   });
+  const _totalPlanSum = Object.values(dayPlanMap).reduce((a,v)=>a+v,0);
+  console.log('[DEBUG] dayPlanMap TOTAL after AP merge:', _totalPlanSum);
 
   // AP actual — col Q(16) migration + col T(19) date — หาร 2 เพราะข้อมูลซ้ำ
   const apActByDate = {};
