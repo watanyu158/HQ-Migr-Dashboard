@@ -103,8 +103,9 @@ function parseData() {
     const device  = r[3] ? String(r[3]).trim() : null;
     const qty     = typeof r[6]==='number' ? r[6] : 0;
     const status  = r[11] ? String(r[11]).trim() : '';
-    const instDt  = toDate(r[9]);
-    const schedDt = toDate(r[7]);
+    // ใช้ helper dates (col T=19 plan, col U=20 actual) แทน col J/H
+    const instDt  = toDate(r[20]) || toDate(r[19]);  // col U ก่อน fallback col T
+    const schedDt = toDate(r[19]);                    // col T = plan date
     const instStr = isoDate(instDt);
     const schedStr= isoDate(schedDt);
 
@@ -136,8 +137,8 @@ function parseData() {
       typeMap[dev].done += migration;
       if (cat==='Switch') instSW+=migration;
       else if (cat==='Infra') instInf+=migration;
-      // ใช้ col U(20) วันที่ติดตั้ง Helper — clamp ไม่ต่ำกว่า PROJ_START
-      const instDt2 = toDate(r[20]);
+      // ใช้ col U(20) วันที่ติดตั้ง Helper — fallback col T(19) ถ้าไม่มี
+      const instDt2 = toDate(r[20]) || toDate(r[19]);
       let instStr2 = instDt2 ? instDt2.toISOString().slice(0,10) : null;
       if (instStr2) {
         if (instStr2 < PROJ_START.toISOString().slice(0,10)) instStr2 = PROJ_START.toISOString().slice(0,10);
@@ -151,11 +152,12 @@ function parseData() {
           dayPlanBySite[site].total += qty;
         }
       }
-      if (instDt && schedDt) {
-        const id=new Date(instDt); id.setHours(0,0,0,0);
+      // on-time check ใช้ instDt2 (helper) vs schedDt
+      if (instDt2 && schedDt) {
+        const id=new Date(instDt2+'T00:00:00'); id.setHours(0,0,0,0);
         const sd=new Date(schedDt); sd.setHours(0,0,0,0);
-        if (id<=sd){onTimeQty+=qty;if(id<sd)earlyQty+=qty;}
-        else lateQty+=qty;
+        if (id<=sd){onTimeQty+=migration;if(id<sd)earlyQty+=migration;}
+        else lateQty+=migration;
       }
     } else if (status.includes('Progress')) {
       inProgress+=qty; siteMap[site].inp+=qty;
