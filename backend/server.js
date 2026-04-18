@@ -318,16 +318,16 @@ function parseData() {
   while (cur2 <= _chartEnd) {
     const k   = cur2.toISOString().slice(0,10);
     const lbl = fmtLbl(cur2);
+    // burndown — push ก่อน accumulate ทำให้วันแรก = TOTAL
     const inAct = lastActDt && cur2 <= lastActDt;
-    dailyLabels.push(lbl);
-    // % สะสม (plan_cum/act_cum) — สำหรับกราฟความก้าวหน้า
-    dailyPlanCum.push(Math.round(Math.min(cumPlan/TOTAL,1)*10000)/100);
-    dailyActCum.push(inAct ? Math.round(cumAct/TOTAL*10000)/100 : null);
-    // burndown — สำหรับ burn-down chart (push ก่อน accumulate = วันแรก TOTAL)
     dailyBdPlan.push(TOTAL - Math.round(Math.min(cumPlan/TOTAL,1)*TOTAL));
     dailyBdAct.push(inAct ? TOTAL - Math.round(cumAct) : null);
+    // accumulate ก่อน push % สะสม ทำให้วันสุดท้ายได้ครบ
     cumAct  += dayActMap[k]||0;
     cumPlan += dayPlanMap[k]||0;
+    dailyLabels.push(lbl);
+    dailyPlanCum.push(Math.round(Math.min(cumPlan/TOTAL,1)*10000)/100);
+    dailyActCum.push(inAct ? Math.round(cumAct/TOTAL*10000)/100 : null);
     cur2.setDate(cur2.getDate()+1);
   }
 
