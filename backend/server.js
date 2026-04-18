@@ -299,11 +299,13 @@ function parseData() {
   const dailyLabels=[],dailyActCum=[],dailyPlanCum=[];
   let cumAct=0, cumPlan=0;
   const cur2 = new Date(PROJ_START_D);
+  let _firstDay=true;
   while (cur2 <= _chartEnd) {
     const k   = cur2.toISOString().slice(0,10);
     const lbl = fmtLbl(cur2);
     cumAct  += dayActMap[k]||0;
     cumPlan += dayPlanMap[k]||0;
+    if(_firstDay){console.log('[DEBUG] day0 k=',k,'planOnDay=',dayPlanMap[k]||0,'cumPlan=',cumPlan);_firstDay=false;}
     const inAct = lastActDt && cur2 <= lastActDt;
     dailyLabels.push(lbl);
     dailyActCum.push(inAct ? Math.round(cumAct/TOTAL*10000)/100 : null);
