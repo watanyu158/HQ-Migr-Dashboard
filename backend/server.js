@@ -306,6 +306,11 @@ function parseData() {
   const PROJ_END_D   = new Date(PROJ_END);   PROJ_END_D.setHours(0,0,0,0);
   const _chartEnd = new Date(Math.max(PROJ_END_D.getTime(), today.getTime()+7*86400000));
   const lastActDt    = lastInstallDate ? new Date(lastInstallDate+'T00:00:00') : null;
+  console.log('[DAILY] lastInstallDate:', lastInstallDate, 'dayActMap on that date:', dayActMap[lastInstallDate]||0);
+  // sum all dayActMap up to lastInstallDate
+  let _cumCheck=0;
+  Object.entries(dayActMap).forEach(([d,v])=>{ if(d<=lastInstallDate) _cumCheck+=v; });
+  console.log('[DAILY] cumAct up to lastInstallDate:', _cumCheck, 'of TOTAL:', TOTAL);
 
   const dailyLabels=[],dailyActCum=[],dailyPlanCum=[],dailyBdPlan=[],dailyBdAct=[];
   let cumAct=0, cumPlan=0;
