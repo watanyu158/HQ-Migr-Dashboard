@@ -2311,7 +2311,7 @@ function buildProgressCharts(){
 
   // ใช้ SW_INF_SITES ถ้ามี ไม่งั้นใช้ FABRICS
   const _progItems = SW_INF_SITES.length ? SW_INF_SITES : FABRICS;
-  _progItems.forEach(f => {
+  _progItems.forEach((f, _fi) => {
     const fname = f.name||f.n||'';
     const fdone = f.done!=null?f.done:f.d||0;
     const ftotal= f.total!=null?f.total:f.t||1;
