@@ -415,20 +415,21 @@ function parseData() {
       bd_plan:dailyBdPlan,
       bd_act: dailyBdAct,
       fab: (() => {
-        // per-site daily act จาก dayActBySite
+        // per-site daily act — ครอบคลุมทุก site จาก swInfSiteMap
         const fab = {};
-        Object.entries(dayActBySite||{}).forEach(([site, dateMap]) => {
+        const allSites = Object.keys(swInfSiteMap);
+        allSites.forEach(site => {
+          const dateMap = dayActBySite[site] || {};
+          const siteTotal = swInfSiteMap[site].sw_t + swInfSiteMap[site].inf_t || 1;
           let cum = 0;
-          const act_cum = dailyLabels.map((lbl, i) => {
-            const k = cur2 ? null : null; // ใช้ key จาก dailyLabels
-            // map lbl DD/MM กลับเป็น YYYY-MM-DD
+          const act_cum = dailyLabels.map((lbl) => {
             const parts = lbl.split('/');
             const k2 = `2026-${parts[1]}-${parts[0]}`;
             cum += (dateMap[k2]||0);
             const inAct = lastActDt && new Date(k2+'T00:00:00') <= lastActDt;
-            return inAct ? Math.round(cum/(dayPlanBySite[site]?.total||1)*10000)/100 : null;
+            return inAct ? Math.round(cum/siteTotal*10000)/100 : null;
           });
-          fab[site] = { sw_plan: dailyPlanCum, sw_act: act_cum, ap_plan: dailyPlanCum, ap_act: [] };
+          fab[site] = { sw_plan: dailyPlanCum, sw_act: act_cum, ap_plan: [], ap_act: [] };
         });
         return fab;
       })(),

@@ -2316,9 +2316,11 @@ function buildProgressCharts(){
     const fdone = f.done!=null?f.done:f.d||0;
     const ftotal= f.total!=null?f.total:f.t||1;
     const fabData = DAILY_FAB_PROG[fname];
-    // ถ้าไม่มี per-site data ให้ใช้ overall แทน
+    // ใช้ per-site sw_act ถ้ามีข้อมูลจริง ไม่งั้น fallback overall
+    const _fabSwAct = fabData?.sw_act||[];
+    const _fabHasAct = _fabSwAct.some(v=>v!=null);
     const _swPlan = (fabData&&fabData.sw_plan&&fabData.sw_plan.length) ? fabData.sw_plan : DAILY_PROG_PLAN;
-    const _swAct  = (fabData&&fabData.sw_act &&fabData.sw_act.length)  ? fabData.sw_act  : DAILY_SW_ACT;
+    const _swAct  = _fabHasAct ? _fabSwAct : DAILY_SW_ACT;
     const swPct = Math.round(fdone/Math.max(ftotal,1)*100);
     const apPct = 0;
     const totPct= swPct;
