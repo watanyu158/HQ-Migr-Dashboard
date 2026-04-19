@@ -115,7 +115,7 @@ function parseData() {
 
     if (!device || !curSite || qty <= 0) continue;
 
-    const site = curSite.length>50 ? curSite.slice(0,50)+'…' : curSite;
+    const site = curSite; // ไม่ truncate
     if (!siteMap[site]) siteMap[site] = {total:0,done:0,inp:0};
     siteMap[site].total += qty;
 
@@ -216,7 +216,7 @@ function parseData() {
     const mig = typeof r[15]==='number' ? r[15] : 0;
     const cat = r[18] ? String(r[18]).trim() : '';
     if (qty<=0 || !_curSite || !['Switch','Infra'].includes(cat)) continue;
-    const site = _curSite.length>50?_curSite.slice(0,50)+'…':_curSite;
+    const site = _curSite; // ไม่ truncate เพื่อให้ตรงกับ fab key
     if (!swInfSiteMap[site]) swInfSiteMap[site]={sw_t:0,sw_d:0,inf_t:0,inf_d:0};
     if (cat==='Switch') { swInfSiteMap[site].sw_t+=qty; swInfSiteMap[site].sw_d+=mig; }
     else               { swInfSiteMap[site].inf_t+=qty; swInfSiteMap[site].inf_d+=mig; }
