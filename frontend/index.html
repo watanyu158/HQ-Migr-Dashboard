@@ -2324,7 +2324,7 @@ function buildProgressCharts(){
     const swPct = Math.round(fdone/Math.max(ftotal,1)*100);
     const apPct = 0;
     const totPct= swPct;
-    const cid   = 'fab-prog-'+(fname).replace(/[^a-zA-Z0-9]/g,'')+'-c';
+    const cid   = 'fab-prog-'+_fi+'-c'; // ใช้ index แทนชื่อที่อาจมีภาษาไทย
 
     const div = document.createElement('div');
     div.className = 'card';
