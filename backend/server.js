@@ -127,7 +127,15 @@ function parseData() {
     const helperDt = toDate(r[19]);
     let helperStr = helperDt ? helperDt.toISOString().slice(0,10) : schedStr;
     if (helperStr && helperStr < PROJ_START.toISOString().slice(0,10)) helperStr = PROJ_START.toISOString().slice(0,10);
-    if (helperStr && cat !== 'AP') dayPlanMap[helperStr] = (dayPlanMap[helperStr]||0) + qty;
+    if (helperStr && cat !== 'AP') {
+      dayPlanMap[helperStr] = (dayPlanMap[helperStr]||0) + qty;
+      // per-site plan tracking
+      if (site) {
+        if (!dayPlanBySite[site]) dayPlanBySite[site]={total:0,byDate:{}};
+        dayPlanBySite[site].total += qty;
+        dayPlanBySite[site].byDate[helperStr]=(dayPlanBySite[site].byDate[helperStr]||0)+qty;
+      }
+    }
 
     // นับจาก Migration column (index 15) — เฉพาะ SW และ Infra
     const migration = typeof r[15]==='number' ? r[15] : 0;
@@ -147,12 +155,10 @@ function parseData() {
         // per-category tracking
         if (cat==='Switch') daySwActMap[instStr2]=(daySwActMap[instStr2]||0)+migration;
         else daySwActMap[instStr2]=(daySwActMap[instStr2]||0); // Infra นับรวม SW
-        // per-site tracking
+        // per-site actual tracking
         if (site) {
           if (!dayActBySite[site]) dayActBySite[site]={};
           dayActBySite[site][instStr2]=(dayActBySite[site][instStr2]||0)+migration;
-          if (!dayPlanBySite[site]) dayPlanBySite[site]={total:0};
-          dayPlanBySite[site].total += qty;
         }
       }
       // on-time check ใช้ instDt2 (helper) vs schedDt
@@ -415,21 +421,25 @@ function parseData() {
       bd_plan:dailyBdPlan,
       bd_act: dailyBdAct,
       fab: (() => {
-        // per-site daily act — ครอบคลุมทุก site จาก swInfSiteMap
+        // per-site daily plan/actual — คำนวณจาก dayPlanBySite/dayActBySite
         const fab = {};
         const allSites = Object.keys(swInfSiteMap);
         allSites.forEach(site => {
-          const dateMap = dayActBySite[site] || {};
-          const siteTotal = swInfSiteMap[site].sw_t + swInfSiteMap[site].inf_t || 1;
-          let cum = 0;
-          const act_cum = dailyLabels.map((lbl) => {
+          const actDateMap  = dayActBySite[site]  || {};
+          const planDateMap = (dayPlanBySite[site]||{}).byDate || {};
+          const siteTotal   = swInfSiteMap[site].sw_t + swInfSiteMap[site].inf_t || 1;
+          let cumAct2=0, cumPlan2=0;
+          const sw_plan=[], sw_act=[];
+          dailyLabels.forEach((lbl) => {
             const parts = lbl.split('/');
             const k2 = `2026-${parts[1]}-${parts[0]}`;
-            cum += (dateMap[k2]||0);
-            const inAct = lastActDt && new Date(k2+'T00:00:00') <= lastActDt;
-            return inAct ? Math.round(cum/siteTotal*10000)/100 : null;
+            cumPlan2 += planDateMap[k2]||0;
+            cumAct2  += actDateMap[k2]||0;
+            const inAct2 = lastActDt && new Date(k2+'T00:00:00') <= lastActDt;
+            sw_plan.push(Math.round(Math.min(cumPlan2/siteTotal,1)*10000)/100);
+            sw_act.push(inAct2 ? Math.round(cumAct2/siteTotal*10000)/100 : null);
           });
-          fab[site] = { sw_plan: dailyPlanCum, sw_act: act_cum, ap_plan: [], ap_act: [] };
+          fab[site] = { sw_plan, sw_act, ap_plan:[], ap_act:[] };
         });
         return fab;
       })(),
