@@ -430,12 +430,18 @@ function parseData() {
           const siteTotal   = swInfSiteMap[site].sw_t + swInfSiteMap[site].inf_t || 1;
           let cumAct2=0, cumPlan2=0;
           const sw_plan=[], sw_act=[];
+          // หา lastActDt สำหรับ site นี้
+          const siteActDates = Object.keys(actDateMap).sort();
+          const siteLastActStr = siteActDates.length ? siteActDates[siteActDates.length-1] : null;
+          const siteLastActDt = siteLastActStr ? new Date(siteLastActStr+'T00:00:00') : null;
+          // ถ้า site ไม่มี actual ใช้ lastActDt global
+          const _siteActDt = siteLastActDt || lastActDt;
           dailyLabels.forEach((lbl) => {
             const parts = lbl.split('/');
             const k2 = `2026-${parts[1]}-${parts[0]}`;
             cumPlan2 += planDateMap[k2]||0;
             cumAct2  += actDateMap[k2]||0;
-            const inAct2 = lastActDt && new Date(k2+'T00:00:00') <= lastActDt;
+            const inAct2 = _siteActDt && new Date(k2+'T00:00:00') <= _siteActDt;
             sw_plan.push(Math.round(Math.min(cumPlan2/siteTotal,1)*10000)/100);
             sw_act.push(inAct2 ? Math.round(cumAct2/siteTotal*10000)/100 : null);
           });
