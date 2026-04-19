@@ -161,11 +161,9 @@ function parseData() {
           dayActBySite[site][instStr2]=(dayActBySite[site][instStr2]||0)+migration;
         }
       }
-      // on-time check ใช้ instDt2 (helper) vs schedDt
-      if (instDt2 && schedDt) {
-        const id=new Date(instDt2+'T00:00:00'); id.setHours(0,0,0,0);
-        const sd=new Date(schedDt); sd.setHours(0,0,0,0);
-        if (id<=sd){onTimeQty+=migration;if(id<sd)earlyQty+=migration;}
+      // on-time check ใช้ ISO string เปรียบเทียบตรงๆ
+      if (instStr2 && helperStr) {
+        if (instStr2 <= helperStr){onTimeQty+=migration;if(instStr2<helperStr)earlyQty+=migration;}
         else lateQty+=migration;
       }
     } else if (status.includes('Progress')) {
