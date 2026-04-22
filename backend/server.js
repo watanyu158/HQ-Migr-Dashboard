@@ -54,7 +54,7 @@ function fmtLbl2(isoStr) {
 }
 
 function parseData() {
-  const excelPath = fs.existsSync(TMP_EXCEL) ? TMP_EXCEL : EXCEL_PATH;
+  const excelPath = EXCEL_PATH; // ใช้ Excel จาก repo เสมอ
   console.log('Reading Excel:', excelPath);
   const wb = XLSX.readFile(excelPath);
 
