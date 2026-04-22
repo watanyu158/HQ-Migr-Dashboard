@@ -46,6 +46,13 @@ function fmtLbl(d) {
   return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
 }
 
+const thMonths = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function fmtLbl2(isoStr) {
+  if (!isoStr) return '–';
+  const d = new Date(isoStr+'T00:00:00');
+  return `${d.getDate()} ${thMonths[d.getMonth()]} ${(d.getFullYear()+543)%100}`;
+}
+
 function parseData() {
   const excelPath = fs.existsSync(TMP_EXCEL) ? TMP_EXCEL : EXCEL_PATH;
   console.log('Reading Excel:', excelPath);
@@ -53,23 +60,22 @@ function parseData() {
 
   const hqRows = XLSX.utils.sheet_to_json(wb.Sheets['HQ'], { header:1, defval:null });
 
-  // หา proj_start/end จาก Migration Plan column H(7)=เริ่ม, I(8)=สิ้นสุด
-  let planDates = [];
-  let startDates=[], endDates=[];
+  // หา proj_start/end จาก col T(19)=เริ่ม, col V(21)=สิ้นสุด (Helper)
+  let PROJ_START = null, PROJ_END = null;
   for (let i=2; i<hqRows.length; i++) {
     const r=hqRows[i]; if(!r) continue;
-    // col H(7) = เริ่ม, col I(8) = สิ้นสุด
-    [r[7]].forEach(v => {
-      const d = typeof v==='number'&&v>40000 ? new Date((v-25569)*86400000) : toDate(v);
-      if (d&&!isNaN(d.getTime())) startDates.push(d);
-    });
-    [r[8]].forEach(v => {
-      const d = typeof v==='number'&&v>40000 ? new Date((v-25569)*86400000) : toDate(v);
-      if (d&&!isNaN(d.getTime())) endDates.push(d);
-    });
+    const dT = toDate(r[19]); // col T = วันที่เริ่ม
+    const dV = toDate(r[21]); // col V = วันที่สิ้นสุด
+    if (dT) {
+      if (!PROJ_START || dT < PROJ_START) PROJ_START = dT;
+      if (!PROJ_END   || dT > PROJ_END)   PROJ_END   = dT;
+    }
+    if (dV) {
+      if (!PROJ_END   || dV > PROJ_END)   PROJ_END   = dV;
+    }
   }
-  const PROJ_START = startDates.length ? new Date(Math.min(...startDates)) : new Date('2026-02-02');
-  const PROJ_END   = endDates.length   ? new Date(Math.max(...endDates))   : new Date('2026-04-30');
+  if (!PROJ_START) PROJ_START = new Date('2026-02-02');
+  if (!PROJ_END)   PROJ_END   = new Date('2026-04-30');
   PROJ_START.setHours(0,0,0,0); PROJ_END.setHours(0,0,0,0);
 
   // คำนวณ TOTAL จาก col G(6) จำนวนใหม่ ทุก row ที่มี Category
@@ -116,7 +122,17 @@ function parseData() {
     if (!device || !curSite || qty <= 0) continue;
 
     const site = curSite; // ไม่ truncate
-    if (!siteMap[site]) siteMap[site] = {total:0,done:0,inp:0};
+    if (!siteMap[site]) siteMap[site] = {total:0,done:0,inp:0,start:null,end:null};
+    // track start/end date per site จาก col T + V
+    const _hStr = r[19] ? toDate(r[19])?.toISOString().slice(0,10) : null;
+    const _eStr = r[21] ? toDate(r[21])?.toISOString().slice(0,10) : null;
+    if (_hStr) {
+      if (!siteMap[site].start || _hStr < siteMap[site].start) siteMap[site].start = _hStr;
+      if (!siteMap[site].end   || _hStr > siteMap[site].end)   siteMap[site].end   = _hStr;
+    }
+    if (_eStr) {
+      if (!siteMap[site].end   || _eStr > siteMap[site].end)   siteMap[site].end   = _eStr;
+    }
     siteMap[site].total += qty;
 
     const dev = device.length>60 ? device.slice(0,60)+'…' : device;
@@ -229,7 +245,7 @@ function parseData() {
       n:name, t:v.total, d:v.done,
       p:v.total>0?Math.round(v.done/v.total*100):0,
       h:0, r:v.total-v.done, c:COLORS[i%7],
-      s:'–', e:'–',
+      s: v.start ? fmtLbl2(v.start) : '–', e: v.end ? fmtLbl2(v.end) : '–',
       sw:{t:0,d:0}, ap:{t:0,d:0}, inf:{t:0,d:0}, weekly:null
     }))
     .sort((a,b)=>b.t-a.t);
@@ -449,9 +465,56 @@ function parseData() {
       })(),
     },
     fab_colors:{}, fab_plan_totals:{}, fab_totals:{}, fab_weekly:{}, fab_daily:{}, fab_daily_plan:{},
-    locations:{},
+    locations: (()=>{
+      // Site → Room จาก col A(0) + col B(1)
+      const locMap = {};
+      let locSite = null;
+      for (let i=2; i<hqRows.length; i++) {
+        const r=hqRows[i]; if(!r) continue;
+        if (r[0]) locSite=String(r[0]).trim();
+        if (!locSite) continue;
+        const room = r[1] ? String(r[1]).trim() : '(ไม่ระบุห้อง)';
+        const qty  = typeof r[6]==='number' ? r[6] : 0;
+        const mig  = typeof r[15]==='number' ? r[15] : 0;
+        if (qty<=0) continue;
+        if (!locMap[locSite]) locMap[locSite]={};
+        if (!locMap[locSite][room]) locMap[locSite][room]={t:0,d:0};
+        locMap[locSite][room].t += qty;
+        locMap[locSite][room].d += mig;
+      }
+      return Object.fromEntries(Object.entries(locMap).map(([site,rooms])=>[
+        site, Object.entries(rooms).map(([room,v])=>({l:room,t:v.t,d:v.d,p:v.t>0?Math.round(v.d/v.t*100):0}))
+      ]));
+    })(),
     types, hold_items:holdItems, fabrics,
-    today_wk:todayWk, last_install_date:lastInstallDate, upcoming:{},
+    today_wk:todayWk, last_install_date:lastInstallDate,
+    upcoming: (()=>{
+      const up={};
+      const todayStr=today.toISOString().slice(0,10);
+      const end14=new Date(today.getTime()+14*86400000).toISOString().slice(0,10);
+      let upSite=null;
+      for (let i=2; i<hqRows.length; i++) {
+        const r=hqRows[i]; if(!r) continue;
+        if (r[0]) upSite=String(r[0]).trim();
+        if (!upSite) continue;
+        const qty=typeof r[6]==='number'?r[6]:0; if(qty<=0) continue;
+        const cat=r[18]?String(r[18]).trim():''; if(cat==='AP') continue;
+        const mig=typeof r[15]==='number'?r[15]:0;
+        const hDt=toDate(r[19]); if(!hDt) continue;
+        const hStr=hDt.toISOString().slice(0,10);
+        if(hStr<todayStr||hStr>end14) continue;
+        const dev=r[3]?String(r[3]).slice(0,50):'อุปกรณ์';
+        if(!up[hStr]) up[hStr]={};
+        if(!up[hStr][upSite]) up[hStr][upSite]={qty:0,rem:0,cats:[],types:[],locs:new Set()};
+        up[hStr][upSite].qty+=qty;
+        up[hStr][upSite].rem+=Math.max(0,qty-mig);
+        if(!up[hStr][upSite].cats.includes(cat)) up[hStr][upSite].cats.push(cat);
+        if(!up[hStr][upSite].types.includes(dev)) up[hStr][upSite].types.push(dev);
+        if(r[1]) up[hStr][upSite].locs.add(String(r[1]).trim());
+      }
+      Object.values(up).forEach(day=>Object.values(day).forEach(v=>{v.locs=[...v.locs];}));
+      return up;
+    })(),
     sites:fabrics.filter(f=>f.t>0).map(f=>({name:f.n,total:f.t,done:f.d,inp:siteMap[f.n]?.inp||0,pct:f.p})),
     sw_inf_sites: Object.entries(swInfSiteMap).map(([name,v])=>({
       name, sw_t:v.sw_t, sw_d:v.sw_d, inf_t:v.inf_t, inf_d:v.inf_d,

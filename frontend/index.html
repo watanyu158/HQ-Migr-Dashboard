@@ -1188,36 +1188,37 @@ main { padding: 12px 10px; }
 <!-- ════ TAB: แผนงาน ════ -->
 <div class="tab-body" id="tab-plan" style="display:none">
   <div style="background:linear-gradient(90deg,var(--primary-l),var(--hold-l));border-radius:var(--rsm);padding:9px 13px;display:flex;align-items:center;gap:7px;margin-bottom:13px;font-size:13px;font-weight:600;color:var(--primary)">📅 การวางแผนโครงการ</div>
-  <div class="g3" style="margin-bottom:14px">
-    <div class="card"><div class="ch" style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:9px">📅 ระยะเวลาโครงการ</div>
-      <div class="g2" style="gap:7px">
-        <div class="pcard"><div class="pc-l">วันเริ่มต้น</div><div class="pc-v">10 ก.พ. 69</div></div>
-        <div class="pcard"><div class="pc-l">วันสิ้นสุด</div><div class="pc-v">23 มิ.ย. 69</div></div>
-        <div class="pcard"><div class="pc-l">จำนวนวันทั้งหมด</div><div class="pc-v" id="plan-proj-days">133 วัน</div></div>
-        <div class="pcard"><div class="pc-l">วันที่เหลือ</div><div class="pc-v red" id="plan-days-left">– วัน</div></div>
+  <div class="g2" style="margin-bottom:14px">
+    <div class="g2" style="grid-template-columns:1fr 1fr;gap:14px;align-content:start">
+      <div class="card"><div class="ch" style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:9px">📅 ระยะเวลาโครงการ</div>
+        <div class="g2" style="gap:7px">
+          <div class="pcard"><div class="pc-l">วันเริ่มต้น</div><div class="pc-v" id="pc-proj-start">–</div></div>
+          <div class="pcard"><div class="pc-l">วันสิ้นสุด</div><div class="pc-v" id="pc-proj-end">–</div></div>
+          <div class="pcard"><div class="pc-l">จำนวนวันทั้งหมด</div><div class="pc-v" id="plan-proj-days">– วัน</div></div>
+          <div class="pcard"><div class="pc-l">วันที่เหลือ</div><div class="pc-v red" id="plan-days-left">– วัน</div></div>
+        </div>
+      </div>
+      <div class="card"><div class="ch" style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:9px">📈 เป้าหมายตามแผน</div>
+        <div class="pcard" style="margin-bottom:7px"><div class="pc-l">เป้าหมายอุปกรณ์/วัน</div><div class="pc-v" id="plan-target-rate">– อุปกรณ์/วัน</div></div>
+        <div class="pcard" style="margin-bottom:7px"><div class="pc-l">เป้าหมายปัจจุบัน</div><div class="pc-v red" id="plan-req-rate">– อุปกรณ์/วัน</div></div>
+        <div class="pcard"><div class="pc-l">อุปกรณ์ที่เหลือ</div><div class="pc-v" id="plan-remaining">– อุปกรณ์</div></div>
       </div>
     </div>
-    <div class="card"><div class="ch" style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:9px">📈 เป้าหมายตามแผน</div>
-      <div class="pcard" style="margin-bottom:7px"><div class="pc-l">เป้าหมายอุปกรณ์/วัน</div><div class="pc-v" id="plan-target-rate">– อุปกรณ์/วัน</div></div>
-      <div class="pcard" style="margin-bottom:7px"><div class="pc-l">เป้าหมายปัจจุบัน</div><div class="pc-v red" id="plan-req-rate">– อุปกรณ์/วัน</div></div>
-      <div class="pcard"><div class="pc-l">อุปกรณ์ที่เหลือ</div><div class="pc-v" id="plan-remaining">– อุปกรณ์</div></div>
+    <div class="g2" style="grid-template-columns:1fr 1fr;gap:14px;align-content:start">
+      <div class="card"><div class="ch" style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:9px">✅ การประเมินโครงการ</div>
+        <div class="pcard" style="margin-bottom:7px"><div class="pc-l">ความคืบหน้าตามแผน</div><div class="pc-v" id="plan-plan-pct">–%</div></div>
+        <div class="pcard" style="margin-bottom:7px"><div class="pc-l">ความคืบหน้าปัจจุบัน</div><div class="pc-v grn" id="plan-act-pct">–%</div><div style="height:5px;background:#f0f4ff;border-radius:99px;margin-top:5px;overflow:hidden"><div id="plan-act-bar" style="height:100%;width:0%;background:var(--success);border-radius:99px"></div></div></div>
+        <div class="pcard"><div class="pc-l">สถานะ</div><div class="pc-v red" id="plan-status">–</div></div>
+      </div>
+      <div class="card"><div class="ch" style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:9px">⚡ ข้อมูลการติดตั้งจริง</div>
+        <div class="pcard" style="margin-bottom:7px"><div class="pc-l">ติดตั้งแล้ว</div><div class="pc-v" id="plan-installed">– อุปกรณ์</div></div>
+        <div class="pcard" style="margin-bottom:7px"><div class="pc-l">เฉลี่ย/วัน</div><div class="pc-v" id="plan-daily-rate">– อุปกรณ์/วัน</div></div>
+        <div class="pcard" style="margin-bottom:7px"><div class="pc-l">คาดว่าจะเสร็จ</div><div class="pc-v red" id="plan-finish-date">–</div></div>
+        <div style="font-size:11px;color:var(--text2);margin:6px 0 4px">ประสิทธิภาพ:</div>
+        <div style="display:flex;align-items:center;gap:7px"><span style="font-size:11px;color:var(--text2)" id="plan-eff-label">–/วัน</span><div style="flex:1;height:8px;background:#f0f4ff;border-radius:99px;overflow:hidden"><div id="plan-eff-bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--danger),#ff8a8a);border-radius:99px"></div></div><span style="font-size:11px;font-weight:700;color:var(--danger)" id="plan-eff-pct">–%</span></div>
+        <div style="text-align:right;font-size:10px;margin-top:2px" id="plan-eff-status">⚠ ต่ำกว่าเป้าหมาย</div>
+      </div>
     </div>
-    <div class="card"><div class="ch" style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:9px">✅ การประเมินโครงการ</div>
-      <div class="pcard" style="margin-bottom:7px"><div class="pc-l">ความคืบหน้าตามแผน</div><div class="pc-v" id="plan-plan-pct">–%</div></div>
-      <div class="pcard" style="margin-bottom:7px"><div class="pc-l">ความคืบหน้าปัจจุบัน</div><div class="pc-v grn" id="plan-act-pct">–%</div><div style="height:5px;background:#f0f4ff;border-radius:99px;margin-top:5px;overflow:hidden"><div id="plan-act-bar" style="height:100%;width:0%;background:var(--success);border-radius:99px"></div></div></div>
-      <div class="pcard"><div class="pc-l">สถานะ</div><div class="pc-v red" id="plan-status">–</div></div>
-    </div>
-  </div>
-  <div class="card" style="margin-bottom:14px">
-    <div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">⚡</div>ข้อมูลการติดตั้งจริง</div>
-    <div class="g3" style="margin-bottom:11px">
-      <div class="pcard"><div class="pc-l">อุปกรณ์ที่ติดตั้งแล้วจริง</div><div class="pc-v" style="font-size:20px" id="plan-installed">– อุปกรณ์</div></div>
-      <div class="pcard"><div class="pc-l">เฉลี่ยที่ทำได้/วัน</div><div class="pc-v" style="font-size:20px" id="plan-daily-rate">– อุปกรณ์/วัน</div></div>
-      <div class="pcard"><div class="pc-l">คาดว่าจะเสร็จ</div><div class="pc-v red" style="font-size:20px" id="plan-finish-date">–</div></div>
-    </div>
-    <div style="font-size:12px;color:var(--text2);margin-bottom:5px">ประสิทธิภาพเทียบกับแผน:</div>
-    <div style="display:flex;align-items:center;gap:9px"><span style="font-size:12px;color:var(--text2);white-space:nowrap" id="plan-eff-label">ทำได้ –/วัน</span><div style="flex:1;height:11px;background:#f0f4ff;border-radius:99px;overflow:hidden"><div id="plan-eff-bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--danger),#ff8a8a);border-radius:99px"></div></div><span style="font-size:12px;font-weight:700;color:var(--danger)" id="plan-eff-pct">–%</span></div>
-    <div style="text-align:right;font-size:11px;margin-top:3px" id="plan-eff-status">⚠ ต่ำกว่าเป้าหมาย</div>
   </div>
   <div id="fpc-list"></div>
 
@@ -1556,15 +1557,8 @@ function buildVelocityChart(){
   });
 
   // ใช้ weekly actual จาก DAILY_L/DAILY_SW/DAILY_AP แทน — นับตาม WK bounds
-  const WK_BOUNDS_MS = [
-    ['2026-02-09','2026-02-15'],['2026-02-16','2026-02-22'],['2026-02-23','2026-03-01'],
-    ['2026-03-02','2026-03-08'],['2026-03-09','2026-03-15'],['2026-03-16','2026-03-22'],
-    ['2026-03-23','2026-03-29'],['2026-03-30','2026-04-05'],['2026-04-06','2026-04-12'],
-    ['2026-04-13','2026-04-19'],['2026-04-20','2026-04-26'],['2026-04-27','2026-05-03'],
-    ['2026-05-04','2026-05-10'],['2026-05-11','2026-05-17'],['2026-05-18','2026-05-24'],
-    ['2026-05-25','2026-05-31'],['2026-06-01','2026-06-08'],['2026-06-09','2026-06-15'],
-    ['2026-06-16','2026-06-22'],['2026-06-23','2026-06-29'],
-  ].map(([s,e])=>[new Date(s+'T00:00:00').getTime(), new Date(e+'T00:00:00').getTime()]);
+  const _projStartMs = window._projStartStr ? new Date(window._projStartStr+'T00:00:00').getTime() : new Date('2026-02-03T00:00:00').getTime();
+  const WK_BOUNDS_MS = WK.map((_,i)=>[_projStartMs+i*7*86400000, _projStartMs+i*7*86400000+6*86400000]);
 
   const wkSW2  = new Array(N_WK).fill(0);
   const wkAP2  = new Array(N_WK).fill(0);
@@ -1574,7 +1568,7 @@ function buildVelocityChart(){
     const [day,mo]=lbl.split('/').map(Number);
     const dt = new Date(2026, mo-1, day).getTime();
     for(let wi=0;wi<N_WK;wi++){
-      if(dt>=WK_BOUNDS_MS[wi][0]&&dt<=WK_BOUNDS_MS[wi][1]){
+      const _wms=WK_BOUNDS_MS[wi]; if(dt>=_wms[0]&&dt<=_wms[1]){
         wkSW2[wi]  +=(DAILY_SW[di]||0);
         wkAP2[wi]  +=(DAILY_AP[di]||0);
         wkInf2[wi] +=(DAILY_INF[di]||0);
@@ -1591,12 +1585,8 @@ function buildVelocityChart(){
   const sliceTot = sliceSW.map((v,i)=>v+sliceAP[i]+(wkInf2[startWk+i]||0));
 
   // Labels: "W7\n09/02-15/02"
-  const WK_DATE_RANGES = [
-    '09/02-15/02','16/02-22/02','23/02-01/03','02/03-08/03','09/03-15/03',
-    '16/03-22/03','23/03-29/03','30/03-05/04','06/04-12/04','13/04-19/04',
-    '20/04-26/04','27/04-03/05','04/05-10/05','11/05-17/05','18/05-24/05',
-    '25/05-31/05','01/06-08/06','09/06-15/06','16/06-22/06','23/06-29/06',
-  ];
+  const _fmt2=(ts)=>{const d=new Date(ts);return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;};
+  const WK_DATE_RANGES = WK_BOUNDS_MS.map(([s,e])=>`${_fmt2(s)}-${_fmt2(e)}`);
   const WK_NAMES = WK.map((_,i)=>`W${i+7}`);
   const sliceLabels = sliceTot.map((_,i)=>{
     const wi=startWk+i;
@@ -1681,15 +1671,13 @@ function buildFabGap(){
   const ex=Chart.getChart(cv); if(ex) ex.destroy();
 
   const wkIdx=Math.max(0,TODAY_WK-1);
-  const WK_BOUNDS_ARR=[
-    ['2026-02-09','2026-02-15'],['2026-02-16','2026-02-22'],['2026-02-23','2026-03-01'],
-    ['2026-03-02','2026-03-08'],['2026-03-09','2026-03-15'],['2026-03-16','2026-03-22'],
-    ['2026-03-23','2026-03-29'],['2026-03-30','2026-04-05'],['2026-04-06','2026-04-12'],
-    ['2026-04-13','2026-04-19'],['2026-04-20','2026-04-26'],['2026-04-27','2026-05-03'],
-    ['2026-05-04','2026-05-10'],['2026-05-11','2026-05-17'],['2026-05-18','2026-05-24'],
-    ['2026-05-25','2026-05-31'],['2026-06-01','2026-06-08'],['2026-06-09','2026-06-15'],
-    ['2026-06-16','2026-06-22'],['2026-06-23','2026-06-29'],
-  ];
+  const _ps2 = window._projStartStr ? new Date(window._projStartStr+'T00:00:00') : new Date('2026-02-03T00:00:00');
+  const _isoD=(d)=>d.toISOString().slice(0,10);
+  const WK_BOUNDS_ARR = WK.map((_,i)=>{
+    const ws=new Date(_ps2.getTime()+i*7*86400000);
+    const we=new Date(ws.getTime()+6*86400000);
+    return [_isoD(ws), _isoD(we)];
+  });
   const [wkS,wkE]=WK_BOUNDS_ARR[wkIdx]||WK_BOUNDS_ARR[0];
   const wkStart=new Date(wkS+'T00:00:00'), wkEnd=new Date(wkE+'T00:00:00');
   const fmtD=d=>`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
@@ -1781,15 +1769,13 @@ function buildWeekdayChart(){
 
   // ใช้ wkIdx เดียวกับ buildFabGap
   const wkIdx=Math.max(0,TODAY_WK-1);
-  const WK_BOUNDS_ARR=[
-    ['2026-02-09','2026-02-15'],['2026-02-16','2026-02-22'],['2026-02-23','2026-03-01'],
-    ['2026-03-02','2026-03-08'],['2026-03-09','2026-03-15'],['2026-03-16','2026-03-22'],
-    ['2026-03-23','2026-03-29'],['2026-03-30','2026-04-05'],['2026-04-06','2026-04-12'],
-    ['2026-04-13','2026-04-19'],['2026-04-20','2026-04-26'],['2026-04-27','2026-05-03'],
-    ['2026-05-04','2026-05-10'],['2026-05-11','2026-05-17'],['2026-05-18','2026-05-24'],
-    ['2026-05-25','2026-05-31'],['2026-06-01','2026-06-08'],['2026-06-09','2026-06-15'],
-    ['2026-06-16','2026-06-22'],['2026-06-23','2026-06-29'],
-  ];
+  const _ps2 = window._projStartStr ? new Date(window._projStartStr+'T00:00:00') : new Date('2026-02-03T00:00:00');
+  const _isoD=(d)=>d.toISOString().slice(0,10);
+  const WK_BOUNDS_ARR = WK.map((_,i)=>{
+    const ws=new Date(_ps2.getTime()+i*7*86400000);
+    const we=new Date(ws.getTime()+6*86400000);
+    return [_isoD(ws), _isoD(we)];
+  });
   const [wkS,wkE]=WK_BOUNDS_ARR[wkIdx]||WK_BOUNDS_ARR[0];
   const wkStart=new Date(wkS+'T00:00:00'), wkEnd=new Date(wkE+'T00:00:00');
   const fmtD=d=>`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
@@ -2899,38 +2885,43 @@ function buildGraphs(){
 // ── LOCATION LIST ─────────────────────────────────────────────────────────────
 function buildLocList(){
   const w=document.getElementById('loc-list');
-  w.innerHTML=Object.entries(LOC_DATA).map(([fab,locs])=>{
-    const f=FABRICS.find(x=>x.n===fab)||{c:'var(--primary)'};
-    const td=locs.reduce((a,l)=>a+l.d,0), tt=locs.reduce((a,l)=>a+l.t,0);
-    const tp=tt>0?Math.round(td/tt*100):0;
-    const _pb=['T1-015','AMF'].includes(fab)?'page-break-before:always;break-before:page;':'';
+  if(!w) return;
+  const COLORS=['#b8593a','#7a8f4c','#c08a2e','#8b6f47','#6b8599','#d98967','#a8452e'];
+  const entries=Object.entries(LOC_DATA);
+  if(!entries.length){ w.innerHTML='<div style="color:var(--text3);padding:12px">ไม่มีข้อมูล</div>'; return; }
 
-    const sorted=[...locs].sort((a,b)=>{
+  w.innerHTML=entries.map(([site,rooms],si)=>{
+    const col=COLORS[si%COLORS.length];
+    const fab=FABRICS.find(f=>f.n===site);
+    const td=rooms.reduce((a,r)=>a+r.d,0), tt=rooms.reduce((a,r)=>a+r.t,0);
+    const tp=tt>0?Math.round(td/tt*100):0;
+    const tpC=tp>=80?'#556b35':tp>=30?'#8f3f26':'#a8452e';
+
+    const sorted=[...rooms].sort((a,b)=>{
       const pa=Math.min(a.p,100), pb=Math.min(b.p,100);
       if(pa===100&&pb!==100) return -1;
       if(pb===100&&pa!==100) return 1;
       return pb-pa;
     });
 
-    const rows=sorted.map(l=>{
-      const pc=Math.min(l.p,100);
-      const done=(pc>=100);
-      const bc=done?'#22c55e':pc>=80?'var(--success)':pc>=30?'var(--warning)':'var(--danger)';
-      const pctC=done?'#16a34a':pc>=80?'var(--success)':pc>=30?'var(--warning)':'var(--danger)';
-      const rowBg=done?'background:#f0fdf4;border-left:3px solid #22c55e;':'border-left:3px solid transparent;';
-      const badge=done?'<span style="font-size:10px;font-weight:700;background:#bbf7d0;color:#166534;padding:1px 7px;border-radius:99px;margin-left:6px;flex-shrink:0">✓ 100%</span>':'';
+    const rows=sorted.map(r=>{
+      const pc=Math.min(r.p,100);
+      const done=pc>=100;
+      const bc=done?'#7a8f4c':pc>=80?'var(--success)':pc>=30?'var(--warning)':'var(--danger)';
+      const pctC=done?'#556b35':pc>=80?'var(--success)':pc>=30?'var(--warning)':'var(--danger)';
+      const rowBg=done?'background:var(--success-l);border-left:3px solid #7a8f4c;':'border-left:3px solid transparent;';
+      const badge=done?'<span style="font-size:10px;font-weight:700;background:#edf0e0;color:#556b35;padding:1px 7px;border-radius:99px;margin-left:6px;flex-shrink:0">✓ 100%</span>':'';
       return '<div class="locrow" style="'+rowBg+'">'
         +'<div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">'
-          +'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="'+(done?'#22c55e':f.c)+'" stroke-width="2.5">'
-            +'<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>'
-            +'<circle cx="12" cy="10" r="3"/>'
+          +'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="'+(done?'#7a8f4c':col)+'" stroke-width="2.5">'
+            +'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>'
           +'</svg>'
-          +'<span class="locname" style="'+(done?'color:#166534;':'')+'">'+l.l+'</span>'
+          +'<span class="locname" style="'+(done?'color:#556b35;':'')+'">'+(r.l||'–')+'</span>'
           +badge
         +'</div>'
         +'<div class="loci">'
           +'<div class="locc">'
-            +'<span style="font-weight:700;color:var(--text)">'+l.d+'/'+l.t+'</span>'
+            +'<span style="font-weight:700;color:var(--text)">'+r.d+'/'+r.t+'</span>'
             +' <span style="font-weight:800;color:'+pctC+'">('+pc+'%)</span>'
           +'</div>'
           +'<div class="locbar"><div class="locfill" style="width:'+pc+'%;background:'+bc+'"></div></div>'
@@ -2938,15 +2929,15 @@ function buildLocList(){
       +'</div>';
     }).join('');
 
-    return '<div class="fg" style="'+_pb+'">'
+    return '<div class="fg">'
       +'<div class="fgh" onclick="togFab(this)">'
-        +'<div style="display:flex;align-items:center;gap:7px">'
-          +'<div style="width:10px;height:10px;border-radius:50%;background:'+f.c+'"></div>'
-          +'<span style="font-size:14px;font-weight:700">'+fab+'</span>'
+        +'<div style="display:flex;align-items:center;gap:8px">'
+          +'<div style="width:10px;height:10px;border-radius:50%;background:'+col+';flex-shrink:0"></div>'
+          +'<span style="font-size:14px;font-weight:700;color:var(--text)">'+site+'</span>'
         +'</div>'
-        +'<div style="display:flex;align-items:center;gap:7px">'
-          +'<span style="font-size:12px;color:var(--text2);font-weight:600">'+td+'/'+tt+'</span>'
-          +'<span style="font-size:13px;font-weight:800;color:'+(tp>=80?'var(--success)':tp>=30?'var(--warning)':'var(--danger)')+'">'+tp+'%</span>'
+        +'<div style="display:flex;align-items:center;gap:8px">'
+          +'<span style="font-size:12px;color:var(--text2);font-weight:600">'+td+'/'+tt+' เครื่อง</span>'
+          +'<span style="font-size:13px;font-weight:800;color:'+tpC+'">'+tp+'%</span>'
           +'<span class="fg-arrow">›</span>'
         +'</div>'
       +'</div>'
@@ -3471,8 +3462,15 @@ async function loadData(){
       _e('plan-eff-status').textContent = effPct>=100?'✅ เกินเป้าหมาย':'⚠ ต่ำกว่าเป้าหมาย';
       _e('plan-eff-status').style.color = effPct>=100?'var(--success)':'var(--danger)';
     }
-    // plan target rate = TOTAL / proj_days (133 วัน)
-    const projDays = 133;
+    // plan dates dynamic
+    const thM2=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    const _fmtTH2=dt=>{const d=new Date(dt+'T00:00:00');return d.getDate()+' '+thM2[d.getMonth()]+' '+((d.getFullYear()+543)%100);};
+    if(_e('pc-proj-start')) _e('pc-proj-start').textContent=_fmtTH2(meta.proj_start);
+    if(_e('pc-proj-end'))   _e('pc-proj-end').textContent=_fmtTH2(meta.proj_end);
+    window._projStartStr = meta.proj_start;
+    window._projEndStr   = meta.proj_end;
+    const projDays = Math.round((new Date(meta.proj_end+'T00:00:00') - new Date(meta.proj_start+'T00:00:00')) / 86400000) || 133;
+    if(_e('plan-proj-days')) _e('plan-proj-days').textContent = projDays+' วัน';
     const targetRate = (meta.total / projDays).toFixed(1);
     if(_e('plan-target-rate'))  _e('plan-target-rate').textContent  = targetRate+' อุปกรณ์/วัน';
     if(_e('plan-finish-date'))  _e('plan-finish-date').textContent  = finTH;
@@ -3840,8 +3838,8 @@ function buildUpcoming(){
   const thDow=['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
   const thMo=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
   const fmtD=s=>{const d=new Date(s+'T00:00:00');return `${thDow[d.getDay()]} ${d.getDate()} ${thMo[d.getMonth()]} ${(d.getFullYear()+543)%100}`;};
-  const FAB_C={'D1-041':'#4361ee','CFZ':'#2bc48a','T1-015':'#ff9f43','D1-091':'#a855f7','RFF':'#22b8cf','AMF':'#f76707','PPW':'#74c0fc'};
-  const CAT_S={'Switch':{bg:'#eff6ff',c:'#1d4ed8',icon:'🔀'},'AP':{bg:'#f0fdf4',c:'#15803d',icon:'📶'},'Infra':{bg:'#fff7ed',c:'#c2410c',icon:'⚡'}};
+  const CAT_S={'Switch':{bg:'#fbeade',c:'#b8593a',icon:'🔀'},'AP':{bg:'#edf0e0',c:'#7a8f4c',icon:'📶'},'Infra':{bg:'#faefd4',c:'#c08a2e',icon:'⚡'}};
+
   if(!dates.length){
     wrap.innerHTML='<div style="padding:16px;color:var(--text2);font-size:12px;text-align:center">ไม่มีแผนการติดตั้งใน 2 สัปดาห์หน้า</div>';
     if(rangeEl) rangeEl.textContent='';
@@ -3850,20 +3848,20 @@ function buildUpcoming(){
   if(rangeEl) rangeEl.textContent=`${fmtD(dates[0])} – ${fmtD(dates[dates.length-1])}`;
 
   // summary
-  let sumQty=0,sumRem=0; const fabSet=new Set(),catCnt={Switch:0,AP:0,Infra:0};
-  dates.forEach(d=>Object.entries(up[d]).forEach(([f,v])=>{
-    sumQty+=v.qty; sumRem+=v.rem; fabSet.add(f);
+  let sumQty=0,sumRem=0; const siteSet=new Set(),catCnt={Switch:0,AP:0,Infra:0};
+  dates.forEach(d=>Object.entries(up[d]).forEach(([s,v])=>{
+    sumQty+=v.qty; sumRem+=v.rem; siteSet.add(s);
     v.cats.forEach(c=>{if(catCnt[c]!==undefined) catCnt[c]+=v.rem;});
   }));
 
-  let html=`<div class="card" style="margin-bottom:12px;background:linear-gradient(135deg,#f0f4ff,#f8faff)">
+  let html=`<div class="card" style="margin-bottom:12px;background:linear-gradient(135deg,var(--primary-l),var(--bg-2))">
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
-      <div style="background:#fff;border-radius:10px;padding:12px 14px;border:1px solid #e0e7ff">
+      <div style="background:var(--card);border-radius:10px;padding:12px 14px;border:1px solid var(--border)">
         <div style="font-size:10px;color:var(--text2)">เหลือต้องติดตั้ง</div>
         <div style="font-size:26px;font-weight:800;color:var(--primary);line-height:1.1">${sumRem}<span style="font-size:12px;font-weight:400;color:var(--text2)"> /${sumQty}</span></div>
         <div style="font-size:10px;color:var(--text2)">เครื่อง (รวม ${dates.length} วัน)</div>
       </div>
-      <div style="background:#fff;border-radius:10px;padding:12px 14px;border:1px solid #e0e7ff">
+      <div style="background:var(--card);border-radius:10px;padding:12px 14px;border:1px solid var(--border)">
         <div style="font-size:10px;color:var(--text2);margin-bottom:5px">ประเภทอุปกรณ์</div>
         ${Object.entries(catCnt).filter(([,v])=>v>0).map(([c,v])=>{
           const s=CAT_S[c]||{bg:'#f5f5f5',c:'#666',icon:'📦'};
@@ -3872,21 +3870,21 @@ function buildUpcoming(){
             <span style="font-size:11px;font-weight:700;color:${s.c}">${v}</span></div>`;
         }).join('')}
       </div>
-      <div style="background:#fff;border-radius:10px;padding:12px 14px;border:1px solid #e0e7ff">
+      <div style="background:var(--card);border-radius:10px;padding:12px 14px;border:1px solid var(--border)">
         <div style="font-size:10px;color:var(--text2);margin-bottom:6px">สถานที่</div>
         <div style="display:flex;flex-wrap:wrap;gap:4px">
-          ${[...fabSet].map(f=>`<span style="font-size:10px;font-weight:700;background:${FAB_C[f]||'#888'}22;color:${FAB_C[f]||'#888'};padding:2px 8px;border-radius:99px">${f}</span>`).join('')}
+          ${[...siteSet].map((s,i)=>{const col=FABRICS[i%FABRICS.length]?.c||'#888';return `<span style="font-size:10px;font-weight:700;background:${col}22;color:${col};padding:2px 8px;border-radius:99px">${s}</span>`;}).join('')}
         </div>
       </div>
     </div>
   </div>`;
 
   dates.forEach(d=>{
-    const fabs=up[d]; const dt=new Date(d+'T00:00:00');
+    const sites=up[d]; const dt=new Date(d+'T00:00:00');
     const dow=dt.getDay(); const isWkend=dow===0||dow===6;
-    const dayRem=Object.values(fabs).reduce((a,v)=>a+v.rem,0);
-    const dayQty=Object.values(fabs).reduce((a,v)=>a+v.qty,0);
-    const ac=isWkend?'#d97706':'#4361ee'; const abg=isWkend?'#fef3c7':'#eff6ff';
+    const dayRem=Object.values(sites).reduce((a,v)=>a+v.rem,0);
+    const dayQty=Object.values(sites).reduce((a,v)=>a+v.qty,0);
+    const ac=isWkend?'#c08a2e':'#b8593a'; const abg=isWkend?'#faefd4':'#fbeade';
     html+=`<div class="card" style="margin-bottom:8px;border-left:4px solid ${ac};padding:12px 14px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
         <div style="display:flex;align-items:center;gap:10px">
@@ -3905,19 +3903,21 @@ function buildUpcoming(){
         </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:7px">`;
-    Object.entries(fabs).forEach(([fab,v])=>{
-      const fc=FAB_C[fab]||'#888';
-      const typeChips=v.types.slice(0,4).map(t=>`<span style="font-size:10px;background:#f1f5f9;color:#475569;padding:2px 8px;border-radius:6px">${t}</span>`).join('');
-      const moreT=v.types.length>4?`<span style="font-size:10px;color:var(--text2)">+${v.types.length-4} อื่นๆ</span>`:'';
-      const locChips=v.locs.slice(0,3).map(l=>`<span style="font-size:10px;background:#f0fdf4;color:#166534;padding:2px 8px;border-radius:6px;border:1px solid #bbf7d0">📍 ${l}</span>`).join('');
-      const moreL=v.locs.length>3?`<span style="font-size:10px;color:var(--text2)">+${v.locs.length-3}</span>`:'';
-      const catBadges=[...new Set(v.cats)].map(c=>{const s=CAT_S[c]||{bg:'#f5f5f5',c:'#666',icon:'📦'};return `<span style="font-size:10px;background:${s.bg};color:${s.c};padding:2px 8px;border-radius:99px;font-weight:600">${c}</span>`;}).join('');
+
+    Object.entries(sites).forEach(([site,v])=>{
+      const fabObj=FABRICS.find(f=>f.n===site)||{c:'#888'};
+      const fc=fabObj.c;
+      const typeChips=v.types.slice(0,3).map(t=>`<span style="font-size:10px;background:var(--bg-2);color:var(--text2);padding:2px 8px;border-radius:6px">${t}</span>`).join('');
+      const moreT=v.types.length>3?`<span style="font-size:10px;color:var(--text2)">+${v.types.length-3} อื่นๆ</span>`:'';
+      const locChips=(v.locs||[]).slice(0,3).map(l=>`<span style="font-size:10px;background:var(--success-l);color:var(--success);padding:2px 8px;border-radius:6px;border:1px solid #c4d9a0">📍 ${l}</span>`).join('');
+      const moreL=(v.locs||[]).length>3?`<span style="font-size:10px;color:var(--text2)">+${v.locs.length-3}</span>`:'';
+      const catBadges=[...new Set(v.cats)].map(c=>{const s=CAT_S[c]||{bg:'#f5f5f5',c:'#666',icon:'📦'};return `<span style="font-size:10px;background:${s.bg};color:${s.c};padding:2px 8px;border-radius:99px;font-weight:600">${s.icon} ${c}</span>`;}).join('');
       const pct=v.qty>0?Math.round((v.qty-v.rem)/v.qty*100):0;
-      html+=`<div style="background:#f8faff;border-radius:8px;padding:10px 12px">
+      html+=`<div style="background:var(--bg);border-radius:8px;padding:10px 12px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
           <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
             <div style="width:9px;height:9px;border-radius:50%;background:${fc};flex-shrink:0"></div>
-            <span style="font-size:13px;font-weight:700;color:${fc}">${fab}</span>
+            <span style="font-size:13px;font-weight:700;color:${fc}">${site}</span>
             ${catBadges}
             ${pct>0?`<span style="font-size:10px;color:var(--success);font-weight:600">✓ ${pct}%</span>`:''}
           </div>
@@ -3927,13 +3927,14 @@ function buildUpcoming(){
           </div>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px">${typeChips}${moreT}</div>
-        ${v.locs.length?`<div style="display:flex;flex-wrap:wrap;gap:4px">${locChips}${moreL}</div>`:''}
+        ${(v.locs||[]).length?`<div style="display:flex;flex-wrap:wrap;gap:4px">${locChips}${moreL}</div>`:''}
       </div>`;
     });
     html+='</div></div>';
   });
   wrap.innerHTML=html;
 }
+
 </script>
 </body>
 </html>
