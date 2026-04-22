@@ -473,7 +473,19 @@ function parseData() {
       })(),
     },
     fab_colors:{}, fab_plan_totals:{}, fab_totals:{},
-    fab_weekly:{}, fab_daily_plan:{},
+    fab_weekly:{},
+    fab_daily_plan: (()=>{
+      const fdp={};
+      Object.keys(swInfSiteMap).forEach(site=>{
+        fdp[site]={};
+        const planByDate=(dayPlanBySite[site]||{}).byDate||{};
+        dailyLabels.forEach(lbl=>{
+          const[dd,mm]=lbl.split('/'); const k=`2026-${mm}-${dd}`;
+          if(planByDate[k]) fdp[site][lbl]=planByDate[k];
+        });
+      });
+      return fdp;
+    })(),
     fab_daily: (()=>{
       const fd={};
       Object.keys(swInfSiteMap).forEach(site=>{
