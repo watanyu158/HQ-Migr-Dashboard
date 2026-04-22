@@ -2828,18 +2828,20 @@ function buildGraphs(){
   wrap.innerHTML = '';
   // Track all chart builds for export
   window._fabChartPromises = [];
-  Object.keys(FAB_DAILY).forEach(fab => {
-    const fd = FAB_DAILY[fab];
-    const fabColor = FAB_COLORS[fab];
-    const total = (FAB_TOTALS[fab].sw + FAB_TOTALS[fab].ap + FAB_TOTALS[fab].inf);
+  // iterate FABRICS ทั้งหมด
+  FABRICS.forEach(fabObj => {
+    const fab = fabObj.n;
+    const fd = FAB_DAILY[fab] || {sw:new Array(DAILY_L.length||131).fill(0),ap:[],inf:[]};
+    const fabColor = FAB_COLORS[fab] || fabObj.c || 'var(--primary)';
 
-    // Only build chart if has any installs
-    const hasData = fd.sw.some(v=>v>0) || fd.ap.some(v=>v>0) || fd.inf.some(v=>v>0);
+    // skip ถ้า fd ไม่มี sw arrays
+    if(!fd.sw || !Array.isArray(fd.sw)) return;
+    const hasData = fd.sw.some(v=>v>0) || (fd.ap||[]).some(v=>v>0) || (fd.inf||[]).some(v=>v>0);
 
     const div = document.createElement('div');
     div.className = 'card';
-    const fabDoneTotal = FAB_TOTALS[fab].sw + FAB_TOTALS[fab].ap + FAB_TOTALS[fab].inf;
-    const fabPlanTotal = FAB_PLAN_TOTALS[fab] || 0;
+    const fabDoneTotal = fabObj.d||0;
+    const fabPlanTotal = fabObj.t||0;
     const fabPct = fabPlanTotal>0 ? Math.round(fabDoneTotal/fabPlanTotal*100) : 0;
     const fabPctColor = fabPct>=80?'#065f46':fabPct>=30?'#92400e':'#4361ee';
     const fabPctBg    = fabPct>=80?'#ecfdf5':fabPct>=30?'#fff5e6':'#eef1ff';
@@ -2851,7 +2853,7 @@ function buildGraphs(){
       <div class="ch" style="margin-bottom:10px;flex-wrap:wrap;gap:6px">
         <div style="width:10px;height:10px;border-radius:50%;background:${fabColor};flex-shrink:0"></div>
         <span style="font-size:13px;font-weight:700">${fab}</span>
-        <span style="font-size:11px;color:var(--text2)">SW:${FAB_TOTALS[fab].sw} / AP:${FAB_TOTALS[fab].ap} / Infra:${FAB_TOTALS[fab].inf}</span>
+        <span style="font-size:11px;color:var(--text2)">SW:${fabObj.sw.d||0}/${fabObj.sw.t||0} / AP:${fabObj.ap.d||0}/${fabObj.ap.t||0} / Infra:${fabObj.inf.d||0}/${fabObj.inf.t||0}</span>
         <span style="margin-left:auto;display:flex;align-items:center;gap:6px">
           <span style="font-size:12px;color:var(--text2)">
             ติดตั้งแล้ว <strong style="color:var(--text)">${fabDoneTotal}</strong> จาก <strong>${fabPlanTotal}</strong> เครื่อง
