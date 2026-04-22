@@ -2459,23 +2459,29 @@ function buildProgressCharts(){
 // ── Synchronous per-fabric chart builder (used by both buildGraphs and exportPDF) ──
 function buildOneFabChart(fab) {
   const fd = FAB_DAILY[fab];
-  if(!fd) return;
-  const fabColor = FAB_COLORS[fab] || '#4361ee';
-  const hasData = fd.sw.some(v=>v>0) || fd.ap.some(v=>v>0) || fd.inf.some(v=>v>0);
-  if(!hasData) return;
+  const fabObj = FABRICS.find(f=>f.n===fab)||{t:0,d:0,sw:{t:0,d:0},ap:{t:0,d:0},inf:{t:0,d:0}};
+  const fabColor = FAB_COLORS[fab] || fabObj.c || 'var(--primary)';
   const ctx = document.getElementById('fd-' + fab.replace(/-/g,'') + '-c');
   if (!ctx) return;
   const existingCh = Chart.getChart(ctx);
   if (existingCh) existingCh.destroy();
-  const planData = FAB_DAILY_PLAN[fab] || DAILY_L.map(()=>0);
+
+  // plan: convert {label:qty} → array indexed by DAILY_L
+  const planMap = FAB_DAILY_PLAN[fab] || {};
+  const planData = DAILY_L.map(lbl => planMap[lbl] || 0);
+
+  // actual: ใช้ FAB_DAILY ถ้ามี ไม่งั้น array ศูนย์
+  const swData  = (fd && Array.isArray(fd.sw))  ? fd.sw  : DAILY_L.map(()=>0);
+  const apData  = (fd && Array.isArray(fd.ap))  ? fd.ap  : DAILY_L.map(()=>0);
+  const infData = (fd && Array.isArray(fd.inf)) ? fd.inf : DAILY_L.map(()=>0);
   new Chart(ctx, {
     type: 'bar',
     data: {
       labels: DAILY_L,
       datasets: [
-    {label:'Switch', data:fd.sw,  backgroundColor:'#4361ee', borderRadius:3, stack:'s', order:2},
-    {label:'AP',     data:fd.ap,  backgroundColor:'#2bc48a', borderRadius:3, stack:'s', order:2},
-    {label:'Infra',  data:fd.inf, backgroundColor:'#ff9f43', borderRadius:3, stack:'s', order:2},
+    {label:'Switch', data:swData,  backgroundColor:'#4361ee', borderRadius:3, stack:'s', order:2},
+    {label:'AP',     data:apData,  backgroundColor:'#2bc48a', borderRadius:3, stack:'s', order:2},
+    {label:'Infra',  data:infData, backgroundColor:'#ff9f43', borderRadius:3, stack:'s', order:2},
     {
       label:'เป้าตามแผน',
       data: planData,
@@ -2521,7 +2527,7 @@ function buildOneFabChart(fab) {
     }
       },
       scales:{
-    x:{stacked:true,ticks:{font:{size:9},maxRotation:45,color:'#94a3c4'},grid:{display:false}},
+    x:{stacked:true,ticks:{font:{size:9},maxRotation:45,color:'#94a3c4',autoSkip:true,maxTicksLimit:8},grid:{display:false}},
     y:{stacked:true,ticks:{font:{size:9},color:'#94a3c4',callback:v=>v>0?v:''},grid:{color:'#f0f4ff'},min:0}
       }
     }
