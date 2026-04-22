@@ -252,7 +252,9 @@ function parseData() {
       p:v.total>0?Math.round(v.done/v.total*100):0,
       h:0, r:v.total-v.done, c:COLORS[i%7],
       s: v.start ? fmtLbl2(v.start) : '–', e: v.end ? fmtLbl2(v.end) : '–',
-      sw:{t:0,d:0}, ap:{t:0,d:0}, inf:{t:0,d:0}, weekly:null
+      sw:{t:swInfSiteMap[name]?.sw_t||0, d:swInfSiteMap[name]?.sw_d||0},
+      ap:{t:0, d:0},
+      inf:{t:swInfSiteMap[name]?.inf_t||0, d:swInfSiteMap[name]?.inf_d||0}, weekly:null
     }))
     .sort((a,b)=>b.t-a.t);
 

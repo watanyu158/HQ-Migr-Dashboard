@@ -3292,10 +3292,11 @@ async function loadData(){
         const fab=fab_obj.n;
         const fd=FAB_DAILY[fab]; if(!fd) return;
         const fabPlanArr = FAB_DAILY_PLAN[fab] || [];
-        const swTotal=fab_obj.sw.t||1;
-        const apTotal=fab_obj.ap.t||1;
-        const swR=fab_obj.sw.t/(fab_obj.sw.t+fab_obj.ap.t+0.001);
-        const apR=fab_obj.ap.t/(fab_obj.sw.t+fab_obj.ap.t+0.001);
+        // HQ: sw.t อาจเป็น 0 ให้ fallback ไป total รวม
+        const swTotal = fab_obj.sw.t > 0 ? fab_obj.sw.t : (fab_obj.t||1);
+        const apTotal = fab_obj.ap.t > 0 ? fab_obj.ap.t : 1;
+        const swR = swTotal > 0 ? 1 : 0; // HQ ไม่แยก sw ratio
+        const apR = 0;
 
         // detect format: new={sw:[],ap:[]} หรือ old=number[]
         const isNewFmt = fd.sw && Array.isArray(fd.sw);
