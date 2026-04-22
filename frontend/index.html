@@ -1060,14 +1060,14 @@ main { padding: 12px 10px; }
   <!-- SW -->
   <div class="card" style="margin-bottom:14px">
     <div class="ch">
-      <div class="chi" style="background:#eef1ff;color:#4361ee">🔀</div>Switch รวม — แผน vs จริง (%)
+      <div class="chi" style="background:#fbeade;color:#b8593a">🔀</div>Switch รวม — แผน vs จริง (%)
       <div style="display:flex;gap:10px;margin-left:auto;font-size:11px;font-weight:400">
         <span id="prog-sw-plan-lbl" style="color:var(--text3)">แผน: –%</span>
-        <span id="prog-sw-act-lbl" style="color:#4361ee;font-weight:600">จริง: –%</span>
+        <span id="prog-sw-act-lbl" style="color:#b8593a;font-weight:600">จริง: –%</span>
       </div>
     </div>
     <div style="height:220px"><canvas id="prog-sw-c"></canvas></div>
-    <div class="cleg"><div class="cl"><div class="cld" style="border-color:#a5b4fc"></div>แผน (%)</div><div class="cl"><div class="cll" style="background:#4361ee"></div>จริง (%)</div></div>
+    <div class="cleg"><div class="cl"><div class="cld" style="border-color:#e8b99b"></div>แผน (%)</div><div class="cl"><div class="cll" style="background:#b8593a"></div>จริง (%)</div></div>
   </div>
   <!-- AP -->
   <div class="card" style="margin-bottom:14px">
@@ -1079,7 +1079,7 @@ main { padding: 12px 10px; }
       </div>
     </div>
     <div style="height:220px"><canvas id="prog-ap-c"></canvas></div>
-    <div class="cleg"><div class="cl"><div class="cld" style="border-color:#6ee7b7"></div>แผน (%)</div><div class="cl"><div class="cll" style="background:#2bc48a"></div>จริง (%)</div></div>
+    <div class="cleg"><div class="cl"><div class="cld" style="border-color:#c4d9a0"></div>แผน (%)</div><div class="cl"><div class="cll" style="background:#7a8f4c"></div>จริง (%)</div></div>
   </div>
 
   <!-- Per Site charts -->
@@ -1093,21 +1093,21 @@ main { padding: 12px 10px; }
 
 <!-- ════ TAB: กราฟ ════ -->
 <div class="tab-body" id="tab-graphs" style="display:none">
-  <div class="g2" style="margin-bottom:14px">
+  <div style="margin-bottom:14px">
     <div class="card"><div class="ch"><div class="chi" style="background:var(--primary-l);color:var(--primary)">🍩</div>สัดส่วนประเภทอุปกรณ์</div>
       <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
         <div style="position:relative;width:150px;height:150px;flex-shrink:0"><canvas id="type-c"></canvas>
           <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-size:16px;font-weight:700"><span id="type-donut-pct">–</span></div><div style="font-size:10px;color:var(--text2)">รวม</div></div>
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;flex:1;font-size:12px;color:var(--text2)">
-          <div style="display:flex;justify-content:space-between"><span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:var(--primary);display:inline-block"></span>Switch 70%</span><span style="font-weight:600">1,121</span></div>
-          <div style="display:flex;justify-content:space-between"><span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:var(--success);display:inline-block"></span>AP 28%</span><span style="font-weight:600">445</span></div>
-          <div style="display:flex;justify-content:space-between"><span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:var(--warning);display:inline-block"></span>Infra 2%</span><span style="font-weight:600">26</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:var(--primary);display:inline-block"></span><span id="td-sw-lbl">Switch –</span></span><span style="font-weight:600" id="td-sw-n">–</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:var(--success);display:inline-block"></span><span id="td-ap-lbl">AP –</span></span><span style="font-weight:600" id="td-ap-n">–</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:var(--warning);display:inline-block"></span><span id="td-inf-lbl">Infra –</span></span><span style="font-weight:600" id="td-inf-n">–</span></div>
         </div>
       </div>
     </div>
-    <div class="card"><div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">📊</div>แผนภูมิ Fabric</div><div style="height:175px"><canvas id="fab-bar-c"></canvas></div></div>
   </div>
+  <div class="card" style="margin-bottom:14px"><div class="ch"><div class="chi" style="background:var(--success-l);color:var(--success)">📊</div>แผนภูมิ Fabric — แยกตามสถานที่</div><div style="height:400px"><canvas id="fab-bar-c"></canvas></div></div>
   <div class="card" style="margin-bottom:14px">
     <div class="ch"><div class="chi" style="background:var(--primary-l);color:var(--primary)">📊</div>แยกตามประเภทอุปกรณ์ — แผน vs ติดตั้งแล้ว</div>
     <div style="height:460px"><canvas id="type-bar-c"></canvas></div>
@@ -1152,19 +1152,19 @@ main { padding: 12px 10px; }
   <!-- Summary bar: done vs plan per fabric -->
   <div class="card" style="margin-bottom:14px">
     <div class="ch">
-      <div class="chi" style="background:#eef1ff;color:var(--primary)">📊</div>
+      <div class="chi" style="background:#fbeade;color:var(--primary)">📊</div>
       สรุปจำนวนติดตั้งแล้ว แยกตามสถานที่
       <span style="margin-left:8px;font-size:11px;font-weight:400;color:var(--text2)">
-        ติดตั้งแล้ว <strong style="color:var(--primary)">441</strong> จากทั้งหมด <strong>1,592</strong> เครื่อง
-        <span style="margin-left:6px;padding:2px 8px;border-radius:99px;background:#eef1ff;color:var(--primary);font-size:10px;font-weight:600">รวม 28%</span>
+        ติดตั้งแล้ว <strong style="color:var(--primary)" id="plan-installed-n">–</strong> จากทั้งหมด <strong id="plan-total-n">–</strong> เครื่อง
+        <span id="plan-all-pct-badge" style="margin-left:6px;padding:2px 8px;border-radius:99px;background:#fbeade;color:var(--primary);font-size:10px;font-weight:600">รวม –%</span>
       </span>
     </div>
     <div style="height:220px"><canvas id="fab-total-bar-c"></canvas></div>
     <div style="display:flex;gap:14px;margin-top:8px;font-size:11px;color:var(--text2)">
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:3px;border-radius:2px;background:#4361ee;display:inline-block"></span>Switch ติดตั้งแล้ว</span>
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:3px;border-radius:2px;background:#2bc48a;display:inline-block"></span>AP ติดตั้งแล้ว</span>
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:3px;border-radius:2px;background:#ff9f43;display:inline-block"></span>Infra ติดตั้งแล้ว</span>
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:2px;border-top:2px dashed #94a3c4;display:inline-block"></span>เป้าหมายทั้งหมด</span>
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:3px;border-radius:2px;background:#b8593a;display:inline-block"></span>Switch ติดตั้งแล้ว</span>
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:3px;border-radius:2px;background:#7a8f4c;display:inline-block"></span>AP ติดตั้งแล้ว</span>
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:3px;border-radius:2px;background:#c08a2e;display:inline-block"></span>Infra ติดตั้งแล้ว</span>
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:2px;border-top:2px dashed #9c8a74;display:inline-block"></span>เป้าหมายทั้งหมด</span>
     </div>
   </div>
 
