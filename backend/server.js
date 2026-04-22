@@ -470,7 +470,28 @@ function parseData() {
         return fab;
       })(),
     },
-    fab_colors:{}, fab_plan_totals:{}, fab_totals:{}, fab_weekly:{}, fab_daily:{}, fab_daily_plan:{},
+    fab_colors:{}, fab_plan_totals:{}, fab_totals:{},
+    fab_weekly:{}, fab_daily_plan:{},
+    fab_daily: (()=>{
+      const fd={};
+      Object.keys(swInfSiteMap).forEach(site=>{
+        const actByDate=dayActBySite[site]||{};
+        const sw=[], ap=[], inf=[];
+        dailyLabels.forEach(lbl=>{
+          const[dd,mm]=lbl.split('/'); const k=`2026-${mm}-${dd}`;
+          sw.push(actByDate[k]||0); ap.push(0); inf.push(0);
+        });
+        fd[site]={sw,ap,inf};
+      });
+      return fd;
+    })(),
+    daily:{
+      labels:dailyLabels,
+      sw:dailyLabels.map(lbl=>{const[dd,mm]=lbl.split('/');return daySwActMap[`2026-${mm}-${dd}`]||0;}),
+      ap:dailyLabels.map(lbl=>{const[dd,mm]=lbl.split('/');return dayApActMap[`2026-${mm}-${dd}`]||0;}),
+      inf:dailyLabels.map(()=>0), plan:dailyLabels.map(lbl=>{const[dd,mm]=lbl.split('/');return dayPlanMap[`2026-${mm}-${dd}`]||0;}),
+      cum_d:[],cum_sw:[],cum_ap:[],cum_inf:[]
+    },
     locations: (()=>{
       // Site → Room จาก col A(0) + col B(1)
       const locMap = {};
