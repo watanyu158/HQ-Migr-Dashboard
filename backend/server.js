@@ -61,17 +61,23 @@ function parseData() {
   const hqRows = XLSX.utils.sheet_to_json(wb.Sheets['HQ'], { header:1, defval:null });
 
   // หา proj_start/end จาก col T(19)=เริ่ม, col V(21)=สิ้นสุด (Helper)
+  // fallback: col H(7) ถ้า col T ว่างทั้งหมด
   let PROJ_START = null, PROJ_END = null;
   for (let i=2; i<hqRows.length; i++) {
     const r=hqRows[i]; if(!r) continue;
-    const dT = toDate(r[19]); // col T = วันที่เริ่ม
-    const dV = toDate(r[21]); // col V = วันที่สิ้นสุด
-    if (dT) {
-      if (!PROJ_START || dT < PROJ_START) PROJ_START = dT;
-      if (!PROJ_END   || dT > PROJ_END)   PROJ_END   = dT;
+    const dT = toDate(r[19]); // col T = วันที่เริ่ม Helper
+    const dV = toDate(r[21]); // col V = วันที่สิ้นสุด Helper
+    const dH = toDate(r[7]);  // col H = Migration Plan เริ่ม (fallback)
+    const dI = toDate(r[8]);  // col I = Migration Plan สิ้นสุด (fallback)
+    // ใช้ T ถ้ามี ไม่งั้น H
+    const dStart = (dT && dT.getFullYear() > 2000) ? dT : (dH && dH.getFullYear() > 2000 ? dH : null);
+    const dEnd   = (dV && dV.getFullYear() > 2000) ? dV : (dI && dI.getFullYear() > 2000 ? dI : null);
+    if (dStart) {
+      if (!PROJ_START || dStart < PROJ_START) PROJ_START = dStart;
+      if (!PROJ_END   || dStart > PROJ_END)   PROJ_END   = dStart;
     }
-    if (dV) {
-      if (!PROJ_END   || dV > PROJ_END)   PROJ_END   = dV;
+    if (dEnd) {
+      if (!PROJ_END   || dEnd > PROJ_END)     PROJ_END   = dEnd;
     }
   }
   if (!PROJ_START) PROJ_START = new Date('2026-02-02');
