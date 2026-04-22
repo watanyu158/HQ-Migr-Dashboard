@@ -2836,7 +2836,7 @@ function buildGraphs(){
 
     // skip ถ้า fd ไม่มี sw arrays
     if(!fd.sw || !Array.isArray(fd.sw)) return;
-    const hasData = fd.sw.some(v=>v>0) || (fd.ap||[]).some(v=>v>0) || (fd.inf||[]).some(v=>v>0);
+    const hasData = true; // แสดงทุก site แม้ยังไม่ติดตั้ง
 
     const div = document.createElement('div');
     div.className = 'card';
@@ -2846,9 +2846,8 @@ function buildGraphs(){
     const fabPctColor = fabPct>=80?'#065f46':fabPct>=30?'#92400e':'#4361ee';
     const fabPctBg    = fabPct>=80?'#ecfdf5':fabPct>=30?'#fff5e6':'#eef1ff';
     const canvasId = 'fd-' + fab.replace(/-/g,'') + '-c';
-    const chartHtml = hasData
-      ? '<div style="height:160px"><canvas id="' + canvasId + '"></canvas></div>'
-      : '<div style="height:80px;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:13px;background:var(--bg);border-radius:8px">ยังไม่มีการติดตั้ง</div>';
+    const _hasAct = fd.sw.some(v=>v>0)||(fd.ap||[]).some(v=>v>0)||(fd.inf||[]).some(v=>v>0);
+    const chartHtml = '<div style="height:160px"><canvas id="' + canvasId + '"></canvas></div>';
     div.innerHTML = `
       <div class="ch" style="margin-bottom:10px;flex-wrap:wrap;gap:6px">
         <div style="width:10px;height:10px;border-radius:50%;background:${fabColor};flex-shrink:0"></div>
@@ -2870,7 +2869,6 @@ function buildGraphs(){
       </div>`;
     wrap.appendChild(div);
 
-    if (!hasData) return;
     const fabIdx = Object.keys(FAB_DAILY).indexOf(fab);
     // Use setTimeout only to yield to browser so div is in DOM, then build chart sync
     const _p = new Promise(res => setTimeout(() => {
