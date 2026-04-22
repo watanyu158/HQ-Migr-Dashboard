@@ -799,8 +799,8 @@ main { padding: 12px 10px; }
         <span class="ins-rate-lbl">ทำได้</span>
         <span class="ins-rate-val">–</span>
         <span class="ins-rate-arrow">→</span>
-        <span class="ins-rate-lbl">ต้องทำ</span>
-        <span class="ins-rate-val ins-rate-target">12.6</span>
+        <span class="ins-rate-lbl">ต้องทำ<br><span style="font-size:9px;font-weight:400;opacity:.7" id="req-rate-basis">ถึง deadline เดิม</span></span>
+        <span class="ins-rate-val ins-rate-target">–</span>
         <span class="ins-rate-unit">อุปกรณ์/วัน</span>
       </div>
       <div class="ins-warn">⚠ กำลังคำนวณ...</div>
@@ -822,12 +822,12 @@ main { padding: 12px 10px; }
           <span class="ins-kpi-unit">/วัน</span>
         </div>
         <div class="ins-kpi-row">
-          <span class="ins-kpi-lbl">เป้าหมาย</span>
+          <span class="ins-kpi-lbl">เป้าหมาย<br><span style="font-size:9px;font-weight:400;opacity:.65" id="kpi-target-basis">ถึง deadline เดิม</span></span>
           <span class="ins-kpi-val">–</span>
           <span class="ins-kpi-unit">/วัน</span>
         </div>
         <div class="ins-kpi-row ins-kpi-gap">
-          <span class="ins-kpi-lbl">ส่วนต่าง</span>
+          <span class="ins-kpi-lbl">ส่วนต่าง (vs deadline)</span>
           <span class="ins-kpi-val">–</span>
           <span class="ins-kpi-unit" style="color:var(--danger)">/วัน</span>
         </div>
@@ -1200,7 +1200,7 @@ main { padding: 12px 10px; }
       </div>
       <div class="card"><div class="ch" style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:9px">📈 เป้าหมายตามแผน</div>
         <div class="pcard" style="margin-bottom:7px"><div class="pc-l">เป้าหมายอุปกรณ์/วัน</div><div class="pc-v" id="plan-target-rate">– อุปกรณ์/วัน</div></div>
-        <div class="pcard" style="margin-bottom:7px"><div class="pc-l">เป้าหมายปัจจุบัน</div><div class="pc-v red" id="plan-req-rate">– อุปกรณ์/วัน</div></div>
+        <div class="pcard" style="margin-bottom:7px"><div class="pc-l">อัตราต้องทำถึง deadline เดิม</div><div class="pc-v red" id="plan-req-rate">– อุปกรณ์/วัน</div></div>
         <div class="pcard"><div class="pc-l">อุปกรณ์ที่เหลือ</div><div class="pc-v" id="plan-remaining">– อุปกรณ์</div></div>
       </div>
     </div>
@@ -3434,6 +3434,10 @@ async function loadData(){
     // Tab แผนงาน
     const effPct = ins.req_rate>0 ? Math.round(ins.daily_rate/ins.req_rate*100) : 0;
     if(_e('plan-req-rate'))  _e('plan-req-rate').textContent  = ins.req_rate+' อุปกรณ์/วัน';
+    // แสดง deadline basis ใน insight card
+    const _deadlineLbl = `ถึง ${_fmtTH2?_fmtTH2(meta.proj_end):meta.proj_end} (เหลือ ${ins.days_left} วัน)`;
+    if(_e('req-rate-basis'))   _e('req-rate-basis').textContent   = _deadlineLbl;
+    if(_e('kpi-target-basis')) _e('kpi-target-basis').textContent = _deadlineLbl;
     if(_e('plan-remaining')) _e('plan-remaining').textContent = meta.remaining.toLocaleString()+' อุปกรณ์';
     // plan-plan-pct: plan ณ วันนี้
     const _todayPlanIdx=(()=>{
