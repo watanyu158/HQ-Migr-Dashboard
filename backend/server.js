@@ -160,7 +160,7 @@ function parseData() {
     }
 
     // นับจาก Migration column (index 15) — เฉพาะ SW และ Infra
-    const migration = typeof r[15]==='number' ? r[15] : 0;
+    const migration = typeof r[15]==='number' ? Math.round(r[15]) : 0;
     if (migration > 0 && cat !== 'AP') {
       installed += migration;
       siteMap[site].done += migration;
@@ -235,7 +235,7 @@ function parseData() {
     const r=hqRows[i]; if(!r||!r.length) continue;
     if (r[0]) _curSite = String(r[0]).trim();
     const qty = typeof r[6]==='number' ? r[6] : 0;
-    const mig = typeof r[15]==='number' ? r[15] : 0;
+    const mig = typeof r[15]==='number' ? Math.round(r[15]) : 0;
     const cat = r[18] ? String(r[18]).trim() : '';
     if (qty<=0 || !_curSite || !['Switch','Infra'].includes(cat)) continue;
     const site = _curSite; // ไม่ truncate เพื่อให้ตรงกับ fab key
@@ -279,7 +279,7 @@ function parseData() {
     if (r[0] && typeof r[0]==='string' && r[0].trim().length>3)
       _apCurSite = r[0].trim();
     const qty = typeof r[3]==='number' ? r[3] : 0;
-    const mig = typeof r[16]==='number' ? r[16] : 0;
+    const mig = typeof r[16]==='number' ? Math.round(r[16]) : 0;
     if (qty<=0) continue;
     apTotal += qty; apDone += mig;
     if (_apCurSite) {
@@ -311,7 +311,7 @@ function parseData() {
   const apActByDate = {};
   for (let i=1; i<wlEndIdx; i++) {
     const r = wlRows[i]; if (!r||!r.length) continue;
-    const mig = typeof r[16]==='number' ? r[16] : 0;
+    const mig = typeof r[16]==='number' ? Math.round(r[16]) : 0;
     const helperDt = toDate(r[19]);
     let helperStr = helperDt ? helperDt.toISOString().slice(0,10) : null;
     if (mig<=0 || !helperStr) continue;
@@ -516,7 +516,7 @@ function parseData() {
         if (!locSite) continue;
         const room = r[1] ? String(r[1]).trim() : '(ไม่ระบุห้อง)';
         const qty  = typeof r[6]==='number' ? r[6] : 0;
-        const mig  = typeof r[15]==='number' ? r[15] : 0;
+        const mig  = typeof r[15]==='number' ? Math.round(r[15]) : 0;
         if (qty<=0) continue;
         if (!locMap[locSite]) locMap[locSite]={};
         if (!locMap[locSite][room]) locMap[locSite][room]={t:0,d:0};
@@ -540,7 +540,7 @@ function parseData() {
         if (!upSite) continue;
         const qty=typeof r[6]==='number'?r[6]:0; if(qty<=0) continue;
         const cat=r[18]?String(r[18]).trim():''; if(cat==='AP') continue;
-        const mig=typeof r[15]==='number'?r[15]:0;
+        const mig=typeof r[15]==='number'?Math.round(r[15]):0;
         const hDt=toDate(r[19]); if(!hDt) continue;
         const hStr=hDt.toISOString().slice(0,10);
         if(hStr<todayStr||hStr>end14) continue;
