@@ -507,7 +507,7 @@ function parseData() {
       cum_d:[],cum_sw:[],cum_ap:[],cum_inf:[]
     },
     locations: (()=>{
-      // Site → Room จาก col A(0) + col B(1)
+      // Site → Room จาก HQ sheet เท่านั้น (SW+Infra) col A=site, col B=room, col G=qty, col P=mig
       const locMap = {};
       let locSite = null;
       for (let i=2; i<hqRows.length; i++) {
@@ -592,6 +592,14 @@ app.post('/api/cache/refresh', (req,res)=>{
   cache=null;
   try { res.json({success:true,data:parseData()}); }
   catch(e) { res.status(500).json({error:String(e)}); }
+});
+
+app.post('/api/clear-upload', (req,res)=>{
+  try {
+    if(fs.existsSync(TMP_EXCEL)) fs.unlinkSync(TMP_EXCEL);
+    cache=null;
+    res.json({success:true, cleared:true, using:'repo Excel'});
+  } catch(e) { res.status(500).json({error:String(e)}); }
 });
 
 const PORT=process.env.PORT||3000;
