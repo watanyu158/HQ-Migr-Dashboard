@@ -515,11 +515,13 @@ function parseData() {
       for (let i=2; i<hqRows.length; i++) {
         const r=hqRows[i]; if(!r) continue;
         if (r[0]) locSite=String(r[0]).trim();
-        if (!locSite || locSite.startsWith('%')) continue; // skip summary rows
-        const room = r[1] && typeof r[1]==='string' ? r[1].trim() : '(ไม่ระบุห้อง)';
+        if (!locSite) continue;
+        if (locSite.startsWith('%') || locSite.match(/^[0-9]/)) { locSite=null; continue; } // skip summary rows
         const qty  = typeof r[6]==='number' ? r[6] : 0;
+        if (qty<=0 || qty > 500) continue; // skip summary/aggregate rows
+        if (typeof r[1] !== 'string') continue; // skip rows ที่ B ไม่ใช่ string (เช่น ตัวเลข)
+        const room = r[1].trim() || '(ไม่ระบุห้อง)';
         const mig  = typeof r[15]==='number' ? Math.round(r[15]) : 0;
-        if (qty<=0) continue;
         if (!locMap[locSite]) locMap[locSite]={};
         if (!locMap[locSite][room]) locMap[locSite][room]={t:0,d:0};
         locMap[locSite][room].t += qty;
