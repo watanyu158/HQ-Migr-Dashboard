@@ -111,6 +111,7 @@ function parseData() {
     const r = hqRows[i];
     if (!r || !r.length) continue;
     if (r[0]) curSite = String(r[0]).trim();
+    if (curSite && curSite.startsWith('%')) { curSite = null; continue; } // skip summary rows
 
     const device  = r[3] ? String(r[3]).trim() : null;
     const qty     = typeof r[6]==='number' ? r[6] : 0;
@@ -234,6 +235,7 @@ function parseData() {
   for (let i=2; i<hqRows.length; i++) {
     const r=hqRows[i]; if(!r||!r.length) continue;
     if (r[0]) _curSite = String(r[0]).trim();
+    if (_curSite && _curSite.startsWith('%')) { _curSite = null; continue; }
     const qty = typeof r[6]==='number' ? r[6] : 0;
     const mig = typeof r[15]==='number' ? Math.round(r[15]) : 0;
     const cat = r[18] ? String(r[18]).trim() : '';
@@ -513,8 +515,8 @@ function parseData() {
       for (let i=2; i<hqRows.length; i++) {
         const r=hqRows[i]; if(!r) continue;
         if (r[0]) locSite=String(r[0]).trim();
-        if (!locSite) continue;
-        const room = r[1] ? String(r[1]).trim() : '(ไม่ระบุห้อง)';
+        if (!locSite || locSite.startsWith('%')) continue; // skip summary rows
+        const room = r[1] && typeof r[1]==='string' ? r[1].trim() : '(ไม่ระบุห้อง)';
         const qty  = typeof r[6]==='number' ? r[6] : 0;
         const mig  = typeof r[15]==='number' ? Math.round(r[15]) : 0;
         if (qty<=0) continue;
