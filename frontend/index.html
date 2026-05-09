@@ -3369,6 +3369,11 @@ async function loadData(){
     window.TOTAL_SW = meta.sw_total || 0;
     window.TOTAL_AP = meta.ap_total || 0;
     window.TOTAL_INF = meta.inf_total || 0;
+    // rebuild type-c chart ด้วยค่าจริง
+    const _tcEl = document.getElementById('type-c');
+    if(_tcEl){ const _ch=Chart.getChart(_tcEl); if(_ch) _ch.destroy();
+      new Chart(_tcEl,{type:'doughnut',data:{datasets:[{data:[window.TOTAL_SW,window.TOTAL_AP,window.TOTAL_INF],backgroundColor:['#4361ee','#2bc48a','#ff9f43'],borderWidth:3,borderColor:'#fff'}]},options:{cutout:'70%',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(30,45,77,.92)',titleColor:'#fff',bodyColor:'rgba(255,255,255,.8)',padding:10,cornerRadius:8}}}});
+    }
     window._projStartStr = meta.proj_start || '2026-02-03';
     window._projEndStr   = meta.proj_end   || '2026-04-12';
     if(_e('ts-done'))   _e('ts-done').textContent   = `${meta.installed}/${TOTAL_HQ}`;
