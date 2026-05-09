@@ -3374,12 +3374,12 @@ async function loadData(){
     const _swPct = _totalDev>0 ? Math.round(window.TOTAL_SW/_totalDev*100) : 0;
     const _apPct = _totalDev>0 ? Math.round(window.TOTAL_AP/_totalDev*100) : 0;
     const _infPct= _totalDev>0 ? Math.round(window.TOTAL_INF/_totalDev*100): 0;
-    if(_e('td-sw-lbl'))  _e('td-sw-lbl').textContent  = 'Switch '+_swPct+'%';
-    if(_e('td-ap-lbl'))  _e('td-ap-lbl').textContent  = 'AP '+_apPct+'%';
-    if(_e('td-inf-lbl')) _e('td-inf-lbl').textContent = 'Infra '+_infPct+'%';
-    if(_e('td-sw-n'))    _e('td-sw-n').textContent    = window.TOTAL_SW.toLocaleString();
-    if(_e('td-ap-n'))    _e('td-ap-n').textContent    = window.TOTAL_AP.toLocaleString();
-    if(_e('td-inf-n'))   _e('td-inf-n').textContent   = window.TOTAL_INF.toLocaleString();
+    if(_e('td-sw-lbl'))  _e('td-sw-lbl').textContent  = `Switch ${_swPct}% (${window.TOTAL_SW.toLocaleString()})`;
+    if(_e('td-ap-lbl'))  _e('td-ap-lbl').textContent  = `AP ${_apPct}% (${window.TOTAL_AP.toLocaleString()})`;
+    if(_e('td-inf-lbl')) _e('td-inf-lbl').textContent = `Infra ${_infPct}% (${window.TOTAL_INF.toLocaleString()})`;
+    if(_e('td-sw-n'))    _e('td-sw-n').textContent    = '';
+    if(_e('td-ap-n'))    _e('td-ap-n').textContent    = '';
+    if(_e('td-inf-n'))   _e('td-inf-n').textContent   = '';
     if(_e('type-donut-pct')) _e('type-donut-pct').textContent = (meta.pct_done||0)+'%';
     // rebuild type-c chart ด้วยค่าจริง
     const _tcEl = document.getElementById('type-c');
