@@ -2549,7 +2549,7 @@ function buildGraphs(){
     const el=document.getElementById(id);
     if(el){const ch=Chart.getChart(el);if(ch)ch.destroy();}
   });
-  new Chart(document.getElementById('type-c'),{type:'doughnut',data:{datasets:[{data:[1121,445,26],backgroundColor:['#4361ee','#2bc48a','#ff9f43'],borderWidth:3,borderColor:'#fff'}]},options:{cutout:'70%',responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(30,45,77,.92)',titleColor:'#fff',bodyColor:'rgba(255,255,255,.8)',padding:10,cornerRadius:8}}}});
+  new Chart(document.getElementById('type-c'),{type:'doughnut',data:{datasets:[{data:[window.TOTAL_SW||0,window.TOTAL_AP||0,window.TOTAL_INF||0],backgroundColor:['#4361ee','#2bc48a','#ff9f43'],borderWidth:3,borderColor:'#fff'}]},options:{cutout:'70%',responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(30,45,77,.92)',titleColor:'#fff',bodyColor:'rgba(255,255,255,.8)',padding:10,cornerRadius:8}}}});
   new Chart(document.getElementById('fab-bar-c'),{
   type:'bar',
   data:{
@@ -3366,6 +3366,9 @@ async function loadData(){
 
     // topbar
     const TOTAL_HQ = meta.total || 0; window.TOTAL_HQ = TOTAL_HQ;
+    window.TOTAL_SW = meta.sw_total || 0;
+    window.TOTAL_AP = meta.ap_total || 0;
+    window.TOTAL_INF = meta.inf_total || 0;
     window._projStartStr = meta.proj_start || '2026-02-03';
     window._projEndStr   = meta.proj_end   || '2026-04-12';
     if(_e('ts-done'))   _e('ts-done').textContent   = `${meta.installed}/${TOTAL_HQ}`;
