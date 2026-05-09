@@ -3793,8 +3793,12 @@ async function exportPDF(){
         img.src=d.url;
         const w=Math.min(d.w,1100), h=d.h;
         img.style.cssText=`display:block;width:${w}px;height:${h}px;max-width:100%;aspect-ratio:${w}/${h}`;
-        // donut: absolute fit container ทำให้ center text อยู่กลาง
-        if(cv.id==='donut-c') img.style.cssText='display:block;position:absolute;inset:0;width:100%;height:100%';
+        // donut: clip container และ fit img ให้อยู่ใน 150px
+        if(cv.id==='donut-c'){
+          const parent=cv.parentNode;
+          parent.style.overflow='hidden';
+          img.style.cssText='display:block;width:150px;height:150px;position:absolute;top:0;left:0';
+        }
         cv.parentNode.replaceChild(img,cv);
       }else cv.style.display='none';
     });
