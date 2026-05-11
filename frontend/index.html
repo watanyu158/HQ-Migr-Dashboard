@@ -1869,7 +1869,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   if(syncLbl) syncLbl.textContent = new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
 
   try {
-    const readyRes = await fetch(API+'/api/ready').then(r=>r.json()).catch(()=>null);
+    const readyRes = await fetch(API+'/api/ready',{cache:'no-store'}).then(r=>r.json()).catch(()=>null);
     if (readyRes) {
       const updatedAfterBoot = readyRes.updated && (readyRes.updated > (Date.now() - readyRes.uptime*1000 - 5000));
       if (!updatedAfterBoot) {
@@ -1879,7 +1879,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         const pollInterval = setInterval(async ()=>{
           waited += 3;
           _setStatus(`☁️ กำลังดึง Excel ล่าสุด... (${waited}s)`);
-          const r2 = await fetch(API+'/api/ready').then(r=>r.json()).catch(()=>null);
+          const r2 = await fetch(API+'/api/ready',{cache:'no-store'}).then(r=>r.json()).catch(()=>null);
           if (r2?.updated && r2.updated !== readyRes.updated) {
             clearInterval(pollInterval);
             _setStatus('✅ ได้ข้อมูลใหม่แล้ว กำลัง reload...');
@@ -3731,7 +3731,7 @@ async function manualRefresh(){
 
   try{
     // ดึงค่า updated ก่อน trigger
-    const before = await fetch(API+'/api/ready').then(r=>r.json()).catch(()=>null);
+    const before = await fetch(API+'/api/ready',{cache:'no-store'}).then(r=>r.json()).catch(()=>null);
     const beforeUpdated = before?.updated || 0;
 
     // trigger Make.com
@@ -3743,7 +3743,7 @@ async function manualRefresh(){
       await new Promise(r=>setTimeout(r,2000));
       waited += 2;
       btns.forEach(b=>b.textContent=`☁️ กำลังดึง Excel... (${waited}s)`);
-      const after = await fetch(API+'/api/ready').then(r=>r.json()).catch(()=>null);
+      const after = await fetch(API+'/api/ready',{cache:'no-store'}).then(r=>r.json()).catch(()=>null);
       if(after?.updated && after.updated !== beforeUpdated) break;
     }
 
