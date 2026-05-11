@@ -3727,26 +3727,35 @@ function updateLoadingProgress(pct, label){}
 async function manualRefresh(){
   const MAKE_WEBHOOK = 'https://hook.eu1.make.com/6mangbq9f8j4evhdv8252x1pjvnhlwsj';
   const btns = document.querySelectorAll('[onclick*="manualRefresh"]');
-  btns.forEach(b=>{ b._orig=b.textContent; b.textContent='⏳ กำลังโหลด...'; b.disabled=true; });
+  btns.forEach(b=>{ b._orig=b.textContent; b.textContent='☁️ กำลังดึง Excel...'; b.disabled=true; });
 
   try{
-    // trigger Make.com ให้ดึง Excel ใหม่
-    btns.forEach(b=>b.textContent='☁️ กำลังดึง Excel...');
+    // ดึงค่า updated ก่อน trigger
+    const before = await fetch(API+'/api/ready').then(r=>r.json()).catch(()=>null);
+    const beforeUpdated = before?.updated || 0;
+
+    // trigger Make.com
     await fetch(MAKE_WEBHOOK, {method:'POST', mode:'no-cors'});
-    await new Promise(r=>setTimeout(r,5000));
-  }catch(e){}
 
-  try{
+    // poll จนกว่า updated จะเปลี่ยน max 60s
+    let waited = 0;
+    while(waited < 60){
+      await new Promise(r=>setTimeout(r,2000));
+      waited += 2;
+      btns.forEach(b=>b.textContent=`☁️ กำลังดึง Excel... (${waited}s)`);
+      const after = await fetch(API+'/api/ready').then(r=>r.json()).catch(()=>null);
+      if(after?.updated && after.updated !== beforeUpdated) break;
+    }
+
+    // clear cache แล้ว reload
     btns.forEach(b=>b.textContent='🔄 กำลังโหลด...');
-    await fetch(API+'/api/cache/refresh',{method:'POST'});
+    await fetch(API+'/api/cache/refresh',{method:'POST'}).catch(()=>{});
   }catch(e){}
 
   await loadData();
-
   const now=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
   const el=document.getElementById('last-sync-lbl');
   if(el)el.textContent=now;
-
   btns.forEach(b=>{ b.textContent=b._orig||'↺ รีเฟรชข้อมูล'; b.disabled=false; });
 }
 
