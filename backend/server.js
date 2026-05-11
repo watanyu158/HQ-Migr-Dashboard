@@ -14,6 +14,8 @@ const TMP_EXCEL  = '/tmp/hq_latest.xlsx';
 // TOTAL, PROJ_START/END คำนวณจาก Excel ใน parseData()
 
 let cache = null, cacheTime = 0;
+let excelUpdatedAt = null;
+let serverStartedAt = Date.now();
 
 function toDate(v) {
   if (!v) return null;
@@ -576,6 +578,32 @@ function parseData() {
 }
 
 const upload = multer({dest:'/tmp/'});
+const uploadMem = multer({storage: multer.memoryStorage(), limits:{fileSize:50*1024*1024}});
+
+// ── Make.com Webhook ──
+app.post('/api/webhook/excel', uploadMem.single('file'), (req,res)=>{
+  try {
+    let buf;
+    if (req.file) {
+      buf = req.file.buffer;
+    } else if (req.body?.content) {
+      buf = Buffer.from(req.body.content, 'base64');
+    } else {
+      return res.status(400).json({error:'No file content', keys:Object.keys(req.body||{})});
+    }
+    if (buf.length < 1000) return res.status(400).json({error:'File too small: '+buf.length});
+    fs.writeFileSync(EXCEL_PATH, buf);
+    cache = null; excelUpdatedAt = Date.now();
+    console.log('Webhook: Excel updated, size='+buf.length);
+    res.json({success:true, size:buf.length, updated: new Date().toISOString()});
+  } catch(e) { res.status(500).json({error:String(e)}); }
+});
+
+// ── Ready endpoint ──
+app.get('/api/ready', (req,res)=>{
+  const uptime = Math.round((Date.now()-serverStartedAt)/1000);
+  res.json({ready: excelUpdatedAt!==null || uptime>30, updated: excelUpdatedAt, uptime});
+});
 app.post('/api/upload-excel', upload.single('excel'), (req,res)=>{
   if (!req.file) return res.status(400).json({error:'No file'});
   fs.renameSync(req.file.path, TMP_EXCEL);
@@ -607,4 +635,10 @@ app.post('/api/clear-upload', (req,res)=>{
 });
 
 const PORT=process.env.PORT||3000;
-app.listen(PORT,()=>console.log(`HQ Dashboard running on port ${PORT}`));
+const MAKE_WEBHOOK_HQ = 'https://hook.eu1.make.com/6mangbq9f8j4evhdv8252x1pjvnhlwsj';
+app.listen(PORT,()=>{
+  console.log(`HQ Dashboard running on port ${PORT}`);
+  require('https').request(MAKE_WEBHOOK_HQ,{method:'POST'},r=>{
+    console.log('Make.com startup trigger:', r.statusCode);
+  }).on('error',e=>console.log('Make.com trigger err:',e.message)).end();
+});

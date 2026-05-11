@@ -1860,10 +1860,36 @@ function buildWeekdayChart(){
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
-  // โหลดข้อมูลจาก API ก่อน แล้ว build charts ทั้งหมด
+  const MAKE_WEBHOOK = 'https://hook.eu1.make.com/6mangbq9f8j4evhdv8252x1pjvnhlwsj';
+  const syncLbl = document.getElementById('last-sync-lbl');
+  const _setStatus = (msg) => { if(syncLbl) syncLbl.textContent = msg; };
+
+  // โหลดข้อมูลที่มีก่อนเลย
   await loadData();
-  const el = document.getElementById('last-sync-lbl');
-  if (el) el.textContent = new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  if(syncLbl) syncLbl.textContent = new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+
+  try {
+    const readyRes = await fetch(API+'/api/ready').then(r=>r.json()).catch(()=>null);
+    if (readyRes) {
+      const updatedAfterBoot = readyRes.updated && (readyRes.updated > (Date.now() - readyRes.uptime*1000 - 5000));
+      if (!updatedAfterBoot) {
+        _setStatus('☁️ กำลังดึง Excel ล่าสุด...');
+        try { await fetch(MAKE_WEBHOOK, {method:'POST', mode:'no-cors'}); } catch(e){}
+        let waited = 0;
+        const pollInterval = setInterval(async ()=>{
+          waited += 3;
+          _setStatus(`☁️ กำลังดึง Excel ล่าสุด... (${waited}s)`);
+          const r2 = await fetch(API+'/api/ready').then(r=>r.json()).catch(()=>null);
+          if (r2?.updated && r2.updated !== readyRes.updated) {
+            clearInterval(pollInterval);
+            _setStatus('✅ ได้ข้อมูลใหม่แล้ว กำลัง reload...');
+            setTimeout(()=>window.location.reload(), 500);
+          }
+          if (waited >= 120) clearInterval(pollInterval);
+        }, 3000);
+      }
+    }
+  } catch(e) {}
 });
 
 function buildGauge(pct){
@@ -3164,7 +3190,7 @@ function toggleAutoSync(){
 async function loadData(){
   showLoading();
   try{
-    const r = await fetch(`${API}/api/dashboard`);
+    const r = await fetch(`${API}/api/dashboard?t=${Date.now()}`, {cache:'no-store'});
     if(!r.ok) throw new Error('HTTP '+r.status);
     const d = await r.json();
     if(!d.weekly || !d.meta) throw new Error('Invalid API response');
