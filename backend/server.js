@@ -186,9 +186,10 @@ function parseData() {
           dayActBySite[site][instStr2]=(dayActBySite[site][instStr2]||0)+migration;
         }
       }
-      // on-time check ใช้ ISO string เปรียบเทียบตรงๆ
-      if (instStr2 && helperStr) {
-        if (instStr2 <= helperStr){onTimeQty+=migration;if(instStr2<helperStr)earlyQty+=migration;}
+      // on-time check: ตรงเวลาถ้าทำเสร็จภายใน start→end window
+      const helperEndStr = r[21] ? toDate(r[21])?.toISOString().slice(0,10) : helperStr;
+      if (instStr2 && helperEndStr) {
+        if (instStr2 <= helperEndStr){onTimeQty+=migration;if(instStr2<helperStr)earlyQty+=migration;}
         else lateQty+=migration;
       }
     } else if (status.includes('Progress')) {
