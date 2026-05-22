@@ -637,7 +637,7 @@ app.post('/api/clear-upload', (req,res)=>{
 const PORT=process.env.PORT||3000;
 app.use(express.static(path.join(__dirname,'../frontend')));
 app.get('*',(req,res)=>res.sendFile(path.join(__dirname,'../frontend/index.html')));
-const MAKE_WEBHOOK_HQ = 'https://hook.eu1.make.com/6mangbq9f8j4evhdv8252x1pjvnhlwsj';
+const MAKE_WEBHOOK_HQ = 'https://hook.eu1.make.com/5npg2okvcc5m4d5ecb87ioar7eytq34n';
 app.listen(PORT,()=>{
   console.log(`HQ Dashboard running on port ${PORT}`);
   require('https').request(MAKE_WEBHOOK_HQ,{method:'POST'},r=>{
