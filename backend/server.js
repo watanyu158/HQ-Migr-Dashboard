@@ -110,8 +110,8 @@ function parseData() {
   // ── pre-scan หา lastInstallDate เพื่อ freeze today ถ้างานเสร็จ ──
   let _preLastInstall = null;
   let _preTotal = 0, _preInstalled = 0;
-  for (let i = 2; i < rows.length; i++) {
-    const r = rows[i]; if (!r) continue;
+  for (let i = 2; i < hqRows.length; i++) {
+    const r = hqRows[i]; if (!r) continue;
     const _qty = typeof r[6]==='number' ? r[6] : 0;
     const _mig = typeof r[15]==='number' ? Math.round(r[15]) : 0;
     if (_qty <= 0) continue;
