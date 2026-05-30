@@ -3499,16 +3499,21 @@ async function loadData(){
     if(_e('ov-inf-badge')) _e('ov-inf-badge').textContent = infPct+'%';
     if(_e('type-donut-pct')) _e('type-donut-pct').textContent = allPct+'%';
     // Tab แผนงาน
-    const effPct = ins.req_rate>0 ? Math.round(ins.daily_rate/ins.req_rate*100) : 0;
-    if(_e('plan-req-rate'))  _e('plan-req-rate').textContent  = ins.req_rate+' อุปกรณ์/วัน';
-    // แสดง deadline basis ใน insight card
+    const effPct = _isDone ? 100 : (_isOverdue ? 0 : (ins.req_rate>0 ? Math.round(ins.daily_rate/ins.req_rate*100) : 0));
     const thM2=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
     const _fmtTH2=dt=>{const d=new Date(dt+'T00:00:00');return d.getDate()+' '+thM2[d.getMonth()]+' '+((d.getFullYear()+543)%100);};
-    const _deadlineLbl = `ถึง ${_fmtTH2(meta.proj_end)} (เหลือ ${ins.days_left} วัน)`;
+    if(_e('plan-req-rate')){
+      if(_isOverdue){
+        _e('plan-req-rate').textContent = ins.daily_rate.toFixed(1)+' อุปกรณ์/วัน';
+        _e('plan-req-rate').closest('.pcard')?.querySelector('.pc-l')&&(_e('plan-req-rate').closest('.pcard').querySelector('.pc-l').textContent='อัตราติดตั้งปัจจุบัน');
+      } else {
+        _e('plan-req-rate').textContent = ins.req_rate+' อุปกรณ์/วัน';
+      }
+    }
+    const _deadlineLbl = _isOverdue ? `เกินกำหนดแล้ว ${ins.days_late} วัน` : `ถึง ${_fmtTH2(meta.proj_end)} (เหลือ ${ins.days_left} วัน)`;
     if(_e('req-rate-basis'))   _e('req-rate-basis').textContent   = _deadlineLbl;
     if(_e('kpi-target-basis')) _e('kpi-target-basis').textContent = _deadlineLbl;
     if(_e('plan-remaining')) _e('plan-remaining').textContent = _isDone ? '✅ เสร็จสิ้น' : meta.remaining.toLocaleString()+' อุปกรณ์';
-    // plan-plan-pct: plan ณ วันนี้
     const _todayPlanIdx=(()=>{
       const tl=String(_todayGMT7().getDate()).padStart(2,'0')+'/'+(String(_todayGMT7().getMonth()+1).padStart(2,'0'));
       const ti=DAILY_PROG_LABELS.indexOf(tl);
@@ -3520,23 +3525,17 @@ async function loadData(){
     if(_e('plan-act-bar'))   _e('plan-act-bar').style.width   = allPct+'%';
     if(_e('plan-installed')) _e('plan-installed').textContent = meta.installed.toLocaleString()+' อุปกรณ์';
     if(_e('plan-daily-rate'))_e('plan-daily-rate').textContent= ins.daily_rate.toFixed(1)+' อุปกรณ์/วัน';
-    if(_e('plan-eff-label')) _e('plan-eff-label').textContent = 'ทำได้ '+ins.daily_rate.toFixed(1)+'/วัน';
-    if(_e('plan-eff-bar')){
-      _e('plan-eff-bar').style.width = Math.min(effPct,100)+'%';
-      _e('plan-eff-bar').style.background = effPct>=100
-        ? 'linear-gradient(90deg,var(--success),#6ee7b7)'
-        : 'linear-gradient(90deg,var(--danger),#ff8a8a)';
+    if(_isOverdue){
+      if(_e('plan-eff-label')) _e('plan-eff-label').textContent = `🚨 เกินกำหนด ${ins.days_late} วัน`;
+      if(_e('plan-eff-bar')){ _e('plan-eff-bar').style.width='100%'; _e('plan-eff-bar').style.background='linear-gradient(90deg,var(--danger),#fca5a5)'; }
+      if(_e('plan-eff-pct')){ _e('plan-eff-pct').textContent=ins.days_late+' วัน'; _e('plan-eff-pct').style.color='var(--danger)'; }
+      if(_e('plan-eff-status')){ _e('plan-eff-status').textContent='🚨 เกินกำหนดแล้ว — ต้องเร่งดำเนินการ'; _e('plan-eff-status').style.color='var(--danger)'; }
+    } else {
+      if(_e('plan-eff-label')) _e('plan-eff-label').textContent = (_isDone?'✅ งานเสร็จสิ้น':'ทำได้ '+ins.daily_rate.toFixed(1)+'/วัน');
+      if(_e('plan-eff-bar')){ _e('plan-eff-bar').style.width=Math.min(effPct,100)+'%'; _e('plan-eff-bar').style.background=effPct>=100?'linear-gradient(90deg,var(--success),#6ee7b7)':'linear-gradient(90deg,var(--danger),#ff8a8a)'; }
+      if(_e('plan-eff-pct')){ _e('plan-eff-pct').textContent=effPct+'%'; _e('plan-eff-pct').style.color=effPct>=100?'var(--success)':'var(--danger)'; }
+      if(_e('plan-eff-status')){ _e('plan-eff-status').textContent=effPct>=100?'✅ เกินเป้าหมาย':'⚠ ต่ำกว่าเป้าหมาย'; _e('plan-eff-status').style.color=effPct>=100?'var(--success)':'var(--danger)'; }
     }
-    if(_e('plan-eff-pct')){
-      _e('plan-eff-pct').textContent = effPct+'%';
-      _e('plan-eff-pct').style.color = effPct>=100?'var(--success)':'var(--danger)';
-    }
-    if(_e('plan-eff-status')){
-      _e('plan-eff-status').textContent = effPct>=100?'✅ เกินเป้าหมาย':'⚠ ต่ำกว่าเป้าหมาย';
-      _e('plan-eff-status').style.color = effPct>=100?'var(--success)':'var(--danger)';
-    }
-    // plan dates dynamic
-    // _fmtTH2 moved earlier
     if(_e('pc-proj-start')) _e('pc-proj-start').textContent=_fmtTH2(meta.proj_start);
     if(_e('pc-proj-end'))   _e('pc-proj-end').textContent=_fmtTH2(meta.proj_end);
     window._projStartStr = meta.proj_start;
@@ -3545,7 +3544,11 @@ async function loadData(){
     if(_e('plan-proj-days')) _e('plan-proj-days').textContent = projDays+' วัน';
     const targetRate = (meta.total / projDays).toFixed(1);
     if(_e('plan-target-rate'))  _e('plan-target-rate').textContent  = targetRate+' อุปกรณ์/วัน';
-    if(_e('plan-finish-date'))  _e('plan-finish-date').textContent  = finTH;
+    if(_e('plan-finish-date')){
+      _e('plan-finish-date').textContent = finTH;
+      _e('plan-finish-date').style.color = _isOverdue ? 'var(--danger)' : (_isDone ? 'var(--success)' : '');
+      _e('plan-finish-date').closest('.pcard')?.querySelector('.pc-l')&&(_e('plan-finish-date').closest('.pcard').querySelector('.pc-l').textContent=_isDone?'เสร็จสิ้นเมื่อ':(_isOverdue?'คาดเสร็จ':'คาดว่าจะเสร็จ'));
+    }
     if(_e('plan-status')){
       const _st = _isDone ? {txt:`🎉 เสร็จสิ้น — ก่อนกำหนด ${ins.days_early} วัน`, c:'var(--success)'}
                 : _isOverdue ? {txt:`🚨 เกินกำหนดแล้ว ${ins.days_late} วัน`, c:'var(--danger)'}
