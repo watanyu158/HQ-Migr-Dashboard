@@ -107,7 +107,24 @@ function parseData() {
 
   const siteMap={}, typeMap={}, dayActMap={}, dayPlanMap={}, dayActBySite={}, dayPlanBySite={}, daySwActMap={}, dayApActMap={};
   const devices=[];
-  const today = new Date(); today.setHours(0,0,0,0);
+  // ── pre-scan หา lastInstallDate เพื่อ freeze today ถ้างานเสร็จ ──
+  let _preLastInstall = null;
+  let _preTotal = 0, _preInstalled = 0;
+  for (let i = 2; i < rows.length; i++) {
+    const r = rows[i]; if (!r) continue;
+    const _qty = typeof r[6]==='number' ? r[6] : 0;
+    const _mig = typeof r[15]==='number' ? Math.round(r[15]) : 0;
+    if (_qty <= 0) continue;
+    _preTotal += _qty; _preInstalled += _mig;
+    const _instStr = r[20] ? toDate(r[20])?.toISOString().slice(0,10) : (r[19] ? toDate(r[19])?.toISOString().slice(0,10) : null);
+    if (_instStr && (!_preLastInstall || _instStr > _preLastInstall)) _preLastInstall = _instStr;
+  }
+  const _isDoneEarly = _preTotal > 0 && _preInstalled >= _preTotal;
+
+  // ── today (freeze ถ้างานเสร็จแล้ว) ──
+  const _realToday = new Date(); _realToday.setHours(0,0,0,0);
+  const today = _isDoneEarly && _preLastInstall ? new Date(_preLastInstall+'T00:00:00') : _realToday;
+  today.setHours(0,0,0,0);
 
   for (let i = 2; i < hqRows.length; i++) {
     const r = hqRows[i];
@@ -386,17 +403,23 @@ function parseData() {
   const projDays  = Math.round((PROJ_END-PROJ_START)/86400000);
   const daysLeft  = Math.max(0,Math.round((PROJ_END-today)/86400000));
   const remaining = TOTAL-installed;
+  const _isDone = remaining <= 0;
   const dailyRate = Math.round(installed/elapsed*10)/10;
-  // ถ้าเลยกำหนดแล้ว ใช้ finish_date คำนวณ req_rate แทน
   const _daysToFinish = dailyRate>0 ? Math.ceil(remaining/dailyRate) : 0;
-  const reqRate   = daysLeft>0 ? Math.ceil(remaining/daysLeft) : (remaining>0 ? Math.ceil(remaining/Math.max(_daysToFinish,1)) : 0);
+  const reqRate   = _isDone ? 0 : (daysLeft>0 ? Math.ceil(remaining/daysLeft) : (remaining>0 ? Math.ceil(remaining/Math.max(_daysToFinish,1)) : 0));
   const needMore  = Math.round((reqRate-dailyRate)*10)/10;
-  const gaugePct  = reqRate>0 ? Math.min(150,Math.round(dailyRate/reqRate*100)) : 100;
+  const gaugePct  = _isDone ? 100 : (reqRate>0 ? Math.min(150,Math.round(dailyRate/reqRate*100)) : 100);
   const pctDone   = Math.round(installed/TOTAL*100);
   const todayWk   = Math.floor((today-PROJ_START)/(7*86400000));
 
   let finishDate = null, daysLate=0, daysEarly=0;
-  if (dailyRate>0) {
+  if (_isDone) {
+    finishDate = lastInstallDate;
+    const fd = new Date(lastInstallDate+'T00:00:00');
+    const diffDays = Math.round((PROJ_END-fd)/86400000);
+    if (diffDays < 0) daysLate = Math.abs(diffDays);
+    else              daysEarly = diffDays;
+  } else if (dailyRate>0) {
     const fd=new Date(today); fd.setDate(fd.getDate()+Math.ceil(remaining/dailyRate));
     fd.setHours(0,0,0,0);
     finishDate = fd.toISOString().slice(0,10);
