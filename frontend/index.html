@@ -3432,32 +3432,32 @@ async function loadData(){
     window._projStartStr = meta.proj_start || '2026-02-03';
     window._projEndStr   = meta.proj_end   || '2026-04-12';
     if(_e('ts-done'))   _e('ts-done').textContent   = `${meta.installed}/${TOTAL_HQ}`;
-    if(_e('tb-days'))   _e('tb-days').textContent   = _isDone ? '✅' : ins.days_left;
-    if(_e('pill-days-left')) _e('pill-days-left').textContent = _isDone ? '✅' : ins.days_left;
-    if(_e('plan-days-left')) _e('plan-days-left').textContent = _isDone ? 'เสร็จสิ้น' : ins.days_left+' วัน';
-    if(_e('tb-days'))   _e('tb-days').textContent   = _isDone ? '✅' : ins.days_left;
+    const _isLate = !_isDone && ins.days_late > 0;
+    const _isOverdue = !_isDone && ins.days_left <= 0;
+    if(_e('tb-days'))   _e('tb-days').textContent   = _isDone ? '✅' : (_isOverdue ? `เกิน ${ins.days_late} วัน` : ins.days_left);
+    if(_e('tb-days'))   _e('tb-days').style.color   = _isDone ? 'var(--success)' : (_isOverdue ? 'var(--danger)' : '');
+    if(_e('pill-days-left')) _e('pill-days-left').textContent = _isDone ? '✅' : (_isOverdue ? `เกิน ${ins.days_late} วัน` : ins.days_left);
+    if(_e('plan-days-left')) _e('plan-days-left').textContent = _isDone ? 'เสร็จสิ้น' : (_isOverdue ? `เกินกำหนด ${ins.days_late} วัน` : ins.days_left+' วัน');
     if(_e('tb-over'))   _e('tb-over').textContent   = _isDone ? '✅' : meta.overdue;
     if(_e('tb-rate'))   _e('tb-rate').textContent   = _isDone ? '✅' : Number(ins.daily_rate).toFixed(1);
     if(_e('tb-pct'))    _e('tb-pct').textContent    = (meta.installed/meta.total*100).toFixed(1)+'%';
 
-    // tb-status: ช้า/ตรงแผน
+    // tb-status
     const tbTxt=document.getElementById('tb-status-txt');
     const tbDot=document.getElementById('tb-sdot');
     if(tbTxt){
-      if(ins.days_late>0){
-        tbTxt.textContent='ช้ากว่าแผน';
-        if(tbDot){
-          tbDot.style.animation='';
-          tbDot.style.background='#ff9f43';
-          tbDot.style.boxShadow='0 0 0 0 rgba(255,159,67,.4)';
-        }
+      if(_isDone){
+        tbTxt.textContent=`🎉 เสร็จสิ้น — ก่อนกำหนด ${ins.days_early} วัน`;
+        if(tbDot){ tbDot.style.animation=''; tbDot.style.background='var(--success)'; tbDot.style.boxShadow='0 0 6px 2px rgba(43,196,138,.4)'; }
+      } else if(_isOverdue){
+        tbTxt.textContent=`⚠ เกินกำหนดแล้ว ${ins.days_late} วัน — คาดเสร็จ ${finTH}`;
+        if(tbDot){ tbDot.style.animation=''; tbDot.style.background='var(--danger)'; tbDot.style.boxShadow='0 0 6px 2px rgba(239,68,68,.4)'; }
+      } else if(_isLate){
+        tbTxt.textContent=`↘ ล่าช้า — คาดเสร็จช้ากว่าแผน ${ins.days_late} วัน`;
+        if(tbDot){ tbDot.style.animation=''; tbDot.style.background='var(--warning)'; tbDot.style.boxShadow='0 0 0 0 rgba(210,153,34,.4)'; }
       } else {
-        tbTxt.textContent='ตรงแผน';
-        if(tbDot){
-          tbDot.style.animation='';
-          tbDot.style.background='';
-          tbDot.style.boxShadow='';
-        }
+        tbTxt.textContent='✓ ตรงแผน';
+        if(tbDot){ tbDot.style.animation=''; tbDot.style.background='var(--success)'; tbDot.style.boxShadow=''; }
       }
     }
 
@@ -3547,7 +3547,9 @@ async function loadData(){
     if(_e('plan-target-rate'))  _e('plan-target-rate').textContent  = targetRate+' อุปกรณ์/วัน';
     if(_e('plan-finish-date'))  _e('plan-finish-date').textContent  = finTH;
     if(_e('plan-status')){
-      const _st = ins.days_late>0 ? {txt:'↘ ช้ากว่าแผน', c:'var(--danger)'}
+      const _st = _isDone ? {txt:`🎉 เสร็จสิ้น — ก่อนกำหนด ${ins.days_early} วัน`, c:'var(--success)'}
+                : _isOverdue ? {txt:`🚨 เกินกำหนดแล้ว ${ins.days_late} วัน`, c:'var(--danger)'}
+                : ins.days_late>0 ? {txt:`↘ ล่าช้า — ช้ากว่าแผน ${ins.days_late} วัน`, c:'var(--danger)'}
                 : ins.days_early>0 ? {txt:'↗ เร็วกว่าแผน', c:'var(--success)'}
                 : {txt:'✓ ตรงแผน', c:'var(--success)'};
       _e('plan-status').textContent = _st.txt;
@@ -3604,6 +3606,11 @@ async function loadData(){
         w.style.color='var(--success)';
         w.style.background='rgba(43,196,138,.08)';
         w.style.borderColor='rgba(43,196,138,.2)';
+      } else if(_isOverdue){
+        w.textContent=`🚨 เกินกำหนดแล้ว ${ins.days_late} วัน — คาดเสร็จ ${finTH} (ต้องทำ ${ins.req_rate} อุปกรณ์/วัน)`;
+        w.style.color='var(--danger)';
+        w.style.background='rgba(239,68,68,.08)';
+        w.style.borderColor='rgba(239,68,68,.2)';
       } else if(ins.days_late>0){
         w.textContent=`⚠ ถ้าไม่เพิ่ม → เสร็จ ${finTH} — ช้ากว่าเป้า ${ins.days_late} วัน`;
         w.style.color='var(--danger)';
@@ -3630,14 +3637,17 @@ async function loadData(){
       if(lbl==='คาดเสร็จ'||lbl==='เสร็จสิ้น') el.textContent=finTH||'–';
       if(lbl==='วันเหลือ') el.textContent=_isDone?'✅':(ins.days_left||'–');
     });
-    document.querySelectorAll('.p-date .ip-lbl').forEach(el=>{ el.textContent=_isDone?'เสร็จสิ้น':'คาดเสร็จ'; });
-    document.querySelectorAll('.p-date .ip-icon').forEach(el=>{ el.textContent=_isDone?'🎉':'📅'; });
+    document.querySelectorAll('.p-date .ip-lbl').forEach(el=>{ el.textContent=_isDone?'เสร็จสิ้น':(_isOverdue?'คาดเสร็จ':'คาดเสร็จ'); });
+    document.querySelectorAll('.p-date .ip-icon').forEach(el=>{ el.textContent=_isDone?'🎉':(_isOverdue?'🚨':'📅'); });
     document.querySelectorAll('.ip-sub').forEach(el=>{
       const lbl=el.previousElementSibling?.textContent||el.parentElement?.querySelector('.ip-lbl')?.textContent||'';
       if(el.closest('.p-date')){
         if(_isDone){
           el.textContent='ก่อนกำหนด '+ins.days_early+' วัน';
           el.style.color='var(--success)';
+        } else if(_isOverdue){
+          el.textContent='ช้ากว่าแผน '+ins.days_late+' วัน';
+          el.style.color='var(--danger)';
         } else if(ins.days_late>0){
           el.textContent='ช้า '+ins.days_late+' วัน';
           el.style.color='var(--danger)';
