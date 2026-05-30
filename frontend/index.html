@@ -3577,29 +3577,43 @@ async function loadData(){
     if(_e('donut-ontime-pct'))_e('donut-ontime-pct').textContent= meta.on_time_pct+'%';
     if(_e('donut-ontime-sub'))_e('donut-ontime-sub').textContent= `${meta.on_time_qty}/${meta.installed}`;
 
-    // insight text — อัพเดทเสมอโดยไม่ check ข้อความเดิม
+    // insight text
     (()=>{
       if(_isDone){
         document.querySelectorAll('.ins-big em').forEach(em=>{em.textContent='🎉 งานเสร็จสิ้นแล้ว';em.style.color='var(--success)';em.style.fontSize='16px';});
+        document.querySelectorAll('.ins-pct-tag').forEach(t=>{t.textContent='ก่อนกำหนด '+ins.days_early+' วัน';t.style.color='var(--success)';t.style.background='var(--success-l)';});
+      } else if(_isOverdue){
+        document.querySelectorAll('.ins-big em').forEach(em=>{em.textContent=`🚨 เกินกำหนด ${ins.days_late} วัน — เหลืออีก ${meta.remaining} อุปกรณ์`;em.style.color='var(--danger)';em.style.fontSize='14px';});
+        document.querySelectorAll('.ins-pct-tag').forEach(t=>{t.textContent='คาดเสร็จ '+finTH;t.style.color='var(--warning)';t.style.background='var(--warning-l)';});
       } else {
         const nm=Number(ins.need_more);
         const col=nm<=0?'var(--success)':'var(--danger)';
         const txt=nm<=0?'เกินเป้า '+Math.abs(nm).toFixed(1)+' อุปกรณ์/วัน':'ต้องเพิ่ม '+nm.toFixed(1)+' อุปกรณ์/วัน';
         document.querySelectorAll('.ins-big em').forEach(em=>{em.textContent=txt;em.style.color=col;em.style.fontSize='';});
+        const pm=Number(ins.pct_more);
+        const col2=pm<=0?'var(--success)':'var(--danger)';
+        const txt2=pm<=0?'เกินเป้า '+Math.abs(pm)+'%':'ต้องเพิ่ม '+pm+'%';
+        document.querySelectorAll('.ins-pct-tag').forEach(t=>{t.textContent=txt2;t.style.color=col2;t.style.background='';});
       }
     })();
-    (()=>{
-      const pm=Number(ins.pct_more);
-      const col=pm<=0?'var(--success)':'#92400e';
-      const bg=pm<=0?'#f0fdf4':'#fff7ed';
-      const txt=pm<=0?'เกินเป้า '+Math.abs(pm)+'%':'ต้องเพิ่ม '+pm+'%';
-      document.querySelectorAll('.ins-pct-tag').forEach(t=>{
-        t.textContent=txt; t.style.color=col; t.style.background=bg;
-      });
-    })();
     const rv=document.querySelectorAll('.ins-rate-val');
-    if(rv[0]) rv[0].textContent=Number(ins.daily_rate).toFixed(1);
-    if(rv[1]) rv[1].textContent=ins.req_rate;
+    if(rv[0]) rv[0].textContent=_isOverdue ? meta.remaining+' อุปกรณ์' : Number(ins.daily_rate).toFixed(1);
+    if(rv[1]) rv[1].textContent=_isOverdue ? '@ '+Number(ins.daily_rate).toFixed(1)+'/วัน' : ins.req_rate;
+    // rate labels
+    const rl=document.querySelectorAll('.ins-rate-lbl');
+    const ra=document.querySelector('.ins-rate-arrow');
+    const ru=document.querySelector('.ins-rate-unit');
+    if(_isOverdue){
+      if(rl[0]) rl[0].textContent='เหลือ';
+      if(rl[1]) rl[1].textContent='อัตรา';
+      if(ra) ra.textContent='';
+      if(ru) ru.textContent='';
+    } else {
+      if(rl[0]) rl[0].textContent='ทำได้';
+      if(rl[1]) rl[1].textContent='ต้องทำ';
+      if(ra) ra.textContent='→';
+      if(ru) ru.textContent='อุปกรณ์/วัน';
+    }
     document.querySelectorAll('.ins-warn').forEach(w=>{
       if(_isDone){
         w.textContent=`🎉 งานเสร็จสิ้นแล้ว — เสร็จ ${finTH} ก่อนกำหนด ${ins.days_early} วัน`;
@@ -3624,11 +3638,38 @@ async function loadData(){
       }
     });
     const kv=document.querySelectorAll('.ins-kpi-val');
-    if(kv[0]) kv[0].textContent=_isDone?'✅':Number(ins.daily_rate).toFixed(1);
-    if(kv[1]) kv[1].textContent=_isDone?'–':ins.req_rate;
-    if(kv[2]){
-      if(_isDone){ kv[2].textContent='เสร็จสิ้น'; kv[2].style.color='var(--success)'; const u=kv[2].nextElementSibling; if(u){u.textContent='';u.style.color='var(--success)';} }
-      else { const nm2=Number(ins.need_more); const col2=nm2<=0?'var(--success)':'var(--danger)'; const txt2=nm2<=0?'เกินเป้า '+Math.abs(nm2).toFixed(1):'ต้องเพิ่ม '+nm2.toFixed(1); kv[2].textContent=txt2; kv[2].style.color=col2; const unit2=kv[2].nextElementSibling; if(unit2){unit2.textContent='/วัน';unit2.style.color=col2;} }
+    const kl=document.querySelectorAll('.ins-kpi-lbl');
+    const ku=document.querySelectorAll('.ins-kpi-unit');
+    const kt=document.querySelector('.ins-kpi-title');
+    if(_isDone){
+      if(kt) kt.textContent='สรุปโครงการ';
+      if(kl[0]) kl[0].textContent='อัตราติดตั้ง';
+      if(kl[1]) kl[1].innerHTML='วันที่เสร็จ';
+      if(kl[2]) kl[2].textContent='ก่อนกำหนด';
+      if(kv[0]) kv[0].textContent=Number(ins.daily_rate).toFixed(1); if(ku[0]) ku[0].textContent='/วัน';
+      if(kv[1]) kv[1].textContent=finTH; if(ku[1]) ku[1].textContent='';
+      if(kv[2]){ kv[2].textContent=ins.days_early+' วัน'; kv[2].style.color='var(--success)'; if(ku[2]) ku[2].textContent=''; }
+    } else if(_isOverdue){
+      if(kt) kt.textContent='สถานการณ์ปัจจุบัน';
+      if(kl[0]) kl[0].textContent='อัตราติดตั้ง/วัน';
+      if(kl[1]) kl[1].innerHTML='คาดเสร็จ';
+      if(kl[2]) kl[2].textContent='เกินกำหนดแล้ว';
+      if(kv[0]) kv[0].textContent=Number(ins.daily_rate).toFixed(1); if(ku[0]) ku[0].textContent='/วัน';
+      if(kv[1]) kv[1].textContent=finTH; if(ku[1]) ku[1].textContent='';
+      if(kv[2]){ kv[2].textContent=ins.days_late+' วัน'; kv[2].style.color='var(--danger)'; if(ku[2]){ ku[2].textContent=''; ku[2].style.color='var(--danger)'; } }
+    } else {
+      if(kt) kt.textContent='ประสิทธิภาพ';
+      if(kl[0]) kl[0].textContent='ทำได้จริง';
+      if(kl[1]) kl[1].innerHTML='เป้าหมาย<br><span style="font-size:9px;font-weight:400;opacity:.65">ถึง deadline เดิม</span>';
+      if(kl[2]) kl[2].textContent='ส่วนต่าง (vs deadline)';
+      if(kv[0]) kv[0].textContent=Number(ins.daily_rate).toFixed(1); if(ku[0]) ku[0].textContent='/วัน';
+      if(kv[1]) kv[1].textContent=ins.req_rate; if(ku[1]) ku[1].textContent='/วัน';
+      if(kv[2]){
+        const nm2=Number(ins.need_more); const col2=nm2<=0?'var(--success)':'var(--danger)';
+        const txt2=nm2<=0?'เกินเป้า '+Math.abs(nm2).toFixed(1):'ต้องเพิ่ม '+nm2.toFixed(1);
+        kv[2].textContent=txt2; kv[2].style.color=col2;
+        if(ku[2]){ ku[2].textContent='/วัน'; ku[2].style.color=col2; }
+      }
     }
 
     // pills คาดเสร็จ / วันเหลือ
