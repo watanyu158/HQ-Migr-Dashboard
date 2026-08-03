@@ -91,7 +91,7 @@ function parseData() {
   for (let i=2; i<hqRows.length; i++) {
     const r=hqRows[i]; if(!r) continue;
     const qty = typeof r[6]==='number' ? r[6] : 0;
-    const cat = r[18] ? String(r[18]).trim() : '';
+    const cat = r[17] ? String(r[17]).trim() : '';
     if (qty>0 && ['Switch','Infra'].includes(cat)) TOTAL += qty;
   }
   // เพิ่ม AP total จาก HQ-WL (คำนวณทีหลัง จะ += apTotal)
@@ -113,7 +113,7 @@ function parseData() {
   for (let i = 2; i < hqRows.length; i++) {
     const r = hqRows[i]; if (!r) continue;
     const _qty = typeof r[6]==='number' ? r[6] : 0;
-    const _mig = typeof r[15]==='number' ? Math.round(r[15]) : 0;
+    const _mig = typeof r[14]==='number' ? Math.round(r[14]) : 0;
     if (_qty <= 0) continue;
     _preTotal += _qty; _preInstalled += _mig;
     const _instStr = r[20] ? toDate(r[20])?.toISOString().slice(0,10) : (r[19] ? toDate(r[19])?.toISOString().slice(0,10) : null);
@@ -142,7 +142,7 @@ function parseData() {
     const schedStr= isoDate(schedDt);
 
     // Category จาก column S (index 18) — Switch/AP/Infra
-    let cat = r[18] ? String(r[18]).trim() : 'Infra';
+    let cat = r[17] ? String(r[17]).trim() : 'Infra';
     if (!['Switch','AP','Infra'].includes(cat)) cat = 'Infra';
 
     if (!device || !curSite || qty <= 0) continue;
@@ -180,7 +180,7 @@ function parseData() {
     }
 
     // นับจาก Migration column (index 15) — เฉพาะ SW และ Infra
-    const migration = typeof r[15]==='number' ? Math.round(r[15]) : 0;
+    const migration = typeof r[14]==='number' ? Math.round(r[14]) : 0;
     if (migration > 0 && cat !== 'AP') {
       installed += migration;
       siteMap[site].done += migration;
@@ -257,8 +257,8 @@ function parseData() {
     if (r[0]) _curSite = String(r[0]).trim();
     if (_curSite && _curSite.startsWith('%')) { _curSite = null; continue; }
     const qty = typeof r[6]==='number' ? r[6] : 0;
-    const mig = typeof r[15]==='number' ? Math.round(r[15]) : 0;
-    const cat = r[18] ? String(r[18]).trim() : '';
+    const mig = typeof r[14]==='number' ? Math.round(r[14]) : 0;
+    const cat = r[17] ? String(r[17]).trim() : '';
     if (qty<=0 || !_curSite || !['Switch','Infra'].includes(cat)) continue;
     const site = _curSite; // ไม่ truncate เพื่อให้ตรงกับ fab key
     if (!swInfSiteMap[site]) swInfSiteMap[site]={sw_t:0,sw_d:0,inf_t:0,inf_d:0};
@@ -360,7 +360,7 @@ function parseData() {
   for (let i=2; i<hqRows.length; i++) {
     const r=hqRows[i]; if(!r||!r.length) continue;
     const qty = typeof r[6]==='number' ? r[6] : 0;
-    const cat = r[18] ? String(r[18]).trim() : '';
+    const cat = r[17] ? String(r[17]).trim() : '';
     if (cat==='Switch') swTotal+=qty;
     else if (cat==='Infra') infTotal+=qty;
   }
@@ -547,7 +547,7 @@ function parseData() {
         if (qty<=0 || qty > 500) continue; // skip summary/aggregate rows
         if (typeof r[1] !== 'string') continue; // skip rows ที่ B ไม่ใช่ string (เช่น ตัวเลข)
         const room = r[1].trim() || '(ไม่ระบุห้อง)';
-        const mig  = typeof r[15]==='number' ? Math.round(r[15]) : 0;
+        const mig  = typeof r[14]==='number' ? Math.round(r[14]) : 0;
         if (!locMap[locSite]) locMap[locSite]={};
         if (!locMap[locSite][room]) locMap[locSite][room]={t:0,d:0};
         locMap[locSite][room].t += qty;
